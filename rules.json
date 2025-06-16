@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Eat when hungry",
+    "condition": "agent.hunger > 70",
+    "action": "EAT",
+    "weight": 1.2
+  },
+  {
+    "name": "Rest when tired",
+    "condition": "agent.energy < 30",
+    "action": "REST",
+    "weight": 1.0
+  },
+  {
+    "name": "Explore if curious",
+    "condition": "agent.character.explore_willingness > 0.5",
+    "action": "MOVE",
+    "weight": 0.8
+  }
+]
