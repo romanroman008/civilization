@@ -1,35 +1,50 @@
 import math
 
-import noise
 import numpy as np
-import matplotlib.pyplot as plt
-from noise import pnoise2
+
 from opensimplex import OpenSimplex
+
+from tools.Utils import normalize, normalize_layered_noise
+from world.biome.BiomeClassifier import BiomeClassifier
 
 
 class WorldGenerator:
 
-    def __init__(self, logger):
+    def __init__(self, logger, biome_class:BiomeClassifier):
         self.logger = logger
+
+        self.biome_class = biome_class
+
         self.layers = [
             {"frequency": 1.0, "amplitude": 1.0},
             {"frequency": 2.0, "amplitude": 0.5},
             {"frequency": 4.0, "amplitude": 0.25},
         ]
-        self.elevation_seed = 999
+        self.height = 1
+        self.width = 1
+
+        self.elevation_seed = 43
+        self.elevation_noise = None
+
         self.moisture_noise_seed = 29
+        self.moisture_noise = None
+
         self.elevation_power = 1.5
         self.scale = 75.0
-        self.elevation_noise = None
-        self.moisture_noise = None
+
+
+
 
 
     def generate_map(self, width, height):
-        self.elevation_noise = OpenSimplex(self.elevation_seed)
+        self.elevation_noise = OpenSimplex(self .elevation_seed)
         self.moisture_noise = OpenSimplex(self.moisture_noise_seed)
+        self.height = height
+        self.width = width
 
         world = np.zeros((height, width, 3), dtype=np.float32)
-        self.logger.info("Generating heightmap ...")
+        biome_map = np.empty((height, width), dtype = object)
+        self.logger.info("Generating world ...")
 
 
         for y in range(height):
@@ -43,15 +58,23 @@ class WorldGenerator:
 
                 elevation = self._generate_elevation(elevation_init, amplitudes_sum, nx, ny)
                 moisture = self._generate_moisture(moisture_init, amplitudes_sum, nx, ny)
-                temperature = 1
+                temperature = self._generate_temperature(y)
+                biome =  self.biome_class.classify(self.__normalize_latitude(y), temperature, elevation, moisture)
 
                 world[y][x][0] = elevation
                 world[y][x][1] = temperature
                 world[y][x][2] = moisture
 
+                biome_map[y][x] = biome
 
-        self.logger.info("Finished generating heightmap")
-        return world
+
+
+
+
+
+
+        self.logger.info("Finished generating world")
+        return world, biome_map
 
 
 
@@ -59,23 +82,34 @@ class WorldGenerator:
         for layer in self.layers:
             elevation += layer["amplitude"] * self.elevation_noise.noise2(layer["frequency"] * nx, layer["frequency"] * ny)
             amplitudes_sum += layer["amplitude"]
-        elevation = self._normalize_elevation(elevation, amplitudes_sum)
+        elevation = normalize_layered_noise(elevation, amplitudes_sum)
         return math.pow(elevation, self.elevation_power)
-
-
 
 
     def _generate_moisture(self, moisture, amplitudes_sum, nx, ny):
         for layer in self.layers:
             moisture += layer["amplitude"] * self.moisture_noise.noise2(layer["frequency"] * nx, layer["frequency"] * ny)
             amplitudes_sum += layer["amplitude"]
-        return self._normalize_elevation(moisture, amplitudes_sum)
+        return normalize_layered_noise(moisture, amplitudes_sum)
+
+
+    def _generate_temperature(self, y):
+        temperature = abs(y - self.height / 2)
+        temperature = normalize(temperature, 0, self.height / 2)
+        return 1.0 - temperature
+
+    def __normalize_latitude(self, y: int) -> float:
+        center = self.height / 2
+        distance_from_equator = abs(y - center)
+        return distance_from_equator / center
 
 
 
 
 
 
-    def _normalize_elevation(self, value, amplitudes_sum):
-        value = value/amplitudes_sum
-        return (value + 1) / 2
+
+
+
+
+

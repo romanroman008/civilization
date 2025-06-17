@@ -1,0 +1,237 @@
+[
+  {
+    "id": "ARCTIC",
+    "name": "Arctic zone",
+    "color": [
+      230,
+      240,
+      255
+    ],
+    "latitude_min": 0.73,
+    "latitude_max": 1.0,
+    "temperature_min": 0.207,
+    "temperature_max": 0.621,
+    "elevation_min": 0.55,
+    "elevation_max": 0.75,
+    "moisture_min": 0.4,
+    "moisture_max": 0.8
+  },
+  {
+    "id": "TUNDRA",
+    "name": "Tundra",
+    "color": [
+      200,
+      220,
+      220
+    ],
+    "latitude_min": 0.67,
+    "latitude_max": 0.83,
+    "temperature_min": 0.483,
+    "temperature_max": 0.69,
+    "elevation_min": 0.55,
+    "elevation_max": 0.625,
+    "moisture_min": 0.5,
+    "moisture_max": 0.9
+  },
+  {
+    "id": "TAIGA",
+    "name": "Taiga (boreal forest)",
+    "color": [
+      34,
+      85,
+      60
+    ],
+    "latitude_min": 0.5,
+    "latitude_max": 0.72,
+    "temperature_min": 0.552,
+    "temperature_max": 0.759,
+    "elevation_min": 0.55,
+    "elevation_max": 0.65,
+    "moisture_min": 0.5,
+    "moisture_max": 0.8
+  },
+  {
+    "id": "FOREST_DEC",
+    "name": "Deciduous forest",
+    "color": [
+      80,
+      160,
+      90
+    ],
+    "latitude_min": 0.39,
+    "latitude_max": 0.61,
+    "temperature_min": 0.621,
+    "temperature_max": 0.793,
+    "elevation_min": 0.55,
+    "elevation_max": 0.625,
+    "moisture_min": 0.6,
+    "moisture_max": 0.85
+  },
+  {
+    "id": "FOREST_TRP",
+    "name": "Tropical rainforest",
+    "color": [
+      20,
+      120,
+      20
+    ],
+    "latitude_min": 0.0,
+    "latitude_max": 0.17,
+    "temperature_min": 0.793,
+    "temperature_max": 0.862,
+    "elevation_min": 0.55,
+    "elevation_max": 0.6,
+    "moisture_min": 0.8,
+    "moisture_max": 1.0
+  },
+  {
+    "id": "SAVANNA",
+    "name": "Savanna",
+    "color": [
+      220,
+      200,
+      100
+    ],
+    "latitude_min": 0.06,
+    "latitude_max": 0.28,
+    "temperature_min": 0.759,
+    "temperature_max": 0.862,
+    "elevation_min": 0.55,
+    "elevation_max": 0.625,
+    "moisture_min": 0.3,
+    "moisture_max": 0.6
+  },
+  {
+    "id": "STEPPE",
+    "name": "Steppe",
+    "color": [
+      190,
+      180,
+      90
+    ],
+    "latitude_min": 0.33,
+    "latitude_max": 0.56,
+    "temperature_min": 0.69,
+    "temperature_max": 0.828,
+    "elevation_min": 0.56,
+    "elevation_max": 0.64,
+    "moisture_min": 0.3,
+    "moisture_max": 0.6
+  },
+  {
+    "id": "DESERT_HOT",
+    "name": "Hot desert",
+    "color": [
+      240,
+      210,
+      130
+    ],
+    "latitude_min": 0.17,
+    "latitude_max": 0.33,
+    "temperature_min": 0.828,
+    "temperature_max": 0.966,
+    "elevation_min": 0.545,
+    "elevation_max": 0.59,
+    "moisture_min": 0.05,
+    "moisture_max": 0.2
+  },
+  {
+    "id": "DESERT_CLD",
+    "name": "Cold desert",
+    "color": [
+      200,
+      180,
+      170
+    ],
+    "latitude_min": 0.44,
+    "latitude_max": 0.67,
+    "temperature_min": 0.483,
+    "temperature_max": 0.69,
+    "elevation_min": 0.575,
+    "elevation_max": 0.7,
+    "moisture_min": 0.1,
+    "moisture_max": 0.4
+  },
+  {
+    "id": "MOUNTAINS",
+    "name": "High mountains",
+    "color": [
+      120,
+      120,
+      120
+    ],
+    "latitude_min": 0.0,
+    "latitude_max": 0.67,
+    "temperature_min": 0.552,
+    "temperature_max": 0.724,
+    "elevation_min": 0.625,
+    "elevation_max": 0.95,
+    "moisture_min": 0.2,
+    "moisture_max": 0.9
+  },
+  {
+    "id": "MED_ZONE",
+    "name": "Mediterranean zone",
+    "color": [
+      180,
+      160,
+      100
+    ],
+    "latitude_min": 0.33,
+    "latitude_max": 0.5,
+    "temperature_min": 0.69,
+    "temperature_max": 0.828,
+    "elevation_min": 0.55,
+    "elevation_max": 0.595,
+    "moisture_min": 0.4,
+    "moisture_max": 0.7
+  },
+  {
+    "id": "OCEAN",
+    "name": "Oceans",
+    "color": [
+      50,
+      100,
+      200
+    ],
+    "latitude_min": 0.0,
+    "latitude_max": 1.0,
+    "temperature_min": 0.607,
+    "temperature_max": 0.828,
+    "elevation_min": 0.0,
+    "elevation_max": 0.55,
+    "moisture_min": 0.95,
+    "moisture_max": 1.0
+  },
+  {
+    "id": "LAKES",
+    "name": "Continental water bodies",
+    "color": [
+      100,
+      150,
+      230
+    ],
+    "latitude_min": 0.0,
+    "latitude_max": 0.83,
+    "temperature_min": 0.621,
+    "temperature_max": 0.862,
+    "elevation_min": 0.53,
+    "elevation_max": 0.8,
+    "moisture_min": 0.7,
+    "moisture_max": 1.0
+  },
+  {
+  "id": "UNKNOWN",
+  "name": "Unknown",
+  "elevation_min": 0.0,
+  "elevation_max": 1.0,
+  "temperature_min": 0.0,
+  "temperature_max": 1.0,
+  "moisture_min": 0.0,
+  "moisture_max": 1.0,
+  "latitude_min": 0.0,
+  "latitude_max": 1.0,
+  "color": [255, 255, 255]
+}
+
+]
