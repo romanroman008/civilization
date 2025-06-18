@@ -7,6 +7,7 @@ from world.Visualisation import show_layer, visualize_biome_map
 from world.WorldGenerator import  WorldGenerator
 from world.biome.Biome import Biome
 from world.biome.BiomeClassifier import BiomeClassifier
+from world.biome.BiomeRepository import BiomeRepository
 from world.layers.WorldLayer import WorldLayer
 
 
@@ -14,8 +15,9 @@ def main():
     logger = get_logger("civilization.world", level="DEBUG")
 
 
-    biome_list = Biome.load_from_json(get_data_path("biomes.json"))
-    biome_classifier = BiomeClassifier(biome_list)
+    biome_repository = BiomeRepository.from_json(get_data_path("biomes.json"))
+    biome_list = biome_repository.get_all()
+    biome_classifier = BiomeClassifier(biome_repository)
     worldGenerator = WorldGenerator(logger, biome_classifier)
     world,biome_map = worldGenerator.generate_map(200,200)
 

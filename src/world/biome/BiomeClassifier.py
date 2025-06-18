@@ -1,42 +1,34 @@
-from typing import Optional, List
 from world.biome.Biome import Biome
+from world.biome.BiomeRepository import BiomeRepository
 
 
 class BiomeClassifier:
-    def __init__(self, biomes: List[Biome]):
-        self.biomes = biomes
-        self.fallback_biome = next((b for b in self.biomes if b.id == "UNKNOWN"), None)
+    def __init__(self, biome_repository: BiomeRepository):
+        self.biome_repository = biome_repository
 
-    def classify(
-        self,
-        latitude: float,
-        temperature: float,
-        elevation: float,
-        moisture: float
-    ) -> Optional[Biome]:
-        candidates = []
+    def classify(self, latitude: float, temperature: float, elevation: float, moisture: float) -> Biome:
+        # Krok 1 – Ocean
+        if elevation <= self.biome_repository.get_ocean_level():
+            return self.biome_repository.get_biomes_by_id([self.biome_repository.ID_OCEAN])[0]
 
-        for biome in self.biomes:
-            if (
-                biome.temperature_min <= temperature <= biome.temperature_max and
-                biome.elevation_min <= elevation <= biome.elevation_max and
-                biome.moisture_min <= moisture <= biome.moisture_max
-            ):
-                # Jeśli latitude_min/latitude_max są dostępne w Biome, dodaj to:
-                if hasattr(biome, "latitude_min") and hasattr(biome, "latitude_max"):
-                    if not (biome.latitude_min <= latitude <= biome.latitude_max):
-                        continue
-                candidates.append(biome)
+        # Krok 2 – Dopasuj lądowe biomy wg podstawowych zakresów
+        candidates = self.biome_repository.find_biomes(
+            lambda b: (
+                b.latitude_min <= latitude <= b.latitude_max and
+                b.temperature_min <= temperature <= b.temperature_max and
+                b.elevation_min <= elevation <= b.elevation_max
+            )
+        )
 
         if not candidates:
-            return self.fallback_biome  # lub Unknown
+            return self.biome_repository.get_fallback_biome()
 
-        # Najlepiej dopasowany biom = najbardziej "specyficzny" (najwęższe zakresy)
+        # Wybierz najbardziej specyficzny biom (najwęższy zakres)
         def specificity(b: Biome) -> float:
             return (
-                (b.elevation_max - b.elevation_min) +
+                (b.latitude_max - b.latitude_min) +
                 (b.temperature_max - b.temperature_min) +
-                (b.moisture_max - b.moisture_min)
+                (b.elevation_max - b.elevation_min)
             )
 
         return min(candidates, key=specificity)

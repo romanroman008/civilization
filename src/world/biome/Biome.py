@@ -17,14 +17,4 @@ class Biome:
     moisture_max:float
     color: Tuple[int, int, int] = (255, 255, 255)
 
-    @staticmethod
-    def load_from_json(path: str) -> List["Biome"]:
-        with open(path, "r") as f:
-            raw = json.load(f)
-        biomes = []
-        for b in raw:
-            b["color"] = tuple(b.get("color", [0, 0, 0]))
-            biomes.append(Biome(**b))
-        return biomes
-
 

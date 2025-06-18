@@ -30,7 +30,7 @@ class WorldGenerator:
         self.moisture_noise = None
 
         self.elevation_power = 1.5
-        self.scale = 75.0
+        self.scale = 75
 
 
 
@@ -66,10 +66,6 @@ class WorldGenerator:
                 world[y][x][2] = moisture
 
                 biome_map[y][x] = biome
-
-
-
-
 
 
 

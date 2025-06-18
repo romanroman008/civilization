@@ -1,0 +1,32 @@
+[
+  {
+    "id": "EQUATORIAL",
+    "latitude_min": 0.00,
+    "latitude_max": 0.17
+  },
+  {
+    "id": "SUBTROPICAL",
+    "latitude_min": 0.17,
+    "latitude_max": 0.25
+  },
+  {
+    "id": "TROPICAL",
+    "latitude_min": 0.25,
+    "latitude_max": 0.33
+  },
+  {
+    "id": "TEMPERATE",
+    "latitude_min": 0.33,
+    "latitude_max": 0.67
+  },
+  {
+    "id": "SUBPOLAR",
+    "latitude_min": 0.67,
+    "latitude_max": 0.73
+  },
+  {
+    "id": "POLAR",
+    "latitude_min": 0.73,
+    "latitude_max": 1.00
+  }
+]

@@ -5,11 +5,15 @@ from matplotlib.patches import Patch
 from world.layers.WorldLayer import WorldLayer
 
 
-def show_layer(layer:WorldLayer):
-    plt.imshow(layer.values, cmap=layer.cmap)
+def show_layer(layer: WorldLayer):
+    cmap, norm = layer.get_colormap_and_norm()
+    plt.imshow(layer.denormalized(), cmap=cmap, norm=norm)
     plt.colorbar(label=layer.label)
     plt.title(layer.name)
+    plt.axis("off")
     plt.show()
+
+
 
 
 def visualize_biome_map(biome_map, biome_list):
@@ -19,7 +23,7 @@ def visualize_biome_map(biome_map, biome_list):
     for y in range(height):
         for x in range(width):
             biome = biome_map[y][x]
-            image[y, x] = biome.color if biome else (255, 255, 255)  # fallback: biały
+            image[y, x] = biome.color if biome else (255, 255, 255)
 
 
     unique_biomes = {b.id: b for b in biome_list}
