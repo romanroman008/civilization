@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-from world.visualization.layers.WorldLayer import WorldLayer
+from visualization.layers.WorldLayer import WorldLayer
 
 
 def show_layer(layer: WorldLayer):

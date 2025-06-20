@@ -31,7 +31,7 @@ class WorldLayer:
             "Height": {
                 "cmap": "terrain",
                 "label": "Elevation (m)",
-                "range": (-3000, 9000),
+                "range": (0, 100),
                 "colormap_fn": terrain_colormap_with_water
             },
             "Temperature": {
