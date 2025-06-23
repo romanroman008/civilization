@@ -13,11 +13,8 @@ TILE_COLORS = {
 TILE_COLORS_RGB = {
 
     1: (59, 131, 189),   # WATER
-    2: (53, 94, 59),     # DARK_GRASS
-    3: (76, 175, 80),    # GRASS
-    4: (139, 195, 74),   # LIGHT_GRASS
-    5: (244, 225, 156),  # SAND
-    6: (139, 140, 122),  # MOUNTAIN
+    2: (76, 175, 80)  # GRASS
+
 }
 
 class TilePresenter:
@@ -29,6 +26,6 @@ class TilePresenter:
 
 
     def present(self, tile: Tile) -> TileView:
-        color = self._biome_colors[tile.biome.value]
+        color = self._biome_colors[tile.terrain.value]
         return TileView(tile.tile_id, color)
 

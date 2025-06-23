@@ -11,4 +11,8 @@ pillow==11.2.1
 pygame==2.6.1
 pyparsing==3.2.3
 python-dateutil==2.9.0.post0
+shapely==2.1.1
 six==1.17.0
+
+SQLAlchemy~=2.0.41
+tqdm~=4.67.1

@@ -2,7 +2,7 @@ from typing import List
 
 from opensimplex import OpenSimplex
 
-from tools.Utils import normalize_layered_noise
+
 from world.generators.noise.NoiseGenerator import NoiseGenerator
 from world.generators.noise.Octave import Octave
 
@@ -20,7 +20,7 @@ class OpenSimplexNoiseGenerator(NoiseGenerator):
         for octave in self.__octaves:
             noise_val += octave.amplitude * self.__noise.noise2(x * octave.frequency, y * octave.frequency)
             amplitudes_sum += octave.amplitude
-        return normalize_layered_noise(noise_val, amplitudes_sum)
+        return self.normalize_layered_noise(noise_val, amplitudes_sum)
 
 
     def set_octaves(self, octaves: List[Octave]) -> None:

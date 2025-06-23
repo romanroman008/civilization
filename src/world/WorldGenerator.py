@@ -1,17 +1,17 @@
 
 import numpy as np
+from tqdm import tqdm
 
-from world.climate.ClimateClassifier import ClimateClassifier
 from world.generators.ElevationGenerator import ElevationGenerator
 
 
 
 class WorldGenerator:
 
-    def __init__(self, logger, elevation_generator: ElevationGenerator, climate_classifier: ClimateClassifier):
+    def __init__(self, logger, elevation_generator: ElevationGenerator):
         self.logger = logger
         self.elevation_generator = elevation_generator
-        self.climate_classifier = climate_classifier
+
 
         self.height = 100
         self.width = 100
@@ -24,16 +24,20 @@ class WorldGenerator:
         self.width = width
         self.scale = scale
 
-        self.logger.info("Generating world ...")
+        self.logger.info("Generating world started ...")
         world = np.zeros((height, width), dtype=np.float32)
 
-        for y in range(height):
-            for x in range(width):
 
+        for y in tqdm(range(height), desc="Generating world"):
+            for x in range(width):
                 nx = x / self.scale
                 ny = y / self.scale
-
                 world[y][x] = self.elevation_generator.generate_elevation(nx, ny)
+
+
+
+
+
 
 
         self.logger.info("Finished generating world")

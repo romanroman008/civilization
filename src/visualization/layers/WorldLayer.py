@@ -4,7 +4,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.colors import Colormap, Normalize
 
-from tools.Utils import terrain_colormap_with_water
+
 
 
 @dataclass
@@ -60,3 +60,14 @@ class WorldLayer:
             original_range=config["range"],
             colormap_fn=config["colormap_fn"]
         )
+
+def terrain_colormap_with_water():
+    from matplotlib.colors import ListedColormap, BoundaryNorm
+    boundaries = [0, 20, 100]
+    colors = [
+        "#3b83bd",  # woda
+        "#4CAF50",  # średnia zieleń
+    ]
+    cmap = ListedColormap(colors)
+    norm = BoundaryNorm(boundaries, len(colors))
+    return cmap, norm

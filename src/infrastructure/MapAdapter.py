@@ -1,6 +1,6 @@
 import numpy as np
 
-from infrastructure.Biome import Biome
+from infrastructure.Terrain import Terrain
 from infrastructure.Tile import Tile
 
 
@@ -11,24 +11,16 @@ class MapAdapter:
 
     def get_tile(self, x, y) -> Tile:
         tile_id = self.get_id(x, y)
-        elevation = self._world_map[y][x]
         biome = self.match_biome(x,y)
 
-        return Tile(tile_id, x, y, biome, elevation)
+        return Tile(tile_id, x, y, biome)
 
-    def match_biome(self, x, y) -> Biome:
+    def match_biome(self, x, y) -> Terrain:
         val = self._world_map[y, x]
-        if val < 0.16:
-            return Biome.WATER
-        elif val < 0.32:
-            return Biome.DARK_GRASS
-        elif val < 0.48:
-            return Biome.GRASS
-        elif val < 0.64:
-            return Biome.LIGHT_GRASS
-        elif val < 0.80:
-            return Biome.SAND
-        return Biome.MOUNTAIN
+        if val < 0.20:
+            return Terrain.WATER
+        return Terrain.GRASS
+
 
     def generate_ids(self) -> np.ndarray:
         h, w = self._world_map.shape

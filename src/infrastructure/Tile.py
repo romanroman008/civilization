@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 
-from infrastructure.Biome import Biome
+from infrastructure.Terrain import Terrain
 
 
 @dataclass
@@ -8,7 +8,5 @@ class Tile:
     tile_id: int
     x: int
     y: int
-    biome: Biome
-    elevation: float
-
+    terrain: Terrain
 
