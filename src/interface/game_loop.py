@@ -1,6 +1,6 @@
 import pygame
 
-from domain.world.services.tile_service import TileService
+from domain.world.services.world_service import WorldService
 from infrastructure.rendering.camera import Camera
 from infrastructure.rendering.tile_presenter import TilePresenter
 from infrastructure.rendering.world_renderer import WorldRenderer
@@ -15,9 +15,9 @@ def run_game(world):
     pygame.display.set_caption("Civilization")
 
     tile_presenter = TilePresenter()
-    map_adapter = TileService(world)
+
     camera = Camera(0,0,CONFIG["screen_width"],CONFIG["screen_height"], CONFIG["map_height"], CONFIG["map_height"])
-    world_renderer = WorldRenderer(screen,map_adapter,tile_presenter)
+    world_renderer = WorldRenderer(screen,world,tile_presenter)
 
     clock = pygame.time.Clock()
     running = True
@@ -30,7 +30,7 @@ def run_game(world):
 
         keyboard = Keyboard()
         dx, dy = keyboard.get_movement()
-        camera.move(dx, dy)
+        camera.move(5*dx,5*dy)
 
 
 

@@ -5,7 +5,7 @@ from domain.world.entieties.terrain import Terrain
 
 @dataclass
 class Tile:
-    tile_id: int
+    id: int
     x: int
     y: int
     terrain: Terrain

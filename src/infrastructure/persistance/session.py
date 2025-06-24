@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
 
-DATABASE_URL = "postgresql+psycopg2://user:password@localhost:5432/civilization"
+DATABASE_URL = "postgresql+psycopg2://civilian:civilian@localhost:5432/civilization"
 
 
 engine = create_engine(DATABASE_URL, echo=True)

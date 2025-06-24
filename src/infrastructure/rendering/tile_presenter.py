@@ -1,3 +1,4 @@
+from domain.world.entieties.terrain import Terrain
 from domain.world.entieties.tile import Tile
 from infrastructure.rendering.tile_view import TileView
 
@@ -12,8 +13,8 @@ TILE_COLORS = {
 
 TILE_COLORS_RGB = {
 
-    1: (59, 131, 189),   # WATER
-    2: (76, 175, 80)  # GRASS
+    Terrain.WATER: (59, 131, 189),   # WATER
+    Terrain.GRASS: (76, 175, 80)  # GRASS
 
 }
 
@@ -27,5 +28,5 @@ class TilePresenter:
 
     def present(self, tile: Tile) -> TileView:
         color = self._biome_colors[tile.terrain.value]
-        return TileView(tile.tile_id, color)
+        return TileView(tile.id, color)
 
