@@ -8,5 +8,6 @@ class Tile:
     id: int
     x: int
     y: int
+    isOccupied: bool
     terrain: Terrain
 

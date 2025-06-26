@@ -18,7 +18,7 @@ def create_world_service(world_generator:WorldGenerator):
 
 
 def init_db():
-    Base.metadata.drop_all(bind=engine)
+    #Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
 
 def main():
@@ -36,11 +36,11 @@ def main():
     world = None
 
     try:
-        world = world_service.get_world_by_name("Dupa")
+        world = world_service.get_world_by_name("WW")
         logger.info(f"World {world.name} already exists")
     except ValueError:
         world = world_service.create_new_world(CONFIG["map_width"], CONFIG["map_height"], CONFIG["scale"])
-        world.name = "Dupa"
+        world.name = "WW"
         world_service.save_world(world)
         logger.info(f"World {world.name} created")
 

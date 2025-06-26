@@ -1,6 +1,6 @@
 import pygame
 
-from domain.world.entieties.world import WorldMap
+from domain.world.entieties.world_map import WorldMap
 from domain.world.services.world_service import WorldService
 
 from infrastructure.rendering.tile_presenter import TilePresenter

@@ -2,16 +2,24 @@ import numpy as np
 from tqdm import tqdm
 
 from domain.world.entieties.tile import Tile
-from domain.world.entieties.world import WorldMap
+from domain.world.entieties.world_map import WorldMap
+from domain.world.services.generators import plants_generator
 from domain.world.services.generators.elevation_generator import ElevationGenerator
+from domain.world.services.generators.plants_generator import PlantsGenerator
 from domain.world.services.tile_adapter import TileAdapter
 
 
 class WorldGenerator:
 
-    def __init__(self, logger, elevation_generator: ElevationGenerator):
+    def __init__(self,
+                 logger,
+                 elevation_generator: ElevationGenerator,
+                 plants_generator:PlantsGenerator):
+
         self.logger = logger
+
         self.elevation_generator = elevation_generator
+        self.plants_generator = plants_generator
 
         self.height = 100
         self.width = 100
@@ -21,6 +29,7 @@ class WorldGenerator:
         world_array = self._generate_map_array(width, height, scale)
         tiles: list[Tile] = TileAdapter.to_tiles(world_array)
         world = WorldMap("Brave new world", width, height, tiles)
+        world = self._generate_plants(world)
 
         return world
 
@@ -41,6 +50,12 @@ class WorldGenerator:
 
         self.logger.info("Finished generating world")
 
+        return world
+
+    def _generate_plants(self, world: WorldMap) -> WorldMap:
+        self.logger.info("Generating plants started ...")
+        world = self.plants_generator.generate_plants(world)
+        self.logger.info("Finished generating plants")
         return world
 
     def __normalize_latitude(self, y: int) -> float:

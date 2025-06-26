@@ -1,9 +1,10 @@
 import numpy as np
 from sqlalchemy import select
 
+from domain.world.entieties.position import Position
 from domain.world.entieties.terrain import Terrain
 from domain.world.entieties.tile import Tile
-from domain.world.entieties.world import WorldMap
+from domain.world.entieties.world_map import WorldMap
 from domain.world.services import tile_adapter
 from domain.world.services.generators.world_generator import WorldGenerator
 from domain.world.services.tile_adapter import TileAdapter
@@ -67,7 +68,6 @@ class WorldService:
 
     def _tile_to_db(self, tile:Tile) -> TileDB:
         return TileDB(
-                    id=tile.id,
                     x=tile.x,
                     y=tile.y,
                     terrain=tile.terrain

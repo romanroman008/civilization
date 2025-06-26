@@ -14,8 +14,8 @@ class WorldDB(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String, unique=True, nullable=False)
-    width: Mapped[int] = mapped_column(String, unique=True, nullable=False)
-    height: Mapped[int] = mapped_column(String, unique=True, nullable=False)
+    width: Mapped[int] = mapped_column(String, unique=False, nullable=False)
+    height: Mapped[int] = mapped_column(String, unique=False, nullable=False)
 
     tiles: Mapped[List["TileDB"]] = relationship(
         back_populates="world",
