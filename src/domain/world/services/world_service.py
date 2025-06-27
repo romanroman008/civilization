@@ -58,7 +58,7 @@ class WorldService:
 
 
     def _db_to_tile(self, tile_db:TileDB) -> Tile:
-        return Tile(tile_db.id, tile_db.x,  tile_db.y, Terrain(tile_db.terrain))
+        return Tile(tile_db.id, tile_db.x,  tile_db.y, False, Terrain(tile_db.terrain))
 
     def _db_to_tiles(self, tiles_db: list[TileDB]) -> list[Tile]:
         return [self._db_to_tile(db) for db in tiles_db]

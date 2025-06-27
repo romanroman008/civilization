@@ -5,3 +5,5 @@ def get_project_root() -> Path:
 
 def get_data_path(filename: str) -> Path:
     return get_project_root() / "data" / filename
+
+

@@ -14,7 +14,8 @@ class WorldGenerator:
     def __init__(self,
                  logger,
                  elevation_generator: ElevationGenerator,
-                 plants_generator:PlantsGenerator):
+                 plants_generator: PlantsGenerator,
+                 ):
 
         self.logger = logger
 

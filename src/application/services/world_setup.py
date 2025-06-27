@@ -1,6 +1,7 @@
 from logging import Logger
 
 from domain.world.services.generators.elevation_generator import ElevationGenerator
+from domain.world.services.generators.plants_generator import PlantsGenerator
 from domain.world.services.generators.world_generator import WorldGenerator
 from domain.world.services.generators.noise.noise_generator import NoiseGenerator
 from domain.world.services.generators.noise.open_simplex_noise_generator import OpenSimplexNoiseGenerator
@@ -12,8 +13,12 @@ def create_elevation_noise_generator(cfg: dict) -> NoiseGenerator:
     noise_generator.set_octaves(cfg["elevation_octaves"])
     return noise_generator
 
-def create_world_generator(logger: Logger, elevation_generator:ElevationGenerator) -> WorldGenerator:
-    return WorldGenerator(logger, elevation_generator)
+def create_world_generator(logger: Logger,
+                           elevation_generator:ElevationGenerator,
+                           plants_generator: PlantsGenerator) -> WorldGenerator:
+    return WorldGenerator(logger, elevation_generator,plants_generator)
+
+
 
 def create_elevation_generator(noise_generator: NoiseGenerator, cfg: dict) -> ElevationGenerator:
     elevation_generator = ElevationGenerator(noise_generator)

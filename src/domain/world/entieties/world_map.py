@@ -15,7 +15,7 @@ class WorldMap:
     height: int
     tiles: list[Tile]
     id: Optional[int] = None
-    plants:list[Organism] = field(default_factory=list)
+    organisms:list[Organism] = field(default_factory=list)
 
     _tile_by_coords: dict[tuple[int, int], Tile] = field(init=False, repr=False)
     _tile_by_id: dict[int, Tile] = field(init=False, repr=False)
@@ -60,11 +60,21 @@ class WorldMap:
         return False
 
     def add_organism(self, organism: Organism):
-        self.get_tile_by_position(organism.position).isOccupied = True
-        self.plants.append(organism)
+        tile = self.get_tile_by_position(organism.position)
+        tile.isOccupied = True
+        tile.add_organism(organism)
+        self.organisms.append(organism)
 
 
+    def get_organism_by_position(self, position: Position) -> Optional[Organism]:
+        return next((o for o in self.organisms if o.position == position), None)
 
+
+    def get_all_renderable(self):
+        renderable = []
+        renderable.extend(self.get_all_tiles())
+        renderable.extend(self.organisms)
+        return renderable
 
 
     @classmethod

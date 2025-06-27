@@ -1,18 +1,24 @@
 from abc import ABC, abstractmethod
-
+from dataclasses import dataclass
+from typing import Optional
 
 from domain.world.entieties.position import Position
-from domain.world.entieties.terrain import Terrain
 
 
+@dataclass
 class Organism(ABC):
-    def __init__(self, name, position: Position, allowed_terrain:set[Terrain]):
-        self.name = name
-        self.position = position
-        self.allowed_terrains = allowed_terrain
-
+    name: str
+    allowed_terrains: set
+    _position: Optional[Position] = None
 
     @abstractmethod
     def tick(self):
-        pass
+        ...
 
+    @property
+    def sprite_key(self) -> str:
+        return self.name
+
+    @property
+    def position(self) -> Position:
+        return self._position

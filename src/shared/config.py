@@ -5,10 +5,10 @@ from domain.world.services.generators.noise.octave import Octave
 CONFIG = {
     "screen_width": 2000,
     "screen_height": 1000,
-    "tile_size": 16,
+    "tile_size": 100,
     "fps": 60,
-    "map_height": 1000,
-    "map_width": 1000,
+    "map_height": 200,
+    "map_width": 200,
     "scale": 50,
     "climate_zones": "climate_zones.json",
     "elevation_seed": 1200,
