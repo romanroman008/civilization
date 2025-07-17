@@ -29,6 +29,7 @@ sprite_assets = {
     "WATER": SpriteAsset("WATER", "assets/terrain/water.png", (1,1), (0,0), 0),
     "Tree": SpriteAsset("TREE", "assets/plants/tree.png", (3, 3), (1, 1), 2),
     "Berries":SpriteAsset("BERRY", "assets/plants/berry.png", (1, 1), (0, 0), 1),
+    "Rabbit":SpriteAsset("RABBIT", "assets/animals/rabbit.png", (1, 1), (0, 0), 1),
 
 }
 

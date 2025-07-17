@@ -1,5 +1,6 @@
 from logging import Logger
 
+from domain.world.services.generators.animals_generator import AnimalsGenerator
 from domain.world.services.generators.elevation_generator import ElevationGenerator
 from domain.world.services.generators.plants_generator import PlantsGenerator
 from domain.world.services.generators.world_generator import WorldGenerator
@@ -15,8 +16,9 @@ def create_elevation_noise_generator(cfg: dict) -> NoiseGenerator:
 
 def create_world_generator(logger: Logger,
                            elevation_generator:ElevationGenerator,
-                           plants_generator: PlantsGenerator) -> WorldGenerator:
-    return WorldGenerator(logger, elevation_generator,plants_generator)
+                           plants_generator: PlantsGenerator,
+                           animals_generator: AnimalsGenerator) -> WorldGenerator:
+    return WorldGenerator(logger, elevation_generator,plants_generator, animals_generator)
 
 
 

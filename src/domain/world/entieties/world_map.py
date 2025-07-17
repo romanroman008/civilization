@@ -41,20 +41,22 @@ class WorldMap:
     def is_position_occupied(self, position: Position) -> bool:
         return self._tile_by_coords[position.x, position.y].isOccupied
 
+
     def is_tile_in_bounds(self, x: int, y: int) -> bool:
         if self.get_tile_by_coords(x,y):
             return True
         return False
 
     def is_position_in_bounds(self, position: Position) -> bool:
-        if self.get_tile_by_coords(position.x, position.y):
+        if 0 <= position.x < self.width and 0 <= position.y < self.height:
             return True
         return False
 
+
     def is_position_available(self, position: Position) -> bool:
         if (
-            self.is_position_occupied(position)
-            and self.is_position_in_bounds(position)
+            self.is_position_in_bounds(position)
+            and not self.is_position_occupied(position)
         ):
             return True
         return False

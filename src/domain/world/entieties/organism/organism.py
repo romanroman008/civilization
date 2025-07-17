@@ -9,6 +9,7 @@ from domain.world.entieties.position import Position
 class Organism(ABC):
     name: str
     allowed_terrains: set
+    block_radius: int = 0
     _position: Optional[Position] = None
 
     @abstractmethod
@@ -22,3 +23,7 @@ class Organism(ABC):
     @property
     def position(self) -> Position:
         return self._position
+
+    @position.setter
+    def position(self, value: Position):
+        self._position = value

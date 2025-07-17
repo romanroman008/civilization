@@ -16,8 +16,17 @@ def run_game(world):
 
     tile_presenter = WorldPresenter(world)
 
-    camera = Camera(0,0,CONFIG["screen_width"],CONFIG["screen_height"], CONFIG["map_height"], CONFIG["map_height"])
-    world_renderer = WorldRenderer(screen,world,tile_presenter)
+    camera = Camera(0,0,
+                    CONFIG["screen_width"],
+                    CONFIG["screen_height"],
+                    CONFIG["map_width"],
+                    CONFIG["map_height"],
+                    CONFIG["tile_size"])
+    world_renderer = WorldRenderer(screen,
+                                   world,
+                                   tile_presenter,
+                                   camera,
+                                   tile_size=CONFIG["tile_size"])
 
     clock = pygame.time.Clock()
     running = True

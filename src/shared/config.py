@@ -5,7 +5,7 @@ from domain.world.services.generators.noise.octave import Octave
 CONFIG = {
     "screen_width": 2000,
     "screen_height": 1000,
-    "tile_size": 100,
+    "tile_size": 32,
     "fps": 60,
     "map_height": 200,
     "map_width": 200,

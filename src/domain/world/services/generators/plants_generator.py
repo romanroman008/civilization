@@ -12,6 +12,7 @@ class PlantsGenerator:
         self.world: WorldMap | None = None
 
 
+
     def generate_plants(self, world: WorldMap) -> WorldMap:
         self.world = world
 
@@ -22,7 +23,8 @@ class PlantsGenerator:
 
 
             for position in approved_positions:
-                plant = Plant(specie.name, specie.allowed_terrains, position)
+                plant = Plant(specie.name, specie.allowed_terrains)
+                plant.position = position
                 world.add_organism(plant)
 
 

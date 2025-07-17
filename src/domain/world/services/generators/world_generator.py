@@ -4,6 +4,7 @@ from tqdm import tqdm
 from domain.world.entieties.tile import Tile
 from domain.world.entieties.world_map import WorldMap
 from domain.world.services.generators import plants_generator
+from domain.world.services.generators.animals_generator import AnimalsGenerator
 from domain.world.services.generators.elevation_generator import ElevationGenerator
 from domain.world.services.generators.plants_generator import PlantsGenerator
 from domain.world.services.tile_adapter import TileAdapter
@@ -15,12 +16,14 @@ class WorldGenerator:
                  logger,
                  elevation_generator: ElevationGenerator,
                  plants_generator: PlantsGenerator,
+                 animals_generator: AnimalsGenerator
                  ):
 
         self.logger = logger
 
         self.elevation_generator = elevation_generator
         self.plants_generator = plants_generator
+        self.animals_generator = animals_generator
 
         self.height = 100
         self.width = 100
@@ -31,6 +34,7 @@ class WorldGenerator:
         tiles: list[Tile] = TileAdapter.to_tiles(world_array)
         world = WorldMap("Brave new world", width, height, tiles)
         world = self._generate_plants(world)
+        world = self._generate_animals(world)
 
         return world
 
@@ -57,6 +61,12 @@ class WorldGenerator:
         self.logger.info("Generating plants started ...")
         world = self.plants_generator.generate_plants(world)
         self.logger.info("Finished generating plants")
+        return world
+
+    def _generate_animals(self, world: WorldMap) -> WorldMap:
+        self.logger.info("Generating animals started ...")
+        world = self.animals_generator.generate(world)
+        self.logger.info("Finished generating animals")
         return world
 
     def __normalize_latitude(self, y: int) -> float:
