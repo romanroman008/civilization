@@ -6,6 +6,11 @@ from domain.world.entieties.position import Position
 from domain.world.entieties.world_map import WorldMap
 
 
+def _get_random_positions(positions: list[Position], amount:int) -> list[Position]:
+    return random.sample(positions, k=min(amount, len(positions)))
+
+
+
 class AnimalsGenerator:
     def __init__(self, count: int, species_distribution: list[tuple[Animal, float]]):
         self.count = count
@@ -16,20 +21,19 @@ class AnimalsGenerator:
     def generate(self, world: WorldMap) -> WorldMap:
         self.world = world
 
-        for specie, fraction   in self.species_distribution:
+        for organism, fraction   in self.species_distribution:
             amount = int(fraction * self.count)
-            available_positions = self._get_valid_positions(world.height, world.width, specie)
-            approved_positions = self._get_random_positions(available_positions, amount)
+            available_positions = self._get_valid_positions(world.height, world.width, organism)
+            approved_positions = _get_random_positions(available_positions, amount)
 
 
             for position in approved_positions:
-                animal = Animal(specie.name, specie.allowed_terrains)
-                animal.position = Position(0,4)
+                animal = Animal(organism.name, organism.allowed_terrains)
+                animal.position = position
                 world.add_organism(animal)
 
 
         return world
-
 
 
 
@@ -45,11 +49,6 @@ class AnimalsGenerator:
     def _is_valid_position(self, position: Position, animal: Animal) -> bool:
         tile = self.world.get_tile_by_position(position)
         return tile.terrain in animal.allowed_terrains
-
-
-
-    def _get_random_positions(self, positions: list[Position], amount:int) -> list[Position]:
-        return random.sample(positions, k=min(amount, len(positions)))
 
 
 

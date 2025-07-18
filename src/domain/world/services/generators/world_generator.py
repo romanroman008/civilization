@@ -32,7 +32,7 @@ class WorldGenerator:
     def create(self, width, height, scale) -> WorldMap:
         world_array = self._generate_map_array(width, height, scale)
         tiles: list[Tile] = TileAdapter.to_tiles(world_array)
-        world = WorldMap("Brave new world", width, height, tiles)
+        world = WorldMap(1,"Brave new world", width, height, tiles)
         world = self._generate_plants(world)
         world = self._generate_animals(world)
 

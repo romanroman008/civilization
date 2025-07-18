@@ -8,8 +8,15 @@ from domain.world.entieties.position import Position
 from domain.world.entieties.world_map import WorldMap
 
 
+def _is_terrain_allowed(tile, organism: Organism):
+    if tile.terrain in organism.allowed_terrains:
+        return True
+    return False
+
+
 class MovementSystem:
-    def __init__(self, world_map: WorldMap):
+    def __init__(self, logger, world_map: WorldMap):
+        self.logger = logger
         self.world = world_map
         self.animals = [o for o in world_map.organisms if isinstance(o, Animal)]
 
@@ -17,40 +24,31 @@ class MovementSystem:
     def move_animal(self, animal: Animal):
         if not animal.is_alive:
             return
-        directions = self.get_valid_directions(animal)
+        directions = self._get_valid_directions(animal)
         chosen_direction = random.choice(directions)
         new_position = animal.position + chosen_direction.vector()
-
-
-
-
         animal.position = new_position
 
 
 
-
-    def get_valid_directions(self, organism: Organism):
+    def _get_valid_directions(self, organism: Organism):
         valid_directions = []
         position = organism.position
         for d in Direction:
             pos = position + d.vector()
-
-            if not self.world.is_position_available(pos):
-                continue
-
-            if not self.is_terrain_allowed(self.world.get_tile_by_position(pos), organism):
-                continue
-
-            valid_directions.append(d)
+            if self._is_move_valid(pos, organism):
+                valid_directions.append(d)
 
         return valid_directions
 
-    def is_terrain_allowed(self, tile, organism: Organism):
-        if tile.terrain in organism.allowed_terrains:
-            return True
-        return False
+    def _is_move_valid(self, pos: Position, organism: Organism) -> bool:
+        if not self.world.is_position_available(pos):
+            return False
+        if not _is_terrain_allowed(self.world.get_tile_by_position(pos), organism):
+            return False
+        return True
 
     def __call__(self, tick_numbers: int):
         for animal in self.animals:
-            print("moving animal", animal.position)
             self.move_animal(animal)
+            self.logger.debug(f"Animal: {animal.name} moved to {animal.position}")

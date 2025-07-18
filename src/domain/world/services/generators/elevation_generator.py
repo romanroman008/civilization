@@ -5,16 +5,16 @@ from domain.world.services.generators.noise.noise_generator import NoiseGenerato
 
 
 class ElevationGenerator:
-    def __init__(self, noise_generator: NoiseGenerator):
-        self.__noise_generator = noise_generator
-        self.__elevation_power = 1.5
+    def __init__(self, noise_generator: NoiseGenerator, elevation_power: float = 1.5):
+        self._noise_generator = noise_generator
+        self._elevation_power = elevation_power
 
 
     def generate_elevation(self, x, y):
-        return math.pow(self.__noise_generator.noise2(x,y), self.__elevation_power)
+        return math.pow(self._noise_generator.noise2(x,y), self._elevation_power)
 
 
     def set_elevation_power(self, power):
-        self.__elevation_power = power
+        self._elevation_power = power
 
 

@@ -16,14 +16,14 @@ class PlantsGenerator:
     def generate_plants(self, world: WorldMap) -> WorldMap:
         self.world = world
 
-        for specie, fraction   in self.species_distribution:
+        for organism, fraction   in self.species_distribution:
             amount = int(fraction * self.count)
-            available_positions = self._get_valid_positions(world.height, world.width, specie)
-            approved_positions = self._get_random_positions_with_blocking(available_positions, specie, amount)
+            available_positions = self._get_valid_positions(world.height, world.width, organism)
+            approved_positions = self._get_random_positions_with_blocking(available_positions, organism, amount)
 
 
             for position in approved_positions:
-                plant = Plant(specie.name, specie.allowed_terrains)
+                plant = Plant(organism.name, organism.allowed_terrains)
                 plant.position = position
                 world.add_organism(plant)
 
@@ -61,7 +61,7 @@ class PlantsGenerator:
             if (pos.x, pos.y) in blocked_set:
                 continue
 
-            blocked_area = self.get_blocked_area(pos, plant.block_radius)
+            blocked_area = self._get_blocked_area(pos, plant.block_radius)
             blocked_coords = {(p.x, p.y) for p in blocked_area}
 
             if blocked_coords & blocked_set:
@@ -75,7 +75,7 @@ class PlantsGenerator:
 
         return selected
 
-    def get_blocked_area(self, position: Position, radius: int) -> list[Position]:
+    def _get_blocked_area(self, position: Position, radius: int) -> list[Position]:
         cx, cy = position.x, position.y
         area = [
             Position(cx + dx, cy + dy)

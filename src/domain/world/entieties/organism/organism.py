@@ -7,9 +7,9 @@ from domain.world.entieties.position import Position
 
 @dataclass
 class Organism(ABC):
-    name: str
-    allowed_terrains: set
-    block_radius: int = 0
+    _name: str
+    _allowed_terrains: set
+    _block_radius: int = 0
     _position: Optional[Position] = None
 
     @abstractmethod
@@ -17,8 +17,20 @@ class Organism(ABC):
         ...
 
     @property
+    def name(self) -> str:
+        return self._name
+
+    @property
+    def allowed_terrains(self) -> set:
+        return self._allowed_terrains
+
+    @property
     def sprite_key(self) -> str:
-        return self.name
+        return self._name
+
+    @property
+    def block_radius(self) -> int:
+        return self._block_radius
 
     @property
     def position(self) -> Position:

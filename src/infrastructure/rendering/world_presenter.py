@@ -43,13 +43,13 @@ class WorldPresenter:
 
 
     def present(self, entity: Renderable):
-        sprite_key = entity.sprite_key
+        terrain = entity.sprite_key
         position = entity.position
 
-        if sprite_key not in self.sprite_assets:
-            raise ValueError(f"Unknown sprite key: '{sprite_key}'")
+        if terrain not in self.sprite_assets:
+            raise ValueError(f"Unknown sprite key: '{terrain}'")
 
-        return Sprite(self.sprite_assets[sprite_key], position)
+        return Sprite(self.sprite_assets[terrain], position)
 
 
 
