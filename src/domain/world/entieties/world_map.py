@@ -49,7 +49,6 @@ class WorldMap:
     def organisms(self) -> Sequence[Organism]:
         return tuple(self._organisms)
 
-
     def get_tile_by_coords(self, x: int, y: int) -> Tile:
         return self._tile_by_coords[(x, y)]
 

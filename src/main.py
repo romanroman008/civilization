@@ -27,12 +27,12 @@ from shared.logger import get_logger
 
 
 plants_dist = [
-    (Plant(name="Berries", allowed_terrains={Terrain.GRASS}), 0),
-    (Plant(name="Tree", allowed_terrains={Terrain.GRASS}, block_radius=1), 0)
+    (Plant(_name="Berries", _allowed_terrains={Terrain.GRASS}), 0),
+    (Plant(_name="Tree", _allowed_terrains={Terrain.GRASS}, _block_radius=1), 0)
 ]
 
 animals_dist = [
-    (Animal(name="Rabbit", allowed_terrains={Terrain.GRASS}), 1)
+    (Animal(_name="Rabbit", _allowed_terrains={Terrain.GRASS}), 1)
 ]
 
 
@@ -52,8 +52,8 @@ def init_db():
 def create_game_clock(logger):
     return GameClock(logger=logger, tick_interval=1)
 
-def create_movement_system(world_map: WorldMap):
-    return MovementSystem(world_map)
+def create_movement_system(logger, world_map: WorldMap):
+    return MovementSystem(logger,world_map)
 
 
 
@@ -82,7 +82,7 @@ def main():
     world = None
     world = world_service.create_new_world(CONFIG["map_width"], CONFIG["map_height"], CONFIG["scale"])
 
-    movement_system = create_movement_system(world)
+    movement_system = create_movement_system(logger,world)
 
     clock.subscribe_every(1, movement_system)
     clock.start()
