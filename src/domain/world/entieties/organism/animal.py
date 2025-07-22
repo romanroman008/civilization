@@ -10,6 +10,7 @@ class Animal(Organism):
     is_alive: bool = True
 
 
+
     def tick(self):
         ...
 

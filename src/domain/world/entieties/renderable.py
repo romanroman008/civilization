@@ -1,5 +1,6 @@
 from typing import Protocol
 
+
 from domain.world.entieties.position import Position
 
 
@@ -9,3 +10,15 @@ class Renderable(Protocol):
 
     @property
     def position(self) -> Position: ...
+
+    @property
+    def rotation(self) -> float: ...
+
+    @property
+    def offset(self) -> tuple[float, float]: ...
+
+
+
+
+
+

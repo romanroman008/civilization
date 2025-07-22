@@ -1,12 +1,12 @@
-from domain.world.entieties.organism.organism import Organism
-from domain.world.entieties.position import Position
+
 from domain.world.entieties.renderable import Renderable
+
 from domain.world.entieties.terrain import Terrain
-from domain.world.entieties.tile import Tile
+
 from domain.world.entieties.world_map import WorldMap
 from infrastructure.rendering.sprite import Sprite
 from infrastructure.rendering.sprite_asset import SpriteAsset
-from infrastructure.rendering.tile_view import TileView
+
 
 TILE_COLORS = {
     1: "#3b83bd",  # WATER – chłodny niebieski
@@ -45,11 +45,13 @@ class WorldPresenter:
     def present(self, entity: Renderable):
         terrain = entity.sprite_key
         position = entity.position
+        rotation = getattr(entity, "rotation", 0.0)
+        offset = getattr(entity, "offset", (0.0,0.0))
 
         if terrain not in self.sprite_assets:
             raise ValueError(f"Unknown sprite key: '{terrain}'")
 
-        return Sprite(self.sprite_assets[terrain], position)
+        return Sprite(self.sprite_assets[terrain], position, rotation, offset)
 
 
 

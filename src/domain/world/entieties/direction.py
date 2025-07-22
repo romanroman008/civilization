@@ -4,11 +4,15 @@ from domain.world.entieties.position import Position
 
 
 class Direction(Enum):
-    NORTH = (0, 1)
-    SOUTH = (0, -1)
-    EAST = (1, 0)
-    WEST = (-1, 0)
-    IDLE = (0, 0)
+    TOP = ((0, -1), 180)
+    BOT = ((0, 1), 0)
+    LEFT = ((-1, 0), 90)
+    RIGHT = ((1, 0), 270)
+    IDLE = ((0, 0), 0)
 
     def vector(self):
-        return Position(*self.value)
+        return Position(*self.value[0])
+
+    @property
+    def angle(self):
+        return self.value[1]

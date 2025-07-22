@@ -1,28 +1,47 @@
 from logging import Logger
 
+from domain.world.entieties.world_map import WorldMap
 from domain.world.services.generators.animals_generator import AnimalsGenerator
 from domain.world.services.generators.elevation_generator import ElevationGenerator
+from domain.world.services.generators.noise.octave import Octave
 from domain.world.services.generators.plants_generator import PlantsGenerator
 from domain.world.services.generators.world_generator import WorldGenerator
 from domain.world.services.generators.noise.noise_generator import NoiseGenerator
 from domain.world.services.generators.noise.open_simplex_noise_generator import OpenSimplexNoiseGenerator
+from domain.world.services.movement.movement_system import MovementSystem
+from domain.world.services.world_service import WorldService
+from shared.config import CONFIG, PLANTS_DIST, ANIMALS_DIST
 
 
-def create_elevation_noise_generator(cfg: dict) -> NoiseGenerator:
+def create_elevation_noise_generator(elevation_seed: int, elevation_octaves: list[Octave]) -> NoiseGenerator:
     noise_generator = OpenSimplexNoiseGenerator()
-    noise_generator.set_seed(cfg["elevation_seed"])
-    noise_generator.set_octaves(cfg["elevation_octaves"])
+    noise_generator.set_seed(elevation_seed)
+    noise_generator.set_octaves(elevation_octaves)
     return noise_generator
 
-def create_world_generator(logger: Logger,
-                           elevation_generator:ElevationGenerator,
-                           plants_generator: PlantsGenerator,
-                           animals_generator: AnimalsGenerator) -> WorldGenerator:
+def create_world_generator(logger: Logger) -> WorldGenerator:
+    noise_generator = create_elevation_noise_generator(CONFIG["elevation_seed"], CONFIG["elevation_octaves"])
+    elevation_generator = create_elevation_generator(noise_generator, CONFIG["elevation_power"])
+
+    plants_generator = create_plant_generator(CONFIG["plants_count"], PLANTS_DIST)
+    animals_generator = create_animal_generator(CONFIG["animals_count"], ANIMALS_DIST)
     return WorldGenerator(logger, elevation_generator,plants_generator, animals_generator)
 
 
 
-def create_elevation_generator(noise_generator: NoiseGenerator, cfg: dict) -> ElevationGenerator:
+def create_elevation_generator(noise_generator: NoiseGenerator, elevation_power) -> ElevationGenerator:
     elevation_generator = ElevationGenerator(noise_generator)
-    elevation_generator.set_elevation_power(cfg["elevation_power"])
+    elevation_generator.set_elevation_power(elevation_power)
     return elevation_generator
+
+def create_plant_generator(count, plant_dist) -> PlantsGenerator:
+    return PlantsGenerator(count, plant_dist)
+
+def create_animal_generator(count, animal_dist) -> AnimalsGenerator:
+    return AnimalsGenerator(count, animal_dist)
+
+def create_world_service(world_generator: WorldGenerator):
+    return WorldService(world_generator)
+
+def create_movement_system(logger, world_map: WorldMap):
+    return MovementSystem(logger, world_map)

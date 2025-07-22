@@ -29,7 +29,8 @@ class AnimalsGenerator:
 
             for position in approved_positions:
                 animal = Animal(organism.name, organism.allowed_terrains)
-                animal.position = Position(3,4)
+                animal.position = position
+                animal.target_position = position
                 world.add_organism(animal)
 
 

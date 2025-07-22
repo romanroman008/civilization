@@ -6,7 +6,8 @@ from domain.world.entieties.world_map import WorldMap
 
 
 class PlantsGenerator:
-    def __init__(self, count: int, species_distribution: list[tuple[Plant, float]]):
+    def \
+            __init__(self, count: int, species_distribution: list[tuple[Plant, float]]):
         self.count = count
         self.species_distribution = species_distribution
         self.world: WorldMap | None = None
@@ -25,6 +26,7 @@ class PlantsGenerator:
             for position in approved_positions:
                 plant = Plant(organism.name, organism.allowed_terrains)
                 plant.position = position
+                plant.target_position = position
                 world.add_organism(plant)
 
 
