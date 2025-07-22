@@ -4,8 +4,8 @@ import pytest
 
 from domain.components.position import Position
 from domain.components.terrain import Terrain
-from domain.entieties.tile import Tile
-from domain.entieties.world_map import WorldMap
+from domain.world_map.tile import Tile
+from domain.world_map.world_map import WorldMap
 
 
 @pytest.fixture

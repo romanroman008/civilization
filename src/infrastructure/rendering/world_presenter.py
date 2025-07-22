@@ -3,7 +3,7 @@ from domain.components.renderable import Renderable
 
 from domain.components.terrain import Terrain
 
-from domain.entieties.world_map import WorldMap
+from domain.world_map.world_map import WorldMap
 from infrastructure.rendering.sprite import Sprite
 from infrastructure.rendering.sprite_asset import SpriteAsset
 

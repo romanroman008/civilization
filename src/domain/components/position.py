@@ -15,6 +15,9 @@ class Position:
     def __sub__(self, other: "Position") -> "Position":
         return Position(self.x - other.x, self.y - other.y)
 
+    def __mul__(self, other: int) -> "Position":
+        return Position(self.x * other, self.y * other)
+
     def equals(self, other: object) -> bool:
         if not isinstance(other, Position):
             return False

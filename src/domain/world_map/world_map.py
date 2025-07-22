@@ -1,10 +1,10 @@
 from dataclasses import dataclass, field
 from typing import Sequence
 
-from domain.entieties.organism.organism import Organism
+from domain.organism.organismdepr import OrganismDEPR
 from domain.components.position import Position
 from domain.components.renderable import Renderable
-from domain.entieties.tile import Tile
+from domain.world_map.tile import Tile
 
 
 @dataclass
@@ -14,7 +14,7 @@ class WorldMap:
     _width: int
     _height: int
     _tiles: list[Tile]
-    _organisms:list[Organism] = field(default_factory=list)
+    _organisms:list[OrganismDEPR] = field(default_factory=list)
 
     _tile_by_coords: dict[tuple[int, int], Tile] = field(init=False, repr=False)
     _tile_by_id: dict[int, Tile] = field(init=False, repr=False)
@@ -44,7 +44,7 @@ class WorldMap:
         return tuple(self._tiles)
 
     @property
-    def organisms(self) -> Sequence[Organism]:
+    def organisms(self) -> Sequence[OrganismDEPR]:
         return tuple(self._organisms)
 
     def get_tile_by_coords(self, x: int, y: int) -> Tile:
@@ -75,7 +75,7 @@ class WorldMap:
             return True
         return False
 
-    def add_organism(self, organism: Organism):
+    def add_organism(self, organism: OrganismDEPR):
         tile = self.get_tile_by_position(organism.position)
         tile.add_organism(organism)
         self._organisms.append(organism)

@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 
-from domain.entieties.organism.organism import Organism
+from domain.organism.organismdepr import OrganismDEPR
 
 
 @dataclass
-class Animal(Organism):
+class Animal(OrganismDEPR):
     is_alive: bool = True
 
 

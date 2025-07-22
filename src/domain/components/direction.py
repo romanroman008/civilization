@@ -10,7 +10,7 @@ class Direction(Enum):
     RIGHT = ((1, 0), 270)
     IDLE = ((0, 0), 0)
 
-    def vector(self):
+    def vector(self) -> Position:
         return Position(*self.value[0])
 
     @property

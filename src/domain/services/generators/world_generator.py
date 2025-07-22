@@ -1,8 +1,8 @@
 import numpy as np
 from tqdm import tqdm
 
-from domain.entieties.tile import Tile
-from domain.entieties.world_map import WorldMap
+from domain.world_map.tile import Tile
+from domain.world_map.world_map import WorldMap
 from domain.services.generators.animals_generator import AnimalsGenerator
 from domain.services.generators.elevation_generator import ElevationGenerator
 from domain.services.generators.plants_generator import PlantsGenerator

@@ -1,8 +1,8 @@
 import random
 
-from domain.entieties.organism.animal import Animal
+from domain.organism.animal import Animal
 from domain.components.position import Position
-from domain.entieties.world_map import WorldMap
+from domain.world_map.world_map import WorldMap
 
 
 def _get_random_positions(positions: list[Position], amount:int) -> list[Position]:

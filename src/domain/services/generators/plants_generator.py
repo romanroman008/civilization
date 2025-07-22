@@ -1,8 +1,8 @@
 import random
 
-from domain.entieties.organism.plant import Plant
+from domain.organism.plant import Plant
 from domain.components.position import Position
-from domain.entieties.world_map import WorldMap
+from domain.world_map.world_map import WorldMap
 
 
 class PlantsGenerator:

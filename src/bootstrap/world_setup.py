@@ -1,6 +1,6 @@
 from logging import Logger
 
-from domain.entieties.world_map import WorldMap
+from domain.world_map.world_map import WorldMap
 from domain.services.generators.animals_generator import AnimalsGenerator
 
 from domain.services.generators.elevation_generator import ElevationGenerator

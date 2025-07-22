@@ -3,8 +3,8 @@ from types import SimpleNamespace
 from unittest.mock import Mock
 
 from domain.components.terrain import Terrain
-from domain.entieties.tile import Tile
-from domain.entieties.world_map import WorldMap
+from domain.world_map.tile import Tile
+from domain.world_map.world_map import WorldMap
 from domain.services.world_service import WorldService
 from infrastructure.persistance.models.tiledb import TileDB
 from infrastructure.persistance.models.worlddb import WorldDB

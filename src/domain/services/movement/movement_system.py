@@ -1,19 +1,27 @@
 import random
 
 from domain.components.direction import Direction
-from domain.entieties.organism.animal import Animal
-from domain.entieties.organism.organism import Organism
+from domain.organism.animal import Animal
+from domain.organism.organismdepr import OrganismDEPR
 from domain.components.position import Position
-from domain.entieties.world_map import WorldMap
+from domain.world_map.world_map import WorldMap
 
 
-def _is_terrain_allowed(tile, organism: Organism):
+def _is_terrain_allowed(tile, organism: OrganismDEPR):
     if tile.terrain in organism.allowed_terrains:
         return True
     return False
 
-def _find_needed_rotation(organism: Organism) -> Direction:
-    position_diff = organism.target_position - organism.position
+def find_needed_offset(organism) -> tuple[float,float]:
+    offset_x = organism.target_position.x - organism.position.x
+    offset_y = organism.target_position.y - organism.position.y
+    return offset_x, offset_y
+
+def find_target_position(actual:Position, direction: Direction, distance: int):
+    return actual - direction.vector() * distance
+
+def find_needed_direction(actual_position: Position, target_position: Position) -> Direction:
+    position_diff = target_position - actual_position
 
     if position_diff == Direction.LEFT.vector():
         return Direction.LEFT
@@ -25,7 +33,8 @@ def _find_needed_rotation(organism: Organism) -> Direction:
         return Direction.BOT
     return Direction.IDLE
 
-def _find_shortest_rotation(current: Direction, desired: Direction) -> float:
+
+def find_shortest_rotation(current: Direction, desired: Direction) -> float:
     current_angle = current.angle
     desired_angle = desired.angle
 
@@ -72,7 +81,7 @@ class MovementSystem:
 
 
 
-    def _get_valid_directions(self, organism: Organism):
+    def _get_valid_directions(self, organism: OrganismDEPR):
         valid_directions = []
         position = organism.position
         for d in Direction:
@@ -82,7 +91,7 @@ class MovementSystem:
 
         return valid_directions
 
-    def _is_move_valid(self, pos: Position, organism: Organism) -> bool:
+    def _is_move_valid(self, pos: Position, organism: OrganismDEPR) -> bool:
         if not self.world.is_position_available(pos):
             return False
         if not _is_terrain_allowed(self.world.get_tile_by_position(pos), organism):

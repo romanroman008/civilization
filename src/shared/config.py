@@ -1,7 +1,7 @@
 
 from domain.components.terrain import Terrain
-from domain.entieties.organism.animal import Animal
-from domain.entieties.organism.plant import Plant
+from domain.organism import Animal
+from domain.organism import Plant
 from domain.services.generators.noise.octave import Octave
 
 CONFIG = {
