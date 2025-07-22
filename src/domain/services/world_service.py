@@ -2,11 +2,11 @@ from typing import Sequence
 
 from sqlalchemy import select
 
-from domain.world.entieties.terrain import Terrain
-from domain.world.entieties.tile import Tile
-from domain.world.entieties.world_map import WorldMap
+from domain.components.terrain import Terrain
+from domain.entieties.tile import Tile
+from domain.entieties.world_map import WorldMap
 
-from domain.world.services.generators.world_generator import WorldGenerator
+from domain.services.generators.world_generator import WorldGenerator
 
 from infrastructure.persistance.models.tiledb import TileDB
 from infrastructure.persistance.models.worlddb import WorldDB

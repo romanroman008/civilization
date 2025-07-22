@@ -1,6 +1,6 @@
 from enum import Enum
 
-from domain.world.entieties.position import Position
+from domain.components.position import Position
 
 
 class Direction(Enum):

@@ -1,10 +1,10 @@
 import pytest
 from unittest.mock import Mock
 
-import domain.world.services.generators.animals_generator as ag_mod
-from domain.world.services.generators.animals_generator import AnimalsGenerator
-from domain.world.entieties.position import Position
-from domain.world.entieties.terrain import Terrain
+import domain.services.generators.animals_generator as ag_mod
+from domain.services.generators import AnimalsGenerator
+from domain.components.position import Position
+from domain.components.terrain import Terrain
 
 # --- Helpers / Fakes -------------------------------------------------------
 

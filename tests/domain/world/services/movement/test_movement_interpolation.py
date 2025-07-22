@@ -1,10 +1,8 @@
 import pytest
 from unittest.mock import MagicMock
 
-
-from domain.world.entieties.direction import Direction
-from domain.world.entieties.position import Position
-from domain.world.services.movement.movement_interpolation import _find_needed_rotation, _find_needed_offset, \
+from domain.components.position import Position
+from domain.services.movement.movement_interpolation import _find_needed_rotation, _find_needed_offset, \
     MovementInterpolation
 
 

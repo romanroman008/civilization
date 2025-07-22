@@ -1,19 +1,7 @@
-import inspect
 import math
-from dataclasses import dataclass
-from enum import IntEnum
 
-from domain.world.entieties import direction
-from domain.world.entieties.direction import Direction
-
-from domain.world.entieties.organism.animal import Animal
-from domain.world.entieties.organism.organism import Organism
-from domain.world.entieties.position import Position
-
-from domain.world.entieties.terrain import Terrain
-
-
-
+from domain.entieties.organism.organism import Organism
+from domain.components.position import Position
 
 
 def _find_needed_offset(organism) -> tuple[float,float]:

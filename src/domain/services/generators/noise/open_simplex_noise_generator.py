@@ -3,8 +3,8 @@ from typing import List
 from opensimplex import OpenSimplex
 
 
-from domain.world.services.generators.noise.noise_generator import NoiseGenerator
-from domain.world.services.generators.noise.octave import Octave
+from domain.services.generators.noise.noise_generator import NoiseGenerator
+from domain.services.generators.noise.octave import Octave
 
 
 class OpenSimplexNoiseGenerator(NoiseGenerator):

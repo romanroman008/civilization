@@ -1,13 +1,12 @@
 import numpy as np
 from tqdm import tqdm
 
-from domain.world.entieties.tile import Tile
-from domain.world.entieties.world_map import WorldMap
-from domain.world.services.generators import plants_generator
-from domain.world.services.generators.animals_generator import AnimalsGenerator
-from domain.world.services.generators.elevation_generator import ElevationGenerator
-from domain.world.services.generators.plants_generator import PlantsGenerator
-from domain.world.services.tile_adapter import TileAdapter
+from domain.entieties.tile import Tile
+from domain.entieties.world_map import WorldMap
+from domain.services.generators.animals_generator import AnimalsGenerator
+from domain.services.generators.elevation_generator import ElevationGenerator
+from domain.services.generators.plants_generator import PlantsGenerator
+from domain.services.tile_adapter import TileAdapter
 
 
 class WorldGenerator:

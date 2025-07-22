@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 
 
-from domain.world.entieties.organism.organism import Organism
-from domain.world.entieties.position import Position
+from domain.entieties.organism.organism import Organism
 
 
 @dataclass

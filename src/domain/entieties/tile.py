@@ -2,9 +2,9 @@
 
 from dataclasses import dataclass, field
 from typing import List
-from domain.world.entieties.organism.organism import Organism
-from domain.world.entieties.position import Position
-from domain.world.entieties.terrain import Terrain
+from domain.entieties.organism.organism import Organism
+from domain.components.position import Position
+from domain.components.terrain import Terrain
 
 
 @dataclass

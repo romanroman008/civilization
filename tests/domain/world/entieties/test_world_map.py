@@ -2,10 +2,10 @@ from unittest.mock import Mock
 
 import pytest
 
-from domain.world.entieties.position import Position
-from domain.world.entieties.terrain import Terrain
-from domain.world.entieties.tile import Tile
-from domain.world.entieties.world_map import WorldMap
+from domain.components.position import Position
+from domain.components.terrain import Terrain
+from domain.entieties.tile import Tile
+from domain.entieties.world_map import WorldMap
 
 
 @pytest.fixture

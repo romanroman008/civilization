@@ -3,8 +3,8 @@ from asyncio import Lock
 from dataclasses import dataclass, field
 from typing import Optional
 
-from domain.world.entieties.direction import Direction
-from domain.world.entieties.position import Position
+from domain.components.direction import Direction
+from domain.components.position import Position
 
 
 

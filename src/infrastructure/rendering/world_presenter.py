@@ -1,9 +1,9 @@
 
-from domain.world.entieties.renderable import Renderable
+from domain.components.renderable import Renderable
 
-from domain.world.entieties.terrain import Terrain
+from domain.components.terrain import Terrain
 
-from domain.world.entieties.world_map import WorldMap
+from domain.entieties.world_map import WorldMap
 from infrastructure.rendering.sprite import Sprite
 from infrastructure.rendering.sprite_asset import SpriteAsset
 

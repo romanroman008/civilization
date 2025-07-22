@@ -1,11 +1,10 @@
 import random
 
-from domain import world
-from domain.world.entieties.direction import Direction
-from domain.world.entieties.organism.animal import Animal
-from domain.world.entieties.organism.organism import Organism
-from domain.world.entieties.position import Position
-from domain.world.entieties.world_map import WorldMap
+from domain.components.direction import Direction
+from domain.entieties.organism.animal import Animal
+from domain.entieties.organism.organism import Organism
+from domain.components.position import Position
+from domain.entieties.world_map import WorldMap
 
 
 def _is_terrain_allowed(tile, organism: Organism):
@@ -98,4 +97,5 @@ class MovementSystem:
             if animal.isMoving:
                 continue
             self.move_animal(animal)
+
             self.logger.debug(f"Animal: {animal.name} moved to {animal.position}")

@@ -1,12 +1,11 @@
 import logging
 
-from application.services.world_setup import create_world_generator, create_world_service, create_movement_system
-
-from domain.world.services.movement.movement_interpolation import MovementInterpolation
+from bootstrap.world_setup import create_world_generator, create_world_service, create_movement_system
+from domain.services.movement.movement_interpolation import MovementInterpolation
 from infrastructure.persistance.base import Base
 from infrastructure.persistance.session import engine
 
-from interface.game_loop import run_game
+from input.game_loop import run_game
 from shared.config import CONFIG
 from shared.logger import get_logger
 

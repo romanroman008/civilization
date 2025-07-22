@@ -1,12 +1,10 @@
 from dataclasses import dataclass, field
-from typing import Sequence, Optional
+from typing import Sequence
 
-from domain.world.entieties.organism.organism import Organism
-from domain.world.entieties.organism.plant import Plant
-from domain.world.entieties.position import Position
-from domain.world.entieties.renderable import Renderable
-from domain.world.entieties.terrain import Terrain
-from domain.world.entieties.tile import Tile
+from domain.entieties.organism.organism import Organism
+from domain.components.position import Position
+from domain.components.renderable import Renderable
+from domain.entieties.tile import Tile
 
 
 @dataclass

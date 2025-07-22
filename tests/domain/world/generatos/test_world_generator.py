@@ -2,9 +2,9 @@ import numpy as np
 import pytest
 from unittest.mock import Mock, call
 
-import domain.world.services.generators.world_generator as wg_mod
-from domain.world.services.generators.world_generator import WorldGenerator
-from domain.world.entieties.world_map import WorldMap
+import domain.services.generators.world_generator as wg_mod
+from domain.services.generators.world_generator import WorldGenerator
+
 
 @pytest.fixture
 def dummy_logger():

@@ -1,6 +1,6 @@
 import pygame
 
-from domain.world.entieties.position import Position
+from domain.components.position import Position
 
 from infrastructure.rendering.sprite_asset import SpriteAsset
 

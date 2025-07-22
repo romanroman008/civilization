@@ -1,10 +1,10 @@
 import pytest
 from unittest.mock import Mock
 
-import domain.world.services.generators.plants_generator as pg_mod
-from domain.world.services.generators.plants_generator import PlantsGenerator
-from domain.world.entieties.position import Position
-from domain.world.entieties.terrain import Terrain
+import domain.services.generators.plants_generator as pg_mod
+from domain.services.generators.plants_generator import PlantsGenerator
+from domain.components.position import Position
+from domain.components.terrain import Terrain
 
 
 class FakePlant:

@@ -1,7 +1,7 @@
 import numpy as np
 
-from domain.world.entieties.terrain import Terrain
-from domain.world.entieties.tile import Tile
+from domain.components.terrain import Terrain
+from domain.entieties.tile import Tile
 
 
 class TileAdapter:

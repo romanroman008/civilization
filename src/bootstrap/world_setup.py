@@ -1,15 +1,18 @@
 from logging import Logger
 
-from domain.world.entieties.world_map import WorldMap
-from domain.world.services.generators.animals_generator import AnimalsGenerator
-from domain.world.services.generators.elevation_generator import ElevationGenerator
-from domain.world.services.generators.noise.octave import Octave
-from domain.world.services.generators.plants_generator import PlantsGenerator
-from domain.world.services.generators.world_generator import WorldGenerator
-from domain.world.services.generators.noise.noise_generator import NoiseGenerator
-from domain.world.services.generators.noise.open_simplex_noise_generator import OpenSimplexNoiseGenerator
-from domain.world.services.movement.movement_system import MovementSystem
-from domain.world.services.world_service import WorldService
+from domain.entieties.world_map import WorldMap
+from domain.services.generators.animals_generator import AnimalsGenerator
+
+from domain.services.generators.elevation_generator import ElevationGenerator
+from domain.services.generators.noise.noise_generator import NoiseGenerator
+from domain.services.generators.noise.octave import Octave
+from domain.services.generators.plants_generator import PlantsGenerator
+from domain.services.generators.world_generator import WorldGenerator
+
+from domain.services.generators.noise.open_simplex_noise_generator import OpenSimplexNoiseGenerator
+from domain.services.movement.movement_system import MovementSystem
+
+from domain.services.world_service import WorldService
 from shared.config import CONFIG, PLANTS_DIST, ANIMALS_DIST
 
 

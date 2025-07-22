@@ -2,10 +2,10 @@ import pytest
 from types import SimpleNamespace
 from unittest.mock import Mock
 
-from domain.world.entieties.terrain import Terrain
-from domain.world.entieties.tile import Tile
-from domain.world.entieties.world_map import WorldMap
-from domain.world.services.world_service import WorldService
+from domain.components.terrain import Terrain
+from domain.entieties.tile import Tile
+from domain.entieties.world_map import WorldMap
+from domain.services.world_service import WorldService
 from infrastructure.persistance.models.tiledb import TileDB
 from infrastructure.persistance.models.worlddb import WorldDB
 
@@ -43,7 +43,7 @@ def patch_get_session(monkeypatch):
     """
     Podmieniamy get_session na DummyCM, by kontrolować add/commit/execute.
     """
-    import domain.world.services.world_service as ws_mod
+    import domain.services.world_service as ws_mod
     session = DummySession()
     monkeypatch.setattr(ws_mod, 'get_session', lambda: DummyCM(session))
     return session
@@ -110,7 +110,7 @@ def test_get_world_by_name_raises_value_error_when_not_found(service):
     stub.scalar_one_or_none.return_value = None
     patch_get_session = DummySession()
     patch_get_session.execute.return_value = stub
-    import domain.world.services.world_service as ws_mod
+    import domain.services.world_service as ws_mod
     pytest.MonkeyPatch().setattr(ws_mod, 'get_session', lambda: DummyCM(patch_get_session))
 
     with pytest.raises(ValueError) as exc:
@@ -130,7 +130,7 @@ def test_get_world_by_name_returns_worldmap_with_expected_properties_when_record
     stub = Mock()
     stub.scalar_one_or_none.return_value = world_db
     session.execute.return_value = stub
-    import domain.world.services.world_service as ws_mod
+    import domain.services.world_service as ws_mod
     pytest.MonkeyPatch().setattr(ws_mod, 'get_session', lambda: DummyCM(session))
 
     result = service.get_world_by_name("FOUND")

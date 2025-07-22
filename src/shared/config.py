@@ -1,9 +1,8 @@
-import pygame
 
-from domain.world.entieties.organism.animal import Animal
-from domain.world.entieties.organism.plant import Plant
-from domain.world.entieties.terrain import Terrain
-from domain.world.services.generators.noise.octave import Octave
+from domain.components.terrain import Terrain
+from domain.entieties.organism.animal import Animal
+from domain.entieties.organism.plant import Plant
+from domain.services.generators.noise.octave import Octave
 
 CONFIG = {
     "screen_width": 2000,

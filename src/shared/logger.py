@@ -5,7 +5,7 @@ from logging.handlers import RotatingFileHandler
 
 def get_logger(name: str,
                level: int = logging.INFO,
-               log_filename: str = "application.log",
+               log_filename: str = "bootstrap.log",
                log_dir: str = None,
                max_bytes: int = 10_000_000,
                backup_count: int = 5,

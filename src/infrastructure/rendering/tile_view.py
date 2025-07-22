@@ -2,9 +2,6 @@ from dataclasses import dataclass
 import pygame
 from pygame.examples.grid import TILE_SIZE
 
-from domain.world.entieties.terrain import Terrain
-from domain.world.entieties.tile import Tile
-
 
 @dataclass
 class TileView:

@@ -3,8 +3,8 @@ from collections import defaultdict
 
 import pygame
 
-from domain.world.entieties.position import Position
-from domain.world.entieties.world_map import WorldMap
+from domain.components.position import Position
+from domain.entieties.world_map import WorldMap
 from infrastructure.rendering.camera import Camera
 from infrastructure.rendering.sprite import Sprite
 

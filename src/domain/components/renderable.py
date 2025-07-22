@@ -1,7 +1,7 @@
 from typing import Protocol
 
 
-from domain.world.entieties.position import Position
+from domain.components.position import Position
 
 
 class Renderable(Protocol):

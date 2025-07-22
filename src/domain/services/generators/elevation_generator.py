@@ -1,7 +1,7 @@
 import math
 
 
-from domain.world.services.generators.noise.noise_generator import NoiseGenerator
+from domain.services.generators.noise.noise_generator import NoiseGenerator
 
 
 class ElevationGenerator:

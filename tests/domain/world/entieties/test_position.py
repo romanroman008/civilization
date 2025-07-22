@@ -1,6 +1,6 @@
 import pytest
 
-from domain.world.entieties.position import Position
+from domain.components.position import Position
 
 
 class TestPositionDistance:
