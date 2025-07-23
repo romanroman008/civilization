@@ -1,8 +1,5 @@
 from dataclasses import dataclass
 
-from domain.components.direction import Direction
-from domain.components.position import Position
-
 
 @dataclass(frozen=True)
 class OrganismPrefab:

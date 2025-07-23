@@ -21,8 +21,8 @@ class Sprite:
         sprite_height = self.asset.tile_size[1] * tile_size
 
         # Anchor (w tile’ach) × tile_size → offset w pikselach od anchor do lewego górnego rogu
-        offset_x = self.asset.anchor[0] * tile_size - self.offset[0] * tile_size
-        offset_y = self.asset.anchor[1] * tile_size - self.offset[1] * tile_size
+        offset_x = self.asset.anchor[0] * tile_size - self.offset[0] / 100 * tile_size
+        offset_y = self.asset.anchor[1] * tile_size - self.offset[1] / 100 * tile_size
 
         # Lewy górny róg = anchor point - offset
         px = int(anchor_px_x - offset_x)

@@ -1,7 +1,7 @@
 import logging
 
 from bootstrap.world_setup import create_world_generator, create_world_service, create_movement_system
-from domain.services.movement.movement_interpolation import MovementInterpolation
+
 from infrastructure.persistance.base import Base
 from infrastructure.persistance.session import engine
 
@@ -36,12 +36,14 @@ def main():
     world = world_service.create_new_world(CONFIG["map_width"], CONFIG["map_height"], CONFIG["scale"])
 
     movement_system = create_movement_system(logger, world)
-    movement_interpolation = MovementInterpolation(world.organisms)
+
 
 
     scheduler.start()
     scheduler.add_job(lambda: movement_system(2), 'interval', seconds=2)
-    scheduler.add_job(lambda: movement_interpolation(0.1), 'interval', seconds=0.1)
+
+    for o in world.organisms:
+        scheduler.add_job(o, 'interval', seconds=0.01)
 
 
     # try:

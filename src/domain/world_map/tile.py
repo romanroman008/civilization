@@ -2,9 +2,10 @@
 
 from dataclasses import dataclass, field
 from typing import List
-from domain.organism.organismdepr import OrganismDEPR
+
 from domain.components.position import Position
 from domain.components.terrain import Terrain
+from domain.organism.instances.organism import Organism
 
 
 @dataclass
@@ -13,7 +14,7 @@ class Tile:
     _x: int
     _y: int
     _terrain: Terrain
-    _organisms: List[OrganismDEPR] = field(default_factory=list)
+    _organisms: List[Organism] = field(default_factory=list)
 
     @property
     def id(self):
@@ -44,11 +45,11 @@ class Tile:
         return Position(self.x, self.y)
 
 
-    def add_organism(self, organism: OrganismDEPR):
+    def add_organism(self, organism: Organism):
         self._organisms.append(organism)
 
 
-    def remove_organism(self, organism: OrganismDEPR):
+    def remove_organism(self, organism: Organism):
         if organism in self._organisms:
             self._organisms.remove(organism)
 

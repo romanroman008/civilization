@@ -1,13 +1,14 @@
 import random
 
-from domain.organism.plant import Plant
+
 from domain.components.position import Position
+from domain.organism.instances.plant import Plant
+from domain.organism.prefabs.organism_prefab import OrganismPrefab
 from domain.world_map.world_map import WorldMap
 
 
 class PlantsGenerator:
-    def \
-            __init__(self, count: int, species_distribution: list[tuple[Plant, float]]):
+    def __init__(self, count: int, species_distribution: list[tuple[OrganismPrefab, float]]):
         self.count = count
         self.species_distribution = species_distribution
         self.world: WorldMap | None = None
@@ -24,9 +25,7 @@ class PlantsGenerator:
 
 
             for position in approved_positions:
-                plant = Plant(organism.name, organism.allowed_terrains)
-                plant.position = position
-                plant.target_position = position
+                plant = Plant(organism, position)
                 world.add_organism(plant)
 
 
@@ -35,18 +34,18 @@ class PlantsGenerator:
 
 
 
-    def _get_valid_positions(self, height: int, width: int, plant: Plant) -> list[Position]:
+    def _get_valid_positions(self, height: int, width: int, organism: OrganismPrefab) -> list[Position]:
         return [
             Position(x, y)
             for x in range (height)
             for y in range (width)
-            if self._is_valid_position(Position(x,y), plant)
+            if self._is_valid_position(Position(x,y), organism)
         ]
 
 
-    def _is_valid_position(self, position: Position, plant: Plant) -> bool:
+    def _is_valid_position(self, position: Position, organism: OrganismPrefab) -> bool:
         tile = self.world.get_tile_by_position(position)
-        return tile.terrain in plant.allowed_terrains
+        return tile.terrain in organism.allowed_terrains
 
     def _get_random_positions_with_blocking(
             self,

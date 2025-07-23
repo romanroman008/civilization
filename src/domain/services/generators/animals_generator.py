@@ -1,7 +1,9 @@
 import random
 
-from domain.organism.animal import Animal
+
 from domain.components.position import Position
+from domain.organism.instances.animal import Animal
+from domain.organism.prefabs.organism_prefab import OrganismPrefab
 from domain.world_map.world_map import WorldMap
 
 
@@ -11,7 +13,7 @@ def _get_random_positions(positions: list[Position], amount:int) -> list[Positio
 
 
 class AnimalsGenerator:
-    def __init__(self, count: int, species_distribution: list[tuple[Animal, float]]):
+    def __init__(self, count: int, species_distribution: list[tuple[OrganismPrefab, float]]):
         self.count = count
         self.species_distribution = species_distribution
         self.world: WorldMap | None = None
@@ -24,12 +26,10 @@ class AnimalsGenerator:
             amount = int(fraction * self.count)
             available_positions = self._get_valid_positions(world.height, world.width, organism)
             approved_positions = _get_random_positions(available_positions, amount)
-
+            animal_prefab = OrganismPrefab(organism.name, organism.allowed_terrains)
 
             for position in approved_positions:
-                animal = Animal(organism.name, organism.allowed_terrains)
-                animal.position = position
-                animal.target_position = position
+                animal = Animal(animal_prefab, position)
                 world.add_organism(animal)
 
 

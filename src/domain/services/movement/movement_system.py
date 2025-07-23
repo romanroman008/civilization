@@ -1,14 +1,20 @@
+from __future__ import annotations
 import random
 
 from domain.components.direction import Direction
-from domain.organism.animal import Animal
-from domain.organism.organismdepr import OrganismDEPR
+
 from domain.components.position import Position
+from domain.components.terrain import Terrain
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from domain.organism.instances.animal import Animal
+
+from domain.organism.instances.organism import Organism
 from domain.world_map.world_map import WorldMap
 
 
-def _is_terrain_allowed(tile, organism: OrganismDEPR):
-    if tile.terrain in organism.allowed_terrains:
+def _is_terrain_allowed(tile, allowed_terrains: list[Terrain]):
+    if tile.terrain in allowed_terrains:
         return True
     return False
 
@@ -18,7 +24,7 @@ def find_needed_offset(organism) -> tuple[float,float]:
     return offset_x, offset_y
 
 def find_target_position(actual:Position, direction: Direction, distance: int):
-    return actual - direction.vector() * distance
+    return actual + direction.vector() * distance
 
 def find_needed_direction(actual_position: Position, target_position: Position) -> Direction:
     position_diff = target_position - actual_position
@@ -52,49 +58,36 @@ def find_shortest_rotation(current: Direction, desired: Direction) -> float:
 
 
 class MovementSystem:
+
     def __init__(self, logger, world_map: WorldMap):
+        from domain.organism.instances.animal import Animal
         self.logger = logger
         self.world = world_map
         self.animals = [o for o in world_map.organisms if isinstance(o, Animal)]
 
 
     def move_animal(self, animal: Animal):
-        if not animal.is_alive:
-            return
-        animal.isMoving = True
         directions = self._get_valid_directions(animal)
         chosen_direction = random.choice(directions)
-
-        #with animal.lock:
-        new_position = animal.position + chosen_direction.vector()
-        animal.target_position = new_position
-        target_direction =  _find_needed_rotation(animal)
-        animal.target_rotation = _find_shortest_rotation(animal.facing, target_direction)
-        if target_direction == Direction.IDLE:
-            animal.isMoving = False
-            animal.target_rotation = animal.rotation
-            return
-
-        animal.target_facing = target_direction
+        animal.move(chosen_direction)
 
 
 
 
-
-    def _get_valid_directions(self, organism: OrganismDEPR):
+    def _get_valid_directions(self, organism: Organism):
         valid_directions = []
         position = organism.position
         for d in Direction:
             pos = position + d.vector()
-            if self._is_move_valid(pos, organism):
+            if self._is_move_valid(pos, organism.allowed_terrains):
                 valid_directions.append(d)
 
         return valid_directions
 
-    def _is_move_valid(self, pos: Position, organism: OrganismDEPR) -> bool:
+    def _is_move_valid(self, pos: Position, allowed_terrains: list[Terrain]) -> bool:
         if not self.world.is_position_available(pos):
             return False
-        if not _is_terrain_allowed(self.world.get_tile_by_position(pos), organism):
+        if not _is_terrain_allowed(self.world.get_tile_by_position(pos), allowed_terrains):
             return False
         return True
 
@@ -103,8 +96,7 @@ class MovementSystem:
 
     def __call__(self, interval:float, *args, **kwargs):
         for animal in self.animals:
-            if animal.isMoving:
+            if animal.is_moving:
                 continue
             self.move_animal(animal)
-
             self.logger.debug(f"Animal: {animal.name} moved to {animal.position}")

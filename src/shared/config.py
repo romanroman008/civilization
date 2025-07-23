@@ -1,7 +1,7 @@
 
 from domain.components.terrain import Terrain
-from domain.organism import Animal
-from domain.organism import Plant
+from domain.organism.prefabs.organism_prefab import OrganismPrefab
+
 from domain.services.generators.noise.octave import Octave
 
 CONFIG = {
@@ -20,7 +20,7 @@ CONFIG = {
         Octave(2.0, 0.5),
         Octave(4.0, 0.25),
     ],
-    "animals_count": 100,
+    "animals_count": 3,
     "plants_count": 0,
 }
 
@@ -33,10 +33,10 @@ DEFAULT_KEY_BINDINGS = {
 }
 
 PLANTS_DIST = [
-    (Plant(_name="Berries", _allowed_terrains={Terrain.GRASS}), 1),
-    (Plant(_name="Tree", _allowed_terrains={Terrain.GRASS}, _block_radius=1), 1)
+    (OrganismPrefab(name="Berries", allowed_terrains={Terrain.GRASS}), 1),
+    (OrganismPrefab(name="Tree", allowed_terrains={Terrain.GRASS}, block_radius=1), 1)
 ]
 
 ANIMALS_DIST = [
-    (Animal(_name="Rabbit", _allowed_terrains={Terrain.GRASS}), 1)
+    (OrganismPrefab(name="Rabbit", allowed_terrains={Terrain.GRASS}), 1)
 ]
