@@ -81,6 +81,9 @@ class WorldMap:
         tile.add_organism(organism)
         self._organisms.append(organism)
 
+    def set_as_move_target(self, position: Position):
+        if self.is_position_in_bounds(position):
+            self.get_tile_by_coords(position.x, position.y).set_as_move_target()
 
 
 

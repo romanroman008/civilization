@@ -7,10 +7,11 @@ from domain.components.position import Position
 from domain.components.terrain import Terrain
 from typing import TYPE_CHECKING
 
-from tests.domain.world.entieties.test_world_map import world
+
 
 if TYPE_CHECKING:
     from domain.organism.instances.animal import Animal
+    from domain.organism.instances.human import Human
 
 from domain.organism.instances.organism import Organism
 from domain.world_map.world_map import WorldMap
@@ -67,17 +68,21 @@ class MovementSystem:
 
     def __init__(self, logger, world_map: WorldMap):
         from domain.organism.instances.animal import Animal
+        from domain.organism.instances.human import Human
         self._counter = 0
         self.logger = logger
         self.world = world_map
         self.animals = [o for o in world_map.organisms if isinstance(o, Animal)]
-        self._set_finalize_movement_call(self.animals)
+        self.humans = [o for o in world_map.organisms if isinstance(o, Human)]
+        self._set_finalize_movement_call(self.animals, self.humans)
 
 
-    def _set_finalize_movement_call(self, animals:list[Animal]):
+    def _set_finalize_movement_call(self, animals:list[Animal], humans: list[Human]):
         for animal in animals:
             animal.add_finalized_move(self.update_organism_occupied_position)
 
+        for human in humans:
+            human.add_finalized_move(self.update_organism_occupied_position)
 
 
     def update_organism_occupied_position(self, prev: Position, new: Position):
@@ -89,8 +94,20 @@ class MovementSystem:
 
     def move_animal(self, animal: Animal):
         directions = self._get_valid_directions(animal)
+        if not directions:
+            return
         chosen_direction = random.choice(directions)
         animal.move(chosen_direction)
+        self.world.set_as_move_target(animal.target_position)
+
+    def move_human(self, human: Human):
+        directions = self._get_valid_directions(human)
+        if not directions:
+            return
+        chosen_direction = random.choice(directions)
+        human.move(chosen_direction)
+        self.world.set_as_move_target(human.target_position)
+
 
 
 
@@ -117,8 +134,12 @@ class MovementSystem:
     def __call__(self, interval:float, *args, **kwargs):
         self._counter += 1
         for animal in self.animals:
-            print(f"Animal: {animal.id}, iteration: {self._counter}")
             if animal.is_moving:
                 continue
             self.move_animal(animal)
+
+        for human in self.humans:
+            if human.is_moving:
+                continue
+            self.move_human(human)
 

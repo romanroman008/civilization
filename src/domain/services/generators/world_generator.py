@@ -1,6 +1,7 @@
 import numpy as np
 from tqdm import tqdm
 
+from domain.services.generators.human_generator import HumanGenerator
 from domain.world_map.tile import Tile
 from domain.world_map.world_map import WorldMap
 from domain.services.generators.animals_generator import AnimalsGenerator
@@ -15,7 +16,8 @@ class WorldGenerator:
                  logger,
                  elevation_generator: ElevationGenerator,
                  plants_generator: PlantsGenerator,
-                 animals_generator: AnimalsGenerator
+                 animals_generator: AnimalsGenerator,
+                 human_generator: HumanGenerator
                  ):
 
         self.logger = logger
@@ -23,6 +25,7 @@ class WorldGenerator:
         self.elevation_generator = elevation_generator
         self.plants_generator = plants_generator
         self.animals_generator = animals_generator
+        self.human_generator = human_generator
 
         self.height = 100
         self.width = 100
@@ -34,6 +37,7 @@ class WorldGenerator:
         world = WorldMap(1,"Brave new world", width, height, tiles)
         world = self._generate_plants(world)
         world = self._generate_animals(world)
+        world = self._generate_humans(world)
 
         return world
 
@@ -66,6 +70,12 @@ class WorldGenerator:
         self.logger.info("Generating animals started ...")
         world = self.animals_generator.generate(world)
         self.logger.info("Finished generating animals")
+        return world
+
+    def _generate_humans(self, world: WorldMap) -> WorldMap:
+        self.logger.info("Generating humans started ...")
+        world = self.human_generator.generate(world)
+        self.logger.info("Finished generating humans")
         return world
 
     def __normalize_latitude(self, y: int) -> float:

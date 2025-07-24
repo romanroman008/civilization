@@ -1,5 +1,6 @@
 from logging import Logger
 
+from domain.services.generators.human_generator import HumanGenerator
 from domain.world_map.world_map import WorldMap
 from domain.services.generators.animals_generator import AnimalsGenerator
 
@@ -13,7 +14,7 @@ from domain.services.generators.noise.open_simplex_noise_generator import OpenSi
 from domain.services.movement.movement_system import MovementSystem
 
 from domain.services.world_service import WorldService
-from shared.config import CONFIG, PLANTS_DIST, ANIMALS_DIST
+from shared.config import CONFIG, PLANTS_DIST, ANIMALS_DIST, HUMAN_DIST
 
 
 def create_elevation_noise_generator(elevation_seed: int, elevation_octaves: list[Octave]) -> NoiseGenerator:
@@ -28,7 +29,8 @@ def create_world_generator(logger: Logger) -> WorldGenerator:
 
     plants_generator = create_plant_generator(CONFIG["plants_count"], PLANTS_DIST)
     animals_generator = create_animal_generator(CONFIG["animals_count"], ANIMALS_DIST)
-    return WorldGenerator(logger, elevation_generator,plants_generator, animals_generator)
+    human_generator = create_human_generator(CONFIG["human_count"], HUMAN_DIST)
+    return WorldGenerator(logger, elevation_generator,plants_generator, animals_generator, human_generator)
 
 
 
@@ -42,6 +44,9 @@ def create_plant_generator(count, plant_dist) -> PlantsGenerator:
 
 def create_animal_generator(count, animal_dist) -> AnimalsGenerator:
     return AnimalsGenerator(count, animal_dist)
+
+def create_human_generator(count, human_dist) -> HumanGenerator:
+    return HumanGenerator(count, human_dist)
 
 def create_world_service(world_generator: WorldGenerator):
     return WorldService(world_generator)

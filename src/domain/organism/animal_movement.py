@@ -9,7 +9,7 @@ from domain.services.movement.movement_system import (
 import math
 
 
-class Movement:
+class AnimalMovement:
     def __init__(self, position: Position, direction: Direction = Direction.BOT):
         self._position = position
         self._target_position = position
@@ -128,3 +128,7 @@ class Movement:
     @property
     def is_moving(self) -> bool:
         return self._is_moving
+
+    @property
+    def target_position(self) -> Position:
+        return self._target_position

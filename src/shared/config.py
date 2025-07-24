@@ -5,12 +5,12 @@ from domain.organism.prefabs.organism_prefab import OrganismPrefab
 from domain.services.generators.noise.octave import Octave
 
 CONFIG = {
-    "screen_width": 2000,
-    "screen_height": 1000,
+    "screen_width": 800,
+    "screen_height": 600,
     "tile_size": 32,
     "fps": 60,
-    "map_height":2,
-    "map_width": 1,
+    "map_height":30,
+    "map_width": 40,
     "scale": 50,
     "climate_zones": "climate_zones.json",
     "elevation_seed": 1200,
@@ -20,8 +20,9 @@ CONFIG = {
         Octave(2.0, 0.5),
         Octave(4.0, 0.25),
     ],
-    "animals_count": 1,
+    "animals_count": 100,
     "plants_count": 0,
+    "human_count": 100
 }
 
 
@@ -39,4 +40,8 @@ PLANTS_DIST = [
 
 ANIMALS_DIST = [
     (OrganismPrefab(name="Rabbit", allowed_terrains={Terrain.GRASS}), 1)
+]
+
+HUMAN_DIST = [
+    (OrganismPrefab(name="Human", allowed_terrains={Terrain.GRASS}), 1)
 ]

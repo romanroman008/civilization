@@ -15,6 +15,7 @@ class Tile:
     _y: int
     _terrain: Terrain
     _organisms: List[Organism] = field(default_factory=list)
+    _is_occupied: bool = False
 
     @property
     def id(self):
@@ -38,20 +39,25 @@ class Tile:
 
     @property
     def is_occupied(self):
-        return bool(self._organisms)
+        return self._is_occupied
 
     @property
     def position(self) -> Position:
         return Position(self.x, self.y)
 
+    def set_as_move_target(self):
+        self._is_occupied = True
+
 
     def add_organism(self, organism: Organism):
         self._organisms.append(organism)
+        self._is_occupied = True
 
 
     def remove_organism(self, organism: Organism):
         if organism in self._organisms:
             self._organisms.remove(organism)
+            self._is_occupied = False
 
     @property
     def organisms(self) -> list[Organism]:
