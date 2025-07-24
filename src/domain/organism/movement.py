@@ -1,3 +1,4 @@
+from typing import Callable, Optional
 
 from domain.components.direction import Direction
 from domain.components.position import Position
@@ -30,6 +31,10 @@ class Movement:
         self._offset_step_y = 0
 
         self._is_moving = False
+        self.on_finalized_move: Optional[Callable[[Position, Position], None]] = None
+
+    def add_finalized_move(self, finalized_move: Callable[[Position,Position], None]):
+        self.on_finalized_move = finalized_move
 
     def start_move(self, direction: Direction, distance: int, position: Position):
         self._is_moving = True
@@ -91,12 +96,14 @@ class Movement:
         return self._offset_y == self._target_offset_y
 
     def _finalize_movement(self):
+        self.on_finalized_move(self._position, self._target_position)
         self._position = self._target_position
         self._offset_x = 0
         self._offset_y = 0
         self._target_offset_x = 0
         self._target_offset_y = 0
         self._is_moving = False
+
 
     @property
     def position(self) -> Position:

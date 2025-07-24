@@ -53,4 +53,8 @@ class Tile:
         if organism in self._organisms:
             self._organisms.remove(organism)
 
+    @property
+    def organisms(self) -> list[Organism]:
+        return self._organisms
+
 

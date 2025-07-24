@@ -37,8 +37,8 @@ class PlantsGenerator:
     def _get_valid_positions(self, height: int, width: int, organism: OrganismPrefab) -> list[Position]:
         return [
             Position(x, y)
-            for x in range (height)
-            for y in range (width)
+            for y in range (height)
+            for x in range (width)
             if self._is_valid_position(Position(x,y), organism)
         ]
 
@@ -50,29 +50,30 @@ class PlantsGenerator:
     def _get_random_positions_with_blocking(
             self,
             candidates: list[Position],
-            plant: Plant,
+            organism: OrganismPrefab,
             count: int
     ) -> list[Position]:
+
         selected: list[Position] = []
         available = candidates[:]
         random.shuffle(available)
         blocked_set: set[tuple[int, int]] = set()
 
-        for pos in available:
-            if (pos.x, pos.y) in blocked_set:
-                continue
+        for _ in range(count):
+            for pos in available:
+                if (pos.x, pos.y) in blocked_set:
+                    continue
 
-            blocked_area = self._get_blocked_area(pos, plant.block_radius)
-            blocked_coords = {(p.x, p.y) for p in blocked_area}
+                blocked_area = self._get_blocked_area(pos, organism.block_radius)
+                blocked_coords = {(p.x, p.y) for p in blocked_area}
 
-            if blocked_coords & blocked_set:
-                continue
+                if blocked_coords & blocked_set:
+                    continue
 
-            selected.append(pos)
-            blocked_set.update(blocked_coords)
+                selected.append(pos)
+                blocked_set.update(blocked_coords)
 
-            if len(selected) >= count:
-                break
+
 
         return selected
 

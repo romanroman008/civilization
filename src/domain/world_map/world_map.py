@@ -82,6 +82,8 @@ class WorldMap:
         self._organisms.append(organism)
 
 
+
+
     def get_all_renderable(self) -> Sequence[Renderable]:
         renderable = []
         renderable.extend(self.tiles)

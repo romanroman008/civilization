@@ -6,6 +6,9 @@ from domain.components.direction import Direction
 from domain.components.position import Position
 from domain.components.terrain import Terrain
 from typing import TYPE_CHECKING
+
+from tests.domain.world.entieties.test_world_map import world
+
 if TYPE_CHECKING:
     from domain.organism.instances.animal import Animal
 
@@ -57,20 +60,37 @@ def find_shortest_rotation(current: Direction, desired: Direction) -> float:
 
 
 
+
+
 class MovementSystem:
+
 
     def __init__(self, logger, world_map: WorldMap):
         from domain.organism.instances.animal import Animal
+        self._counter = 0
         self.logger = logger
         self.world = world_map
         self.animals = [o for o in world_map.organisms if isinstance(o, Animal)]
+        self._set_finalize_movement_call(self.animals)
 
+
+    def _set_finalize_movement_call(self, animals:list[Animal]):
+        for animal in animals:
+            animal.add_finalized_move(self.update_organism_occupied_position)
+
+
+
+    def update_organism_occupied_position(self, prev: Position, new: Position):
+        prev_tile = self.world.get_tile_by_position(prev)
+        animal = prev_tile.organisms[0]
+        prev_tile.remove_organism(animal)
+        act_tile = self.world.get_tile_by_position(new)
+        act_tile.add_organism(animal)
 
     def move_animal(self, animal: Animal):
         directions = self._get_valid_directions(animal)
         chosen_direction = random.choice(directions)
         animal.move(chosen_direction)
-
 
 
 
@@ -95,8 +115,10 @@ class MovementSystem:
 
 
     def __call__(self, interval:float, *args, **kwargs):
+        self._counter += 1
         for animal in self.animals:
+            print(f"Animal: {animal.id}, iteration: {self._counter}")
             if animal.is_moving:
                 continue
             self.move_animal(animal)
-            self.logger.debug(f"Animal: {animal.name} moved to {animal.position}")
+

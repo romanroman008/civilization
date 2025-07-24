@@ -37,18 +37,18 @@ class AnimalsGenerator:
 
 
 
-    def _get_valid_positions(self, height: int, width: int, animal: Animal) -> list[Position]:
+    def _get_valid_positions(self, height: int, width: int, organism: OrganismPrefab) -> list[Position]:
         return [
             Position(x, y)
-            for x in range (height)
-            for y in range (width)
-            if self._is_valid_position(Position(x,y), animal)
+            for y in range (height)
+            for x in range (width)
+            if self._is_valid_position(Position(x,y), organism)
         ]
 
 
-    def _is_valid_position(self, position: Position, animal: Animal) -> bool:
+    def _is_valid_position(self, position: Position, organism: OrganismPrefab) -> bool:
         tile = self.world.get_tile_by_position(position)
-        return tile.terrain in animal.allowed_terrains
+        return tile.terrain in organism.allowed_terrains
 
 
 

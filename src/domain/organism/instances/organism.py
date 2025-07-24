@@ -1,11 +1,14 @@
 from abc import ABC
+from itertools import count
 
 from domain.components.position import Position
 from domain.organism.prefabs.organism_prefab import OrganismPrefab
 
 
 class Organism(ABC):
+    _id_counter = count(1)
     def __init__(self, prefab: OrganismPrefab, position: Position):
+        self._id = next(Organism._id_counter)
         self._prefab = prefab
         self._position = position
         self._rotation = 0
@@ -14,6 +17,10 @@ class Organism(ABC):
 
     def __call__(self, *args, **kwargs):
         pass
+
+    @property
+    def id(self) -> int:
+        return self._id
 
     @property
     def sprite_key(self) -> str:

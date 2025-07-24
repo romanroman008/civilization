@@ -1,3 +1,5 @@
+from typing import Callable
+
 from domain.components.direction import Direction
 from domain.components.position import Position
 from domain.organism.instances.organism import Organism
@@ -11,11 +13,15 @@ class Animal(Organism):
         super().__init__(prefab, position)
         self._movement = Movement(position)
 
+    def add_finalized_move(self, on_finalized_move: Callable[[Position, Position], None]):
+        self._movement.add_finalized_move(on_finalized_move)
+
     def move(self, direction: Direction, distance: int = 1):
         self._movement.start_move(direction, distance, self._movement.position)
 
     def __call__(self, *args, **kwargs):
         self._movement.tick()
+        #print(f"Animal {self.id} tick")
 
     @property
     def is_moving(self) -> bool:

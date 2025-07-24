@@ -9,8 +9,8 @@ CONFIG = {
     "screen_height": 1000,
     "tile_size": 32,
     "fps": 60,
-    "map_height": 100,
-    "map_width": 100,
+    "map_height":2,
+    "map_width": 1,
     "scale": 50,
     "climate_zones": "climate_zones.json",
     "elevation_seed": 1200,
@@ -20,7 +20,7 @@ CONFIG = {
         Octave(2.0, 0.5),
         Octave(4.0, 0.25),
     ],
-    "animals_count": 3,
+    "animals_count": 1,
     "plants_count": 0,
 }
 
