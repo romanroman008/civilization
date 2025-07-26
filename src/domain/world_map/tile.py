@@ -1,7 +1,7 @@
 
 
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Optional
 
 from domain.components.position import Position
 from domain.components.terrain import Terrain
@@ -14,7 +14,7 @@ class Tile:
     _x: int
     _y: int
     _terrain: Terrain
-    _organisms: List[Organism] = field(default_factory=list)
+    _organism: Optional[Organism] = None
     _is_occupied: bool = False
 
     @property
@@ -26,7 +26,7 @@ class Tile:
         return self._terrain
 
     @property
-    def terrain(self) -> str:
+    def terrain(self) -> Terrain:
         return self._terrain
 
     @property
@@ -50,17 +50,16 @@ class Tile:
 
 
     def add_organism(self, organism: Organism):
-        self._organisms.append(organism)
+        self._organism = organism
         self._is_occupied = True
 
 
-    def remove_organism(self, organism: Organism):
-        if organism in self._organisms:
-            self._organisms.remove(organism)
-            self._is_occupied = False
+    def remove_organism(self):
+        self._organism = None
+        self._is_occupied = False
 
     @property
-    def organisms(self) -> list[Organism]:
-        return self._organisms
+    def organism(self) -> Optional[Organism]:
+        return self._organism
 
 

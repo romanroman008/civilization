@@ -1,12 +1,17 @@
 from dataclasses import dataclass, field
-from typing import Sequence
-
+from typing import Sequence, Optional
 
 from domain.components.position import Position
 from domain.components.renderable import Renderable
+from domain.components.terrain import Terrain
 from domain.organism.instances.organism import Organism
 from domain.world_map.tile import Tile
 
+
+def _is_terrain_allowed(tile, allowed_terrains: set[Terrain]):
+    if tile.terrain in allowed_terrains:
+        return True
+    return False
 
 @dataclass
 class WorldMap:
@@ -48,11 +53,20 @@ class WorldMap:
     def organisms(self) -> Sequence[Organism]:
         return tuple(self._organisms)
 
-    def get_tile_by_coords(self, x: int, y: int) -> Tile:
-        return self._tile_by_coords[(x, y)]
+    def _get_tile_by_coords(self, x: int, y: int) -> Optional[Tile]:
+        if self.are_coords_in_bounds(x, y):
+            return self._tile_by_coords[(x, y)]
+        return None
 
-    def get_tile_by_position(self, position: Position) -> Tile:
-        return self.get_tile_by_coords(position.x, position.y)
+    def get_tile_by_position(self, position: Position) -> Optional[Tile]:
+        return self._get_tile_by_coords(position.x, position.y)
+
+    def is_position_allowed(self, position: Position, allowed_terrains: set[Terrain]) -> bool:
+        if self.are_coords_in_bounds(position.x, position.y):
+            tile = self._get_tile_by_coords(position.x, position.y)
+            return (_is_terrain_allowed(tile, allowed_terrains)) and not tile.is_occupied
+        return False
+
 
 
     def is_tile_occupied(self, x: int, y: int) -> bool:
@@ -61,6 +75,10 @@ class WorldMap:
     def is_position_occupied(self, position: Position) -> bool:
         return self._tile_by_coords[position.x, position.y].is_occupied
 
+    def are_coords_in_bounds(self, x: int, y: int) -> bool:
+        if 0 <= x < self.width and 0 <= y < self.height:
+            return True
+        return False
 
     def is_position_in_bounds(self, position: Position) -> bool:
         if 0 <= position.x < self.width and 0 <= position.y < self.height:
@@ -83,8 +101,7 @@ class WorldMap:
 
     def set_as_move_target(self, position: Position):
         if self.is_position_in_bounds(position):
-            self.get_tile_by_coords(position.x, position.y).set_as_move_target()
-
+            self._get_tile_by_coords(position.x, position.y).set_as_move_target()
 
 
     def get_all_renderable(self) -> Sequence[Renderable]:
@@ -93,5 +110,25 @@ class WorldMap:
         renderable.extend(self.organisms)
         return renderable
 
+
+    def _get_tiles_by_positions(self, positions:list[Position]) -> list[Tile]:
+        tiles = []
+        for position in positions:
+            if self.is_position_in_bounds(position):
+                tiles.append(self._get_tile_by_coords(position.x, position.y))
+        return tiles
+
+    def get_organisms_by_positions(self, positions:list[Position]):
+        tiles = self._get_tiles_by_positions(positions)
+        organisms = []
+        for tile in tiles:
+            organisms.append(tile.organism)
+        return organisms
+
+    def get_terrains_by_positions(self, positions:list[Position]):
+        tiles = self._get_tiles_by_positions(positions)
+        terrains = []
+        for tile in tiles:
+            terrains.append()
 
 

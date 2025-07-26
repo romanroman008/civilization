@@ -42,13 +42,8 @@ class AnimalsGenerator:
             Position(x, y)
             for y in range (height)
             for x in range (width)
-            if self._is_valid_position(Position(x,y), organism)
+            if self.world.is_position_allowed(Position(x,y), organism.allowed_terrains)
         ]
-
-
-    def _is_valid_position(self, position: Position, organism: OrganismPrefab) -> bool:
-        tile = self.world.get_tile_by_position(position)
-        return tile.terrain in organism.allowed_terrains
 
 
 

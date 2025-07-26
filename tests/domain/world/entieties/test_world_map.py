@@ -55,7 +55,7 @@ def test_properties(world):
     (3,2)
 ])
 def test_get_tiles_by_coords(world, tiles, x, y):
-    tile = world.get_tile_by_coords(x,y)
+    tile = world._get_tile_by_coords(x, y)
     assert tile.x == x
     assert tile.y == y
 
@@ -70,13 +70,13 @@ def test_get_tiles_by_coords(world, tiles, x, y):
 ])
 def test_get_tile_by_invalid_coords(world, tiles, x, y):
     with pytest.raises(KeyError):
-        world.get_tile_by_coords(x,y)
+        world._get_tile_by_coords(x, y)
 
 
 def test_get_tile_by_position(world):
     pos = Position(2, 1)
     # powinno delegować do get_tile_by_coords
-    assert world.get_tile_by_position(pos) is world.get_tile_by_coords(2, 1)
+    assert world.get_tile_by_position(pos) is world._get_tile_by_coords(2, 1)
 
 
 def test_is_tile_and_position_occupied(world):
@@ -85,7 +85,7 @@ def test_is_tile_and_position_occupied(world):
     assert not world.is_position_occupied(Position(0, 0))
 
     # zasymulujmy zajęcie kafla (np. przez dodanie organizmu)
-    tile = world.get_tile_by_coords(1, 1)
+    tile = world._get_tile_by_coords(1, 1)
     dummy_org = Mock()
     tile.add_organism(dummy_org)
 
@@ -115,7 +115,7 @@ def test_is_position_available(world, tiles, x, y, occupy, expected):
     pos = Position(x, y)
     if occupy and world.is_position_in_bounds(pos):
         # zajmujemy kafel przez dodanie organizmu
-        world.get_tile_by_coords(x, y).add_organism(Mock())
+        world._get_tile_by_coords(x, y).add_organism(Mock())
     assert world.is_position_available(pos) is expected
 
 
@@ -123,7 +123,7 @@ def test_add_organism_appends_and_marks_tile(world):
     # przygotuj dummy-organizm z pozycją
     dummy = Mock()
     dummy.position = Position(3, 2)
-    target = world.get_tile_by_coords(3, 2)
+    target = world._get_tile_by_coords(3, 2)
 
     # przed dodaniem nic nie ma
     assert not target._organisms

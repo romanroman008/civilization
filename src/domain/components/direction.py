@@ -8,7 +8,6 @@ class Direction(Enum):
     BOT = ((0, 1), 0)
     LEFT = ((-1, 0), 90)
     RIGHT = ((1, 0), -90)
-    IDLE = ((0, 0), 0)
 
     def vector(self) -> Position:
         return Position(*self.value[0])

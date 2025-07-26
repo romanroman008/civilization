@@ -17,10 +17,7 @@ from domain.organism.instances.organism import Organism
 from domain.world_map.world_map import WorldMap
 
 
-def _is_terrain_allowed(tile, allowed_terrains: list[Terrain]):
-    if tile.terrain in allowed_terrains:
-        return True
-    return False
+
 
 def find_needed_offset(organism) -> tuple[float,float]:
     offset_x = organism.target_position.x - organism.position.x
@@ -30,18 +27,6 @@ def find_needed_offset(organism) -> tuple[float,float]:
 def find_target_position(actual:Position, direction: Direction, distance: int):
     return actual + direction.vector() * distance
 
-def find_needed_direction(actual_position: Position, target_position: Position) -> Direction:
-    position_diff = target_position - actual_position
-
-    if position_diff == Direction.LEFT.vector():
-        return Direction.LEFT
-    if position_diff == Direction.TOP.vector():
-        return Direction.TOP
-    if position_diff == Direction.RIGHT.vector():
-        return Direction.RIGHT
-    if position_diff == Direction.BOT.vector():
-        return Direction.BOT
-    return Direction.IDLE
 
 
 def find_shortest_rotation(current: Direction, desired: Direction) -> float:
@@ -65,7 +50,6 @@ def find_shortest_rotation(current: Direction, desired: Direction) -> float:
 
 class MovementSystem:
 
-
     def __init__(self, logger, world_map: WorldMap):
         from domain.organism.instances.animal import Animal
         from domain.organism.instances.human import Human
@@ -87,8 +71,8 @@ class MovementSystem:
 
     def update_organism_occupied_position(self, prev: Position, new: Position):
         prev_tile = self.world.get_tile_by_position(prev)
-        animal = prev_tile.organisms[0]
-        prev_tile.remove_organism(animal)
+        animal = prev_tile.organism
+        prev_tile.remove_organism()
         act_tile = self.world.get_tile_by_position(new)
         act_tile.add_organism(animal)
 
@@ -116,17 +100,10 @@ class MovementSystem:
         position = organism.position
         for d in Direction:
             pos = position + d.vector()
-            if self._is_move_valid(pos, organism.allowed_terrains):
+            if self.world.is_position_allowed(pos, organism.allowed_terrains):
                 valid_directions.append(d)
 
         return valid_directions
-
-    def _is_move_valid(self, pos: Position, allowed_terrains: list[Terrain]) -> bool:
-        if not self.world.is_position_available(pos):
-            return False
-        if not _is_terrain_allowed(self.world.get_tile_by_position(pos), allowed_terrains):
-            return False
-        return True
 
 
 
