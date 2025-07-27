@@ -1,13 +1,21 @@
 from dataclasses import field
 
 from domain.components.position import Position
+from domain.human.perception.organism_info import OrganismInfo
 from domain.human.perception.percived_object import PerceivedObject
+from domain.organism.instances.organism import Organism
 
 from domain.world_map.tile import Tile
 
 
 def _tile_to_perceived_object(observer_position: Position, tile: Tile) -> PerceivedObject:
-    return PerceivedObject(tile.position - observer_position, tile.terrain, tile.organism)
+    organism_info = _organism_to_organism_info(observer_position, tile.organism)
+    return PerceivedObject(tile.position - observer_position, tile.terrain, organism_info)
+
+
+
+def _organism_to_organism_info(observer_position: Position, organism: Organism) -> OrganismInfo:
+    return OrganismInfo(organism.id, organism.position - observer_position)
 
 
 class WorldPerception:

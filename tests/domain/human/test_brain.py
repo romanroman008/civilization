@@ -18,7 +18,7 @@ def make_obj(x: int, y: int, terrain: Terrain = Terrain.GRASS) -> PerceivedObjec
     return PerceivedObject(
         relative_position=Position(x, y),
         terrain=terrain,
-        organism=None
+        organism_info=None
     )
 
 

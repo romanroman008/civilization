@@ -3,10 +3,11 @@ from typing import Optional
 
 from domain.components.position import Position
 from domain.components.terrain import Terrain
-from domain.organism.instances.organism import Organism
+from domain.human.perception.organism_info import OrganismInfo
+
 
 @dataclass(frozen=True)
 class PerceivedObject:
     relative_position: Position
     terrain: Terrain
-    organism: Optional[Organism] = None
+    organism_info: Optional[OrganismInfo] = None

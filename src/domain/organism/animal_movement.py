@@ -66,7 +66,7 @@ class AnimalMovement:
 
 
     def _is_direction_correct(self):
-        return self._direction == self._target_direction or self._target_direction == Direction.IDLE
+        return self._direction == self._target_direction
 
     def _rotate(self):
         self._rotation = (self._rotation + self._rotation_step + 180) % 360 - 180

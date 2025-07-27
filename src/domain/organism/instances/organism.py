@@ -27,10 +27,6 @@ class Organism(ABC):
         return self._prefab.name
 
     @property
-    def block_radius(self) -> int:
-        return self._prefab.block_radius
-
-    @property
     def allowed_terrains(self):
         return self._prefab.allowed_terrains
 

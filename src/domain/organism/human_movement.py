@@ -1,3 +1,4 @@
+import asyncio
 from typing import Callable, Optional
 
 from domain.components.direction import Direction
@@ -32,13 +33,19 @@ class HumanMovement:
         self._is_moving = False
         self.on_finalized_move: Optional[Callable[[Position, Position], None]] = None
 
+        self._move_done_future: asyncio.Future | None = None
+
+
     def add_finalized_move(self, finalized_move: Callable[[Position,Position], None]):
         self.on_finalized_move = finalized_move
 
-    def start_move(self, direction: Direction, distance: int, position: Position):
+    def start_move(self, direction: Direction, distance: int):
+        if self._is_moving:
+            raise RuntimeError("Cannot start a new move while already moving")
+
         self._is_moving = True
         self._target_direction = direction
-        self._target_position = find_target_position(position, direction, distance)
+        self._target_position = find_target_position(self._position, direction, distance)
 
         self._target_offset_x = direction.vector().x * distance * 100
         self._offset_step_x = int(math.copysign(self._offset_step, self._target_offset_x))
@@ -79,6 +86,15 @@ class HumanMovement:
         self._target_offset_x = 0
         self._target_offset_y = 0
         self._is_moving = False
+
+        if self._move_done_future and not self._move_done_future.done():
+            self._move_done_future.set_result(True)
+            self._move_done_future = None
+
+
+    async def wait_until_stop(self):
+        if self._move_done_future:
+            await self._move_done_future
 
 
     @property

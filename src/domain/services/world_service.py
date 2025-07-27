@@ -43,7 +43,7 @@ class WorldService:
             tiles = self._db_to_tiles(result.tiles)
 
             return WorldMap(
-                _id=result.id,
+                _id=result._id,
                 _name=name,
                 _width=result.width,
                 _height=result.height,

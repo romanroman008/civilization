@@ -20,8 +20,8 @@ from domain.world_map.world_map import WorldMap
 
 
 def find_needed_offset(organism) -> tuple[float,float]:
-    offset_x = organism.target_position.x - organism.position.x
-    offset_y = organism.target_position.y - organism.position.y
+    offset_x = organism.target_position.x - organism.relative_position.x
+    offset_y = organism.target_position.y - organism.relative_position.y
     return offset_x, offset_y
 
 def find_target_position(actual:Position, direction: Direction, distance: int):

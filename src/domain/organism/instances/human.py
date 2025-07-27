@@ -16,7 +16,7 @@ class Human(Organism):
         self._movement.add_finalized_move(on_finalized_move)
 
     def move(self, direction: Direction, distance: int = 1):
-        self._movement.start_move(direction, distance, self._movement.position)
+        self._movement.start_move(direction, distance)
 
     def __call__(self, *args, **kwargs):
         self._movement.tick()
