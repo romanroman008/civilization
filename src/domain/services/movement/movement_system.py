@@ -118,5 +118,5 @@ class MovementSystem:
         for human in self.humans:
             if human.is_moving:
                 continue
-            self.move_human(human)
+            # self.move_human(human)
 

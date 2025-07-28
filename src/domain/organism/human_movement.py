@@ -1,11 +1,9 @@
 import asyncio
+import math
 from typing import Callable, Optional
 
 from domain.components.direction import Direction
 from domain.components.position import Position
-
-import math
-
 from domain.services.movement.movement_system import find_target_position
 
 
@@ -34,15 +32,13 @@ class HumanMovement:
         self.on_finalized_move: Optional[Callable[[Position, Position], None]] = None
 
         self._move_done_future: asyncio.Future | None = None
+        self._loop: Optional[asyncio.AbstractEventLoop] = None  # <== kluczowa linia
 
 
-    def add_finalized_move(self, finalized_move: Callable[[Position,Position], None]):
+    def add_finalized_move(self, finalized_move: Callable[[Position, Position], None]):
         self.on_finalized_move = finalized_move
 
     def start_move(self, direction: Direction, distance: int):
-        if self._is_moving:
-            raise RuntimeError("Cannot start a new move while already moving")
-
         self._is_moving = True
         self._target_direction = direction
         self._target_position = find_target_position(self._position, direction, distance)
@@ -53,8 +49,18 @@ class HumanMovement:
         self._target_offset_y = direction.vector().y * distance * 100
         self._offset_step_y = int(math.copysign(self._offset_step, self._target_offset_y))
 
+        # zapamiętujemy aktywną pętlę tylko raz (właściwą dla await)
+        if self._loop is None:
+            try:
+                self._loop = asyncio.get_running_loop()
+            except RuntimeError:
+                self._loop = asyncio.get_event_loop()
+
+        self._move_done_future = self._loop.create_future()
+
+
     def tick(self):
-        if not self.is_moving:
+        if not self._is_moving:
             return
 
         if not self._is_offset_at_target():
@@ -79,7 +85,9 @@ class HumanMovement:
         return self._offset_y == self._target_offset_y
 
     def _finalize_movement(self):
-        self.on_finalized_move(self._position, self._target_position)
+        if self.on_finalized_move:
+            self.on_finalized_move(self._position, self._target_position)
+
         self._position = self._target_position
         self._offset_x = 0
         self._offset_y = 0
@@ -88,15 +96,15 @@ class HumanMovement:
         self._is_moving = False
 
         if self._move_done_future and not self._move_done_future.done():
-            self._move_done_future.set_result(True)
-            self._move_done_future = None
-
+            if self._loop and self._loop.is_running():
+                self._loop.call_soon_threadsafe(self._move_done_future.set_result, True)
+        self._move_done_future = None
 
     async def wait_until_stop(self):
         if self._move_done_future:
             await self._move_done_future
 
-
+    # Properties
     @property
     def position(self) -> Position:
         return self._position

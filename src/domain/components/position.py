@@ -18,9 +18,14 @@ class Position:
     def __mul__(self, other: int) -> "Position":
         return Position(self.x * other, self.y * other)
 
-    def equals(self, other: object) -> bool:
+    # def equals(self, other: object) -> bool:
+    #     if not isinstance(other, Position):
+    #         return False
+    #     return self.x == other.x and self.y == other.y
+
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, Position):
-            return False
+            return NotImplemented
         return self.x == other.x and self.y == other.y
 
     def neighbors(self, diagonals: bool = False) -> list["Position"]:

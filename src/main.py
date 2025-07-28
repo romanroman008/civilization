@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 from apscheduler.events import EVENT_JOB_MISSED
@@ -67,7 +68,13 @@ def main():
     #
     # # show_layer(create_terrain_layer(world))
 
-    run_game(world)
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
+    import threading
+    threading.Thread(target=loop.run_forever, daemon=True).start()
+
+    run_game(world, loop)
     scheduler.shutdown(wait=True)
 
 

@@ -1,3 +1,4 @@
+import asyncio
 from collections import deque
 from typing import Optional
 
@@ -23,15 +24,29 @@ class Brain:
         self._perceived_objects: list[PerceivedObject] = []
         self._target: Optional[OrganismInfo] = None
 
-    def update(self, perceived_objects: list[PerceivedObject]):
-        self._perceived_objects = perceived_objects
+        self.is_hunting = False
+
+
+    def tick(self, position: Position):
+        self._field_of_view.update(position)
+        self._perceived_objects = self._field_of_view.get_perceived_objects()
         self._check_target_visibility()
 
-    async def hunt(self, animal_info: AnimalInfo):
-        self._target = animal_info
-        if animal_info.is_visible:
-            path = self.find_shortest_path(animal_info.relative_position)
+    def update(self):
+        pass
+
+
+    async def hunt(self):
+        self.is_hunting = True
+        closest_animal = self._field_of_view.detect_closest_animal()
+
+        if closest_animal is None:
+            return
+        self._target = closest_animal
+        if closest_animal.is_visible:
+            path = self.find_shortest_path(closest_animal.relative_position)
             await self._execute_move_sequence(path)
+            self.is_hunting = False
 
 
     def _check_target_visibility(self):
@@ -52,15 +67,12 @@ class Brain:
 
 
 
-
-
     async def _execute_move_sequence(self, directions: list[Direction]):
         for direction in directions:
             self._movement.start_move(direction, 1)
             await self._movement.wait_until_stop()
 
-    def _is_visible(self, animal_info: AnimalInfo):
-        return
+
 
 
     def find_shortest_path(self, goal: Position, start: Position = Position(0, 0)) -> Optional[list[Direction]]:
@@ -85,11 +97,15 @@ class Brain:
 
     def _get_possible_move_neighbours(self, position: Position) -> dict[Direction, Position]:
         neighbours: dict[Direction, Position] = {}
+        perceived_map = {
+            obj.relative_position: obj
+            for obj in self._perceived_objects
+        }
+
         for direction in Direction:
             neighbour_pos = position + direction.vector()
-            for perc_obj in self._perceived_objects:
-                if perc_obj.relative_position == neighbour_pos and perc_obj.terrain == Terrain.GRASS:
-                    neighbours[direction] = neighbour_pos
-                    break
+            obj = perceived_map.get(neighbour_pos)
+            if obj and obj.terrain == Terrain.GRASS:
+                neighbours[direction] = neighbour_pos
 
         return neighbours

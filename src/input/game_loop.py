@@ -1,5 +1,12 @@
+import asyncio
+from typing import Optional
+
 import pygame
 
+from domain.components.direction import Direction
+from domain.organism.human_movement import HumanMovement
+from domain.organism.instances.human import Human
+from domain.world_map.world_map import WorldMap
 from infrastructure.rendering.camera import Camera
 from infrastructure.rendering.world_presenter import WorldPresenter
 from infrastructure.rendering.world_renderer import WorldRenderer
@@ -7,7 +14,7 @@ from input.keyboard import Keyboard
 from shared.config import CONFIG
 
 
-def run_game(world):
+def run_game(world: WorldMap, loop: asyncio.AbstractEventLoop):
     pygame.init()
     screen = pygame.display.set_mode((CONFIG["screen_width"], CONFIG["screen_height"]))
     pygame.display.set_caption("Civilization")
@@ -37,7 +44,9 @@ def run_game(world):
 
         keyboard = Keyboard()
         dx, dy = keyboard.get_movement()
+        action = keyboard.get_action()
         camera.move(5*dx,5*dy)
+        decide(get_agent(world), action, loop)
 
 
 
@@ -47,3 +56,35 @@ def run_game(world):
         clock.tick(60)
 
     pygame.quit()
+
+def decide(agent: Optional[Human], action: Optional[str], loop: asyncio.AbstractEventLoop):
+    if agent is None or action is None or agent.is_hunting == True:
+        return
+
+    action_map = {
+        "stop": lambda: print("STOP"),
+        "walk": lambda: agent.move(Direction.TOP),
+        "hunt": lambda: safe_async(agent.hunt(), loop)
+    }
+
+    func = action_map.get(action)
+    if func:
+        func()
+    else:
+        print(f"[WARN] Unknown action: {action}")
+
+
+
+def get_agent(world: WorldMap) -> Optional[Human]:
+    for organism in world.organisms:
+        if isinstance(organism, Human):
+            return organism
+    return None
+
+def safe_async(coro, loop: asyncio.AbstractEventLoop):
+    try:
+        asyncio.run_coroutine_threadsafe(coro, loop)
+    except Exception as e:
+        print(f"[ERROR] Failed to schedule async action: {e}")
+
+

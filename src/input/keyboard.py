@@ -13,6 +13,12 @@ NAME_TO_PYGAME_KEY = {
     "right": pygame.K_RIGHT,
 }
 
+ACTION_KEYS = {
+   pygame.K_1: "stop",
+    pygame.K_2: "walk",
+    pygame.K_3: "hunt",
+}
+
 class Keyboard:
     def __init__(self, bindings: dict[str, str] = DEFAULT_KEY_BINDINGS):
         self.key_bindings = {
@@ -31,3 +37,11 @@ class Keyboard:
                 dx += x
                 dy += y
         return dx, dy
+
+
+    def get_action(self) -> str | None:
+        kes = pygame.key.get_pressed()
+        for key, action in ACTION_KEYS.items():
+            if kes[key]:
+                return action
+        return None

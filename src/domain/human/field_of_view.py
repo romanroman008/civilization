@@ -1,4 +1,7 @@
+from typing import Optional
+
 from domain.components.position import Position
+from domain.human.perception import animal_info
 from domain.human.perception.animal_info import AnimalInfo
 from domain.human.perception.percived_object import PerceivedObject
 from domain.organism.instances.animal import Animal
@@ -31,15 +34,20 @@ class FieldOfView:
     def detect_animals(self):
         return [
             perc_obj.organism_info for perc_obj in self._perceived_objects
-            if (isinstance(perc_obj.organism_info, Animal))
+            if (isinstance(perc_obj.organism_info, AnimalInfo))
         ]
 
-    def detect_closest_animal(self):
+    def detect_closest_animal(self) -> Optional[AnimalInfo]:
         animals = self.detect_animals()
-        if animals:
-            closest_animal = min(animals, key=lambda animal: animal.distance_to(self._position))
-            return self._animal_to_animal_info(closest_animal)
-        return None
+        if not animals:
+            return None
+
+        return min(animals,
+                   key=lambda animal: animal.relative_position.distance_to(self._position)
+                   )
+
+
+
 
 
     def update(self, position: Position):
