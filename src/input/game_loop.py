@@ -46,7 +46,11 @@ def run_game(world: WorldMap, loop: asyncio.AbstractEventLoop):
         dx, dy = keyboard.get_movement()
         action = keyboard.get_action()
         camera.move(5*dx,5*dy)
-        decide(get_agent(world), action, loop)
+        if action:
+            asyncio.run_coroutine_threadsafe(
+                decide(get_agent(world), action, loop),
+                loop
+            )
 
 
 
@@ -57,19 +61,19 @@ def run_game(world: WorldMap, loop: asyncio.AbstractEventLoop):
 
     pygame.quit()
 
-def decide(agent: Optional[Human], action: Optional[str], loop: asyncio.AbstractEventLoop):
-    if agent is None or action is None or agent.is_hunting == True:
+async def decide(agent: Optional[Human], action: Optional[str], loop: asyncio.AbstractEventLoop):
+    if agent is None or action is None:
         return
 
     action_map = {
         "stop": lambda: print("STOP"),
-        "walk": lambda: agent.move(Direction.TOP),
-        "hunt": lambda: safe_async(agent.hunt(), loop)
+        "walk": lambda: agent.brain.walk(),
+        "hunt": lambda: agent.brain.hunt()
     }
 
     func = action_map.get(action)
     if func:
-        func()
+        await func()
     else:
         print(f"[WARN] Unknown action: {action}")
 

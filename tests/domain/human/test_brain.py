@@ -29,7 +29,7 @@ def test_straight_line_path():
         make_obj(0, 1)
     ]
 
-    path = brain.find_shortest_path(Position(0, 0), Position(0, 1))
+    path = find_shortest_path(Position(0, 0), Position(0, 1))
 
     assert path == [Direction.BOT]
 
@@ -42,7 +42,7 @@ def test_turning_path():
         make_obj(1, 1)
     ]
 
-    path = brain.find_shortest_path(Position(0, 0), Position(1, 1))
+    path = find_shortest_path(Position(0, 0), Position(1, 1))
 
     assert path in [
         [Direction.RIGHT, Direction.BOT],
@@ -57,7 +57,7 @@ def test_unreachable_goal():
         make_obj(0, 1, terrain=Terrain.WATER)
     ]
 
-    path = brain.find_shortest_path(Position(0, 0), Position(0, 1))
+    path = find_shortest_path(Position(0, 0), Position(0, 1))
 
     assert path is None
 
@@ -72,7 +72,7 @@ def test_surrounded_by_water():
         make_obj(-1, 0, terrain=Terrain.WATER),
     ]
 
-    path = brain.find_shortest_path(Position(0, 0), Position(1, 1))
+    path = find_shortest_path(Position(0, 0), Position(1, 1))
 
     assert path is None
 
@@ -89,7 +89,7 @@ def test_shortest_path_around_wall():
 
     ]
 
-    path = brain.find_shortest_path(Position(0, 0), Position(0, 2))
+    path = find_shortest_path(Position(0, 0), Position(0, 2))
 
     assert path == [Direction.RIGHT,Direction.BOT, Direction.BOT, Direction.LEFT]
 
@@ -124,6 +124,6 @@ def test_small_map():
 
     ]
 
-    path = brain.find_shortest_path(Position(0, 0), Position(2, 2))
+    path = find_shortest_path(Position(0, 0), Position(2, 2))
 
     assert path == [Direction.LEFT, Direction.BOT, Direction.BOT, Direction.RIGHT, Direction.RIGHT, Direction.RIGHT]

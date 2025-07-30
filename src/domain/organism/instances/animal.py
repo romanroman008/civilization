@@ -1,3 +1,4 @@
+from itertools import count
 from typing import Callable
 
 from domain.components.direction import Direction
@@ -9,9 +10,13 @@ from domain.organism.prefabs.organism_prefab import OrganismPrefab
 
 
 class Animal(Organism):
+    _id_counter = count(1)
     def __init__(self, prefab: OrganismPrefab, position: Position):
-        super().__init__(prefab, position)
+        self._id = next(self._id_counter)
+        self._prefab = prefab
         self._movement = AnimalMovement(position)
+
+
 
     def add_finalized_move(self, on_finalized_move: Callable[[Position, Position], None]):
         self._movement.add_finalized_move(on_finalized_move)
@@ -22,6 +27,18 @@ class Animal(Organism):
     def __call__(self, *args, **kwargs):
         self._movement.tick()
         #print(f"Animal {self.id} tick")
+
+    @property
+    def id(self) -> int:
+        return self._id
+
+    @property
+    def sprite_key(self) -> str:
+        return self._prefab.name
+
+    @property
+    def allowed_terrains(self):
+        return self._prefab.allowed_terrains
 
     @property
     def is_moving(self) -> bool:

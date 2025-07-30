@@ -65,8 +65,7 @@ class MovementSystem:
         for animal in animals:
             animal.add_finalized_move(self.update_organism_occupied_position)
 
-        for human in humans:
-            human.add_finalized_move(self.update_organism_occupied_position)
+
 
 
     def update_organism_occupied_position(self, prev: Position, new: Position):
@@ -113,7 +112,7 @@ class MovementSystem:
         for animal in self.animals:
             if animal.is_moving:
                 continue
-            self.move_animal(animal)
+          #  self.move_animal(animal)
 
         for human in self.humans:
             if human.is_moving:

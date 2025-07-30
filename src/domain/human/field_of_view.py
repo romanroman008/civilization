@@ -9,6 +9,8 @@ from domain.organism.instances.plant import Plant
 from domain.world_map.world_perception import WorldPerception
 
 
+
+
 class FieldOfView:
     def __init__(self, radius, world_perception: WorldPerception):
         self._radius = radius

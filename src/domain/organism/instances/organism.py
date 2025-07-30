@@ -1,45 +1,24 @@
-from abc import ABC
-from itertools import count
-
+from typing import Protocol, runtime_checkable
 from domain.components.position import Position
 from domain.organism.prefabs.organism_prefab import OrganismPrefab
 
 
-class Organism(ABC):
-    _id_counter = count(1)
-    def __init__(self, prefab: OrganismPrefab, position: Position):
-        self._id = next(Organism._id_counter)
-        self._prefab = prefab
-        self._position = position
-        self._rotation = 0
-        self._offset = (0,0)
-
-
-    def __call__(self, *args, **kwargs):
-        pass
+@runtime_checkable
+class Organism(Protocol):
+    @property
+    def id(self) -> int: ...
 
     @property
-    def id(self) -> int:
-        return self._id
+    def sprite_key(self) -> str: ...
 
     @property
-    def sprite_key(self) -> str:
-        return self._prefab.name
+    def allowed_terrains(self): ...
 
     @property
-    def allowed_terrains(self):
-        return self._prefab.allowed_terrains
+    def position(self) -> Position: ...
 
     @property
-    def position(self) -> Position:
-        return self._position
+    def rotation(self) -> int: ...
 
     @property
-    def rotation(self) -> int:
-        return self._rotation
-
-    @property
-    def offset(self) -> tuple[int, int]:
-        return self._offset
-
-
+    def offset(self) -> tuple[int, int]: ...
