@@ -5,6 +5,7 @@ from domain.components.position import Position
 from domain.organism.instances.plant import Plant
 from domain.organism.prefabs.organism_prefab import OrganismPrefab
 from domain.organism.prefabs.plant_prefab import PlantPrefab
+from domain.world_map.world_facade import WorldFacade
 from domain.world_map.world_map import WorldMap
 
 
@@ -12,25 +13,25 @@ class PlantsGenerator:
     def __init__(self, count: int, species_distribution: list[tuple[PlantPrefab, float]]):
         self.count = count
         self.species_distribution = species_distribution
-        self.world: WorldMap | None = None
+        self.world_facade: WorldFacade | None = None
 
 
 
-    def generate_plants(self, world: WorldMap) -> WorldMap:
-        self.world = world
+    def generate_plants(self, world_facade: WorldFacade) -> WorldFacade:
+        self.world_facade = world_facade
 
         for plant_pref, fraction   in self.species_distribution:
             amount = int(fraction * self.count)
-            available_positions = self._get_valid_positions(world.height, world.width, plant_pref)
+            available_positions = self._get_valid_positions(world_facade.height, world_facade.width, plant_pref)
             approved_positions = self._get_random_positions_with_blocking(available_positions, plant_pref, amount)
 
 
             for position in approved_positions:
                 plant = Plant(plant_pref, position)
-                world.add_organism(plant)
+                world_facade.add_organism(plant)
 
 
-        return world
+        return world_facade
 
 
 
@@ -40,7 +41,7 @@ class PlantsGenerator:
             Position(x, y)
             for y in range (height)
             for x in range (width)
-            if self.world.is_position_allowed(Position(x,y), plant_pref.allowed_terrains)
+            if self.world_facade.is_position_allowed(Position(x,y), plant_pref.allowed_terrains)
         ]
 
 
@@ -85,7 +86,7 @@ class PlantsGenerator:
             for dx in range(-radius, radius + 1)
             for dy in range(-radius, radius + 1)
         ]
-        return [pos for pos in area if 0 <= pos.x < self.world.width and 0 <= pos.y < self.world.height]
+        return [pos for pos in area if 0 <= pos.x < self.world_facade.width and 0 <= pos.y < self.world_facade.height]
 
 
 

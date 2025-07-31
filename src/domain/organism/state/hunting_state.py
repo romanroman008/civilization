@@ -7,10 +7,12 @@ from domain.organism.state.human_state import HumanState
 
 class HuntingState(HumanState):
     def __init__(self, path: list[Direction]):
+        super().__init__()
         self._path: list[Direction] = path
 
     async def on_enter(self, human: Human):
-        self.logger.info(f"Human {human.id} has started hunting")
+        self._logger.info(f"Human {human.id} has started hunting")
+        self._is_busy = True
 
         for direction in self._path:
             await human.movement.move_to(direction)
@@ -19,6 +21,7 @@ class HuntingState(HumanState):
 
 
     async def on_exit(self, human: Human):
-        self.logger.info(f"Human {human.id} has stopped hunting")
+        self._logger.info(f"Human {human.id} has stopped hunting")
+        self._is_busy = False
 
 

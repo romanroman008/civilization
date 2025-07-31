@@ -9,6 +9,9 @@ class Position:
     def distance_to(self, other: "Position") -> int:
         return abs(self.x - other.x) + abs(self.y - other.y)  # Manhattan
 
+    def as_key(self) -> tuple[int, int]:
+        return self.x, self.y
+
     def __add__(self, other: "Position") -> "Position":
         return Position(self.x + other.x, self.y + other.y)
 
@@ -17,11 +20,6 @@ class Position:
 
     def __mul__(self, other: int) -> "Position":
         return Position(self.x * other, self.y * other)
-
-    # def equals(self, other: object) -> bool:
-    #     if not isinstance(other, Position):
-    #         return False
-    #     return self.x == other.x and self.y == other.y
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Position):

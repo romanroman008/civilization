@@ -18,7 +18,6 @@ def _tile_to_perceived_object(observer_position: Position, tile: Tile) -> Percei
     return PerceivedObject(tile.position - observer_position, tile.terrain)
 
 
-
 def _organism_to_organism_info(observer_position: Position, organism: Organism) -> OrganismInfo:
     if isinstance(organism, Animal):
         return AnimalInfo(organism.id, organism.position - observer_position)

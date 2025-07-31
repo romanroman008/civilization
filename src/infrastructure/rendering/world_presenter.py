@@ -35,12 +35,8 @@ sprite_assets = {
 
 
 class WorldPresenter:
-    def __init__(self, world_map: WorldMap):
-        self.world_map = world_map
+    def __init__(self):
         self.sprite_assets = sprite_assets
-
-
-
 
     def present(self, entity: Renderable):
         terrain = entity.sprite_key

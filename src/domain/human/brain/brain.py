@@ -1,3 +1,5 @@
+import asyncio
+import logging
 from collections import deque
 from typing import Optional
 
@@ -14,9 +16,13 @@ from domain.organism.instances.human import Human
 from domain.organism.state.hunting_state import HuntingState
 from domain.organism.state.idle_state import IdleState
 from domain.organism.state.walking_state import WalkingState
+from domain.services.event_bus import EventBus
+from domain.services.movement.move_result import MoveResult
+from shared.logger import get_logger
 
 
-def _get_possible_move_neighbours(position: Position, perceived_objects: list[PerceivedObject]) -> dict[Direction, Position]:
+def _get_possible_move_neighbours(position: Position, perceived_objects: list[PerceivedObject]) -> dict[
+    Direction, Position]:
     neighbours: dict[Direction, Position] = {}
     perceived_map = {
         obj.relative_position: obj
@@ -55,7 +61,7 @@ def find_shortest_path(goal: Position, perceived_objects: list[PerceivedObject])
 
 
 class Brain:
-    def __init__(self, field_of_view: FieldOfView, vitals: Vitals):
+    def __init__(self, field_of_view: FieldOfView, vitals: Vitals, event_bus: EventBus):
         self._field_of_view = field_of_view
         self._vitals = vitals
         self._human: Optional[Human] = None
@@ -64,19 +70,19 @@ class Brain:
         self._perceived_objects: list[PerceivedObject] = []
         self._target: Optional[OrganismInfo] = None
 
+        self._event_bus = event_bus
+        self._logger = get_logger("Brain", level=logging.INFO, log_filename="brain.log")
 
-    def set_human(self, human:Human):
+        self._is_busy = False
+        self._lock = asyncio.Lock()
+
+    def set_human(self, human: Human):
         self._human = human
-
 
     def tick(self, position: Position):
         self._field_of_view.update(position)
         self._perceived_objects = self._field_of_view.get_perceived_objects()
         self._check_target_visibility()
-
-
-
-
 
     async def decide(self):
         if self._human.state != IdleState:
@@ -89,8 +95,9 @@ class Brain:
         await self._human.set_state(HuntingState(path))
 
     async def walk(self):
-        await self._human.set_state(WalkingState(Direction.TOP))
-
+        result = await self.emit_walking_decision(Direction.TOP)
+        if result is MoveResult.SUCCESS:
+            await self._human.set_state(WalkingState(Direction.TOP))
 
     async def hunt(self) -> list[Direction]:
         closest_animal = self._field_of_view.detect_closest_animal()
@@ -107,8 +114,6 @@ class Brain:
             path = find_shortest_path(closest_animal.last_seen_position, self._perceived_objects)
             await self._human.set_state(HuntingState(path))
             return path
-
-
 
     def _check_target_visibility(self):
         if self._target is None:
@@ -127,5 +132,27 @@ class Brain:
             self._target.lost_sighting()
 
 
+    async def emit_walking_decision(self, move_direction: Direction):
+        target_position = self._direction_to_position(move_direction)
+        try:
+            result = await self._event_bus.emit_with_response("change_state_requested",{
+                "organism": self._human,
+                "new_state": "WalkingState",
+                "target_position": target_position
+            })
+            if result == MoveResult.SUCCESS:
+                self._logger.info(f"Human {self._human.id} has started walking from {self._human.position} to {target_position}")
+            elif result == MoveResult.OUT_OF_BOUNDS:
+                self._logger.info(f"Human {self._human.id}: Position {target_position} is out of bounds")
+            elif result == MoveResult.RESERVED:
+                self._logger.info(f"Human {self._human.id}: Position {target_position} is reserved")
+            else:
+                self._logger.info(f"Human {self._human.id}: Position {target_position} is occupied")
+            return result
+
+        except Exception as e:
+            self._logger.exception(f"Failed to request state change: {e}")
 
 
+    def _direction_to_position(self, direction: Direction) -> Position:
+        return direction.vector() + self._human.position

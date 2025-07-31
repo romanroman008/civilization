@@ -1,10 +1,10 @@
 import asyncio
-import logging
 
-from apscheduler.events import EVENT_JOB_MISSED
 
-from bootstrap.world_setup import create_world_generator, create_world_service, create_movement_system
-from domain.organism.orchestrator import Orchestrator
+
+
+from bootstrap.world_setup import create_world_generator, create_world_service
+
 
 from infrastructure.persistance.base import Base
 from infrastructure.persistance.session import engine
@@ -38,22 +38,16 @@ def main():
     world_service = create_world_service(world_generator)
 
     world = None
-    world = world_service.create_new_world(CONFIG["map_width"], CONFIG["map_height"], CONFIG["scale"])
+    #world = world_service.create_new_world(CONFIG["map_width"], CONFIG["map_height"], CONFIG["scale"])
 
-    movement_system = create_movement_system(logger, world)
+    world_facade = world_generator.create(CONFIG["map_width"], CONFIG["map_height"], CONFIG["scale"])
+
+
     scheduler.remove_all_jobs()
 
-    def listener(event):
-        print("MISSED job:", event.job_id)
 
-    scheduler.add_listener(listener, EVENT_JOB_MISSED)
 
-    scheduler.start()
-    scheduler.add_job(lambda: movement_system(5), 'interval', seconds=2)
 
-    orchestrator = Orchestrator(world.organisms)
-
-    scheduler.add_job(orchestrator,'interval', seconds=0.01, max_instances=5)
 
 
 
@@ -74,7 +68,7 @@ def main():
     import threading
     threading.Thread(target=loop.run_forever, daemon=True).start()
 
-    run_game(world, loop)
+    run_game(world_facade, loop)
     scheduler.shutdown(wait=True)
 
 

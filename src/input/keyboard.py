@@ -1,3 +1,5 @@
+from typing import Optional
+
 import pygame
 from shared.config import DEFAULT_KEY_BINDINGS
 
@@ -27,6 +29,7 @@ class Keyboard:
             NAME_TO_PYGAME_KEY[bindings["move_left"]]: (-1, 0),
             NAME_TO_PYGAME_KEY[bindings["move_right"]]: (1, 0),
         }
+        self._latest_action: Optional[str] = None
 
     def get_movement(self) -> tuple[int, int]:
         """Zwraca kierunek ruchu jako (dx, dy)."""
@@ -38,10 +41,14 @@ class Keyboard:
                 dy += y
         return dx, dy
 
+    def get_action(self) -> Optional[str]:
+        """Zwraca ostatnią akcję i natychmiast ją czyści."""
+        action = self._latest_action
+        self._latest_action = None
+        return action
 
-    def get_action(self) -> str | None:
-        kes = pygame.key.get_pressed()
-        for key, action in ACTION_KEYS.items():
-            if kes[key]:
-                return action
-        return None
+    def handle_event(self, event: pygame.event.Event):
+        if event.type == pygame.KEYDOWN:
+            action = ACTION_KEYS.get(event.key)
+            if action:
+                self._latest_action = action
