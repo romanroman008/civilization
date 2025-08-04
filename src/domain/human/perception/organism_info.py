@@ -2,16 +2,17 @@ from dataclasses import dataclass
 from typing import Protocol, Optional
 
 from domain.components.position import Position
+from domain.organism.organism_id import OrganismID
 
 
 class OrganismInfo(Protocol):
-    def __init__(self, id, relative_position: Position, is_visible = True):
+    def __init__(self, id: OrganismID, relative_position: Position, is_visible = True):
         self._id = id
         self._relative_position: Optional[Position] = relative_position
         self._is_visible = is_visible
 
     @property
-    def id(self):
+    def id(self) -> OrganismID:
         return self._id
 
     @property

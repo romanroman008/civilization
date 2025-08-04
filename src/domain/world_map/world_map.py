@@ -55,6 +55,12 @@ class WorldMap:
             return True
         return False
 
+    def get_terrain_at_position(self, position: Position) -> Optional[Terrain]:
+        tile = self._get_tile_by_coords(position.x, position.y)
+        if not tile:
+            return None
+        return tile.terrain
+
     def is_position_in_bounds(self, position: Position) -> bool:
         if 0 <= position.x < self.width and 0 <= position.y < self.height:
             return True

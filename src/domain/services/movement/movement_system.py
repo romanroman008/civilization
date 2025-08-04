@@ -19,30 +19,6 @@ from domain.world_map.world_map import WorldMap
 
 
 
-def find_needed_offset(organism) -> tuple[float,float]:
-    offset_x = organism.target_position.x - organism.relative_position.x
-    offset_y = organism.target_position.y - organism.relative_position.y
-    return offset_x, offset_y
-
-def find_target_position(actual:Position, direction: Direction, distance: int):
-    return actual + direction.vector() * distance
-
-
-
-def find_shortest_rotation(current: Direction, desired: Direction) -> float:
-    current_angle = current.angle
-    desired_angle = desired.angle
-
-    rotation = desired_angle - current_angle
-
-    if rotation > 180:
-        rotation -= 360
-    elif rotation < -180:
-        rotation += 360
-
-
-    return rotation
-
 
 
 

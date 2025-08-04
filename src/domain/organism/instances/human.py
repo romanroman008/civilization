@@ -3,9 +3,11 @@ from itertools import count
 from domain.components.position import Position
 from typing import TYPE_CHECKING
 
+from domain.organism.organism_id import OrganismID
+
 if TYPE_CHECKING:
     from domain.human.brain.brain import Brain
-from domain.human.field_of_view import FieldOfView
+
 
 from domain.organism.human_movement import HumanMovement
 from domain.organism.instances.organism import Organism
@@ -18,7 +20,7 @@ class Human(Organism):
     _human_counter = count(1)
 
     def __init__(self, prefab: OrganismPrefab,  brain: "Brain", movement: HumanMovement):
-        self._id = next(self._human_counter)
+        self._id = OrganismID("Human", next(self._human_counter))
         self._prefab = prefab
         self._movement = movement
         self._brain = brain
@@ -27,7 +29,7 @@ class Human(Organism):
 
 
     @property
-    def id(self) -> int:
+    def id(self) -> OrganismID:
         return self._id
 
     @property

@@ -1,12 +1,13 @@
 from typing import Protocol, runtime_checkable
 from domain.components.position import Position
-from domain.organism.prefabs.organism_prefab import OrganismPrefab
+from domain.organism.organism_id import OrganismID
+
 
 
 @runtime_checkable
 class Organism(Protocol):
     @property
-    def id(self) -> int: ...
+    def id(self) -> OrganismID: ...
 
     @property
     def sprite_key(self) -> str: ...

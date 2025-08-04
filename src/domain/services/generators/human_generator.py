@@ -14,7 +14,7 @@ from domain.services.event_bus import EventBus
 from domain.world_map.tile import Tile
 from domain.world_map.world_facade import WorldFacade
 
-from domain.world_map.world_perception import WorldPerception
+
 from shared.config import CONFIG
 
 
@@ -24,17 +24,17 @@ def _get_random_positions(positions: list[Position], amount:int) -> list[Positio
 def create_vitals():
     return Vitals()
 
-def create_field_of_view(radius: int, world_perception: WorldPerception) -> FieldOfView:
-    return FieldOfView(radius, world_perception)
+def create_field_of_view(radius: int, world_facade:WorldFacade) -> FieldOfView:
+    return FieldOfView(radius, world_facade)
 
 def create_movement(position: Position) -> HumanMovement:
     return HumanMovement(position)
 
-def create_brain(world_perception:WorldPerception, event_bus: EventBus) -> Brain:
-    field_of_view = create_field_of_view(CONFIG["human_vision_radius"],world_perception)
+def create_brain(world_facade:WorldFacade, movement: HumanMovement, event_bus: EventBus) -> Brain:
+    field_of_view = create_field_of_view(CONFIG["human_vision_radius"],world_facade)
     vitals = create_vitals()
 
-    return Brain(field_of_view, vitals, event_bus)
+    return Brain(field_of_view, vitals, movement, event_bus)
 
 
 
@@ -48,7 +48,7 @@ class HumanGenerator:
     def generate(self, world_facade: WorldFacade) -> WorldFacade:
         self.world_facade = world_facade
         event_bus = world_facade.event_bus
-        world_perception = world_facade.world_perception
+
 
         for organism, fraction   in self.species_distribution:
             amount = int(fraction * self.count)
@@ -59,7 +59,7 @@ class HumanGenerator:
             for position in approved_positions:
                 position = Position(3,3)
                 movement = create_movement(position)
-                brain = create_brain(world_perception, event_bus)
+                brain = create_brain(world_facade, movement, event_bus)
                 human = Human(animal_prefab, brain, movement)
                 world_facade.add_organism(human)
 

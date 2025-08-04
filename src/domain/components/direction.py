@@ -15,3 +15,7 @@ class Direction(Enum):
     @property
     def angle(self):
         return self.value[1]
+
+    @classmethod
+    def min_rotation_degrees(cls):
+        return 90

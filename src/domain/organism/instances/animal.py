@@ -5,6 +5,7 @@ from domain.components.direction import Direction
 from domain.components.position import Position
 from domain.organism.instances.organism import Organism
 from domain.organism.animal_movement import AnimalMovement
+from domain.organism.organism_id import OrganismID
 
 from domain.organism.prefabs.organism_prefab import OrganismPrefab
 
@@ -12,7 +13,7 @@ from domain.organism.prefabs.organism_prefab import OrganismPrefab
 class Animal(Organism):
     _id_counter = count(1)
     def __init__(self, prefab: OrganismPrefab, position: Position):
-        self._id = next(self._id_counter)
+        self._id = OrganismID("animal", next(self._id_counter))
         self._prefab = prefab
         self._movement = AnimalMovement(position)
 
@@ -29,7 +30,7 @@ class Animal(Organism):
         #print(f"Animal {self.id} tick")
 
     @property
-    def id(self) -> int:
+    def id(self) -> OrganismID:
         return self._id
 
     @property

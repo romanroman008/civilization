@@ -24,10 +24,11 @@ class AnimalsGenerator:
             available_positions = self._get_valid_positions(world_facade.height, world_facade.width, organism_prefab)
             approved_positions = _get_random_positions(available_positions, amount)
             animal_prefab = OrganismPrefab(organism_prefab.name, organism_prefab.allowed_terrains)
-
+            i = 0
             for position in approved_positions:
                 animal = Animal(animal_prefab, position)
                 world_facade.add_organism(animal)
+                i += 1
 
         return world_facade
 

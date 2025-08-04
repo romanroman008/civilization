@@ -5,10 +5,12 @@ from domain.components.position import Position
 from domain.components.renderable import Renderable
 from domain.organism.instances.human import Human
 from domain.organism.instances.organism import Organism
+from domain.organism.organism_id import OrganismID
 
 
 class WorldStateService:
     def __init__(self):
+        self._organism_index: Dict[OrganismID, Organism] = {}
         self._organism_positions: Dict[Organism, Position] = {}
         self._position_organisms: Dict[tuple[int, int], Set[Organism]] = defaultdict(set)
         self._move_targets: Set[tuple[int, int]] = set()
@@ -17,8 +19,10 @@ class WorldStateService:
         pos = organism.position
         self._organism_positions[organism] = pos
         self._position_organisms[pos.as_key()].add(organism)
+        self._organism_index[organism.id] = organism
 
-    def update_position(self, organism: Organism, new_position: Position):
+    def update_position(self, organism_id: OrganismID, new_position: Position):
+        organism = self._organism_index[organism_id]
         old_pos = self._organism_positions.get(organism)
         if old_pos:
             self._position_organisms[(old_pos.x, old_pos.y)].discard(organism)
@@ -29,7 +33,10 @@ class WorldStateService:
         return self._organism_positions.get(organism)
 
     def get_organism_at_position(self, position: Position) -> Optional[Organism]:
-        return self._position_organisms.get(position.as_key())
+        organisms = self._position_organisms.get(position.as_key())
+        if not organisms:
+            return None
+        return next(iter(organisms))
 
     def is_occupied(self, position: Position) -> bool:
         return bool(self._position_organisms.get((position.x, position.y)))

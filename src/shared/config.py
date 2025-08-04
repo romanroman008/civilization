@@ -1,4 +1,3 @@
-
 from domain.components.terrain import Terrain
 from domain.organism.prefabs.organism_prefab import OrganismPrefab
 from domain.organism.prefabs.plant_prefab import PlantPrefab
@@ -10,7 +9,7 @@ CONFIG = {
     "screen_height": 600,
     "tile_size": 32,
     "fps": 60,
-    "map_height":5,
+    "map_height": 5,
     "map_width": 10,
     "scale": 50,
     "climate_zones": "climate_zones.json",
@@ -21,12 +20,18 @@ CONFIG = {
         Octave(2.0, 0.5),
         Octave(4.0, 0.25),
     ],
-    "animals_count": 0,
+    "animals_count": 3,
     "plants_count": 1,
     "human_count": 1,
-    "human_vision_radius": 5
-}
+    "human_vision_radius": 5,
 
+    "allowed_rotation_speed": [1, 2, 3, 5, 6, 9, 10, 15, 18, 30, 45, 90],
+    "allowed_movement_speed": [1, 2, 4, 5, 10, 20, 25, 50, 100],
+    "rotation_speed" : 10,
+    "movement_speed" : 10,
+
+
+}
 
 DEFAULT_KEY_BINDINGS = {
     "move_up": "w",
@@ -36,8 +41,8 @@ DEFAULT_KEY_BINDINGS = {
 }
 
 PLANTS_DIST = [
-    (PlantPrefab(name="Berries", allowed_terrains={Terrain.GRASS}, is_edible = True), 1),
-    (PlantPrefab(name="Tree", allowed_terrains={Terrain.GRASS},is_edible = False, block_radius=1), 1)
+    (PlantPrefab(name="Berries", allowed_terrains={Terrain.GRASS}, is_edible=True), 1),
+    (PlantPrefab(name="Tree", allowed_terrains={Terrain.GRASS}, is_edible=False, block_radius=1), 1)
 ]
 
 ANIMALS_DIST = [

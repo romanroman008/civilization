@@ -11,7 +11,9 @@ from domain.human.field_of_view import FieldOfView
 from domain.human.perception.organism_info import OrganismInfo
 from domain.human.perception.percived_object import PerceivedObject
 from domain.human.vitals import Vitals
+from domain.organism.human_movement import HumanMovement
 from domain.organism.instances.human import Human
+
 
 from domain.organism.state.hunting_state import HuntingState
 from domain.organism.state.idle_state import IdleState
@@ -61,26 +63,37 @@ def find_shortest_path(goal: Position, perceived_objects: list[PerceivedObject])
 
 
 class Brain:
-    def __init__(self, field_of_view: FieldOfView, vitals: Vitals, event_bus: EventBus):
+    def __init__(self, field_of_view: FieldOfView, vitals: Vitals, movement: HumanMovement, event_bus: EventBus):
         self._field_of_view = field_of_view
         self._vitals = vitals
         self._human: Optional[Human] = None
+        self._movement = movement
 
         self._organism_data: list[OrganismInfo] = []
         self._perceived_objects: list[PerceivedObject] = []
         self._target: Optional[OrganismInfo] = None
 
         self._event_bus = event_bus
-        self._logger = get_logger("Brain", level=logging.INFO, log_filename="brain.log")
 
         self._is_busy = False
-        self._lock = asyncio.Lock()
+        self._register_handlers()
+
+
+    def _register_handlers(self):
+        self._event_bus.on_async("position update", self.tick)
+
+    def _initialize_logger(self):
+        self._logger = get_logger(f"Human {self._human.id}", level=logging.INFO, log_filename="human.log")
 
     def set_human(self, human: Human):
         self._human = human
+        self._field_of_view.update(self._human.position)
+        self._perceived_objects = self._field_of_view.get_perceived_objects()
+        self._check_target_visibility()
+        self._initialize_logger()
 
-    def tick(self, position: Position):
-        self._field_of_view.update(position)
+    async def tick(self, payload):
+        self._field_of_view.update(self._human.position)
         self._perceived_objects = self._field_of_view.get_perceived_objects()
         self._check_target_visibility()
 
@@ -94,26 +107,35 @@ class Brain:
             await self._human.set_state(IdleState())
         await self._human.set_state(HuntingState(path))
 
-    async def walk(self):
-        result = await self.emit_walking_decision(Direction.TOP)
+    async def walk(self, direction: Direction):
+        result = await self.emit_walking_decision(direction)
         if result is MoveResult.SUCCESS:
-            await self._human.set_state(WalkingState(Direction.TOP))
+            await self._human.set_state(WalkingState())
+            await self._movement.move_to(direction)
+            await self._notify_position_change()
+            await self._human.set_state(IdleState())
 
-    async def hunt(self) -> list[Direction]:
+
+
+    async def hunt(self):
         closest_animal = self._field_of_view.detect_closest_animal()
         if closest_animal is None:
             return []
-
         self._target = closest_animal
-
+        self._logger.info(f"has started hunting for: {self._target.id}, "
+                          f"position {self._target.relative_position},"
+                          f"last seen {self._target.last_seen_position}")
+        path = []
         if closest_animal.is_visible:
             path = find_shortest_path(closest_animal.relative_position, self._perceived_objects)
-            await self._human.set_state(HuntingState(path))
-            return path
         else:
             path = find_shortest_path(closest_animal.last_seen_position, self._perceived_objects)
-            await self._human.set_state(HuntingState(path))
-            return path
+        self._logger.info(f"walking sequence: {path}")
+        await self._human.set_state(HuntingState())
+        for direction in path:
+            await self.walk(direction)
+        await self._human.set_state(IdleState())
+
 
     def _check_target_visibility(self):
         if self._target is None:
@@ -132,6 +154,16 @@ class Brain:
             self._target.lost_sighting()
 
 
+    async def _notify_position_change(self):
+        payload = {
+            "organism_id": self._human.id,
+            "position": self._human.position
+        }
+
+        await self._event_bus.emit("position_change", payload)
+
+
+
     async def emit_walking_decision(self, move_direction: Direction):
         target_position = self._direction_to_position(move_direction)
         try:
@@ -141,13 +173,13 @@ class Brain:
                 "target_position": target_position
             })
             if result == MoveResult.SUCCESS:
-                self._logger.info(f"Human {self._human.id} has started walking from {self._human.position} to {target_position}")
+                self._logger.info(f"has started walking from {self._human.position} to {target_position}")
             elif result == MoveResult.OUT_OF_BOUNDS:
-                self._logger.info(f"Human {self._human.id}: Position {target_position} is out of bounds")
+                self._logger.info(f"Position {target_position} is out of bounds")
             elif result == MoveResult.RESERVED:
-                self._logger.info(f"Human {self._human.id}: Position {target_position} is reserved")
+                self._logger.info(f"Position {target_position} is reserved")
             else:
-                self._logger.info(f"Human {self._human.id}: Position {target_position} is occupied")
+                self._logger.info(f"Position {target_position} is occupied")
             return result
 
         except Exception as e:

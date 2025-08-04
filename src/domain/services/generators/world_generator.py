@@ -12,15 +12,14 @@ from domain.services.generators.animals_generator import AnimalsGenerator
 from domain.services.generators.elevation_generator import ElevationGenerator
 from domain.services.generators.plants_generator import PlantsGenerator
 from domain.services.tile_adapter import TileAdapter
-from domain.world_map.world_perception import WorldPerception
+
 from domain.world_map.world_state_service import WorldStateService
 
 
 def create_world_facade(world_map: WorldMap,
                         world_state_service: WorldStateService,
-                        world_perception: WorldPerception,
                         event_bus:EventBus) -> WorldFacade:
-    return WorldFacade(world_map, world_state_service, world_perception, event_bus)
+    return WorldFacade(world_map, world_state_service, event_bus)
 
 def create_world_state_service():
     return WorldStateService()
@@ -55,17 +54,14 @@ class WorldGenerator:
         world_array = self._generate_map_array(width, height, scale)
         tiles: list[Tile] = TileAdapter.to_tiles(world_array)
         world_map = WorldMap(1,"Brave new world", width, height, tiles)
-        world_perception = self._create_world_perception(tiles)
         world_state_service = create_world_state_service()
-        world_facade = create_world_facade(world_map, world_state_service, world_perception, self.event_bus)
+        world_facade = create_world_facade(world_map, world_state_service, self.event_bus)
        # world = self._generate_plants(world)
         world_facade = self._generate_animals(world_facade)
         world_facade = self._generate_humans(world_facade)
 
         return world_facade
 
-    def _create_world_perception(self, tiles: Sequence[Tile]) -> WorldPerception:
-        return WorldPerception(tiles, self.width, self.height)
 
     def _generate_map_array(self, width, height, scale):
 

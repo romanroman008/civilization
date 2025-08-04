@@ -11,7 +11,6 @@ class HumanState(ABC):
     @abstractmethod
     async def on_enter(self, organism): pass
     async def on_exit(self, organism): pass
-    async def on_tick(self, organism): pass
     @property
     def is_busy(self):
         return self._is_busy

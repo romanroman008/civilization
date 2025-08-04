@@ -2,6 +2,7 @@ from itertools import count
 
 from domain.components.position import Position
 from domain.organism.instances.organism import Organism
+from domain.organism.organism_id import OrganismID
 from domain.organism.prefabs.plant_prefab import PlantPrefab
 
 
@@ -9,7 +10,7 @@ class Plant(Organism):
     _id_counter = count(1)
 
     def __init__(self, prefab: PlantPrefab, position: Position):
-        self._id = next(Plant._id_counter)
+        self._id = OrganismID("plant", next(self._id_counter))
         self._prefab: PlantPrefab = prefab
         self._position: Position = position
         self._rotation = 0
@@ -19,7 +20,7 @@ class Plant(Organism):
         pass
 
     @property
-    def id(self) -> int:
+    def id(self) -> OrganismID:
         return self._id
 
     @property
