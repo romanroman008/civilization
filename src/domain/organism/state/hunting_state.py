@@ -1,21 +1,23 @@
 from domain.components.direction import Direction
 
 from domain.organism.instances.human import Human
-from domain.organism.state.human_state import HumanState
+from domain.organism.instances.organism import Organism
+
+from domain.organism.state.organism_state import OrganismState
 
 
 
-class HuntingState(HumanState):
+class HuntingState(OrganismState):
     def __init__(self):
         super().__init__()
 
-    async def on_enter(self, human: Human):
+    async def on_enter(self, organism: Organism):
         self._is_busy = True
-        self._logger.info(f"Human {human.id} has started hunting")
+        self._logger.info(f"Organism {organism.id} has started hunting")
 
-    async def on_exit(self, human: Human):
+    async def on_exit(self, organism: Organism):
         self._is_busy = False
-        self._logger.info(f"Human {human.id} has stopped hunting")
+        self._logger.info(f"Organism {organism.id} has stopped hunting")
 
 
 

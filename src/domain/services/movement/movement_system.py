@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from domain.organism.instances.animal import Animal
     from domain.organism.instances.human import Human
 
-from domain.organism.instances.organism import Organism
+from domain.organism.instances.organismDEPR import Organism
 from domain.world_map.world_map import WorldMap
 
 

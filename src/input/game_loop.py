@@ -2,12 +2,11 @@ import asyncio
 from typing import Optional
 
 import pygame
+from asyncio import Queue
 
 from domain.components.direction import Direction
-from domain.organism.human_movement import HumanMovement
 from domain.organism.instances.human import Human
 from domain.world_map.world_facade import WorldFacade
-from domain.world_map.world_map import WorldMap
 from infrastructure.rendering.camera import Camera
 from infrastructure.rendering.world_presenter import WorldPresenter
 from infrastructure.rendering.world_renderer import WorldRenderer
@@ -15,7 +14,55 @@ from input.keyboard import Keyboard
 from shared.config import CONFIG
 
 
-def run_game(world_facade: WorldFacade, loop: asyncio.AbstractEventLoop):
+async def render_loop(world_renderer: WorldRenderer, camera: Camera, screen):
+    while True:
+        screen.fill((0, 0, 0))
+        world_renderer.render_map(camera)
+        pygame.display.flip()
+        await asyncio.sleep(1 / 60)  # ~60 FPS
+
+async def game_loop(agent: Human, action_queue: Queue):
+    action_locked = False
+
+    async def handle_action(action: Optional[str]):
+        nonlocal action_locked
+        action_locked = True
+        await decide(agent, action)
+        action_locked = False
+
+    while True:
+        action = await action_queue.get()
+        if not action_locked:
+            await handle_action(action)
+
+
+
+
+from asyncio import Queue
+
+async def input_loop(keyboard: Keyboard, camera: Camera, action_queue: Queue):
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit(0)
+
+            keyboard.handle_event(event)
+
+        dx, dy = keyboard.get_movement()
+        if dx != 0 or dy != 0:
+            camera.move(5 * dx, 5 * dy)
+
+        action = keyboard.get_action()
+        if action:
+            await action_queue.put(action)
+
+        await asyncio.sleep(1 / 60)
+
+
+
+
+async def run_game(world_facade: WorldFacade):
     pygame.init()
     screen = pygame.display.set_mode((CONFIG["screen_width"], CONFIG["screen_height"]))
     pygame.display.set_caption("Civilization")
@@ -32,61 +79,33 @@ def run_game(world_facade: WorldFacade, loop: asyncio.AbstractEventLoop):
                                    tile_presenter,
                                    camera,
                                    tile_size=CONFIG["tile_size"])
-    clock = pygame.time.Clock()
-    running = True
-
-    # 🔐 Flaga do blokowania inputu
-    action_locked = False
-
-    # 🧠 Agent kontrolowany przez gracza
     agent = get_agent(world_facade)
-
-    async def handle_action(action: Optional[str]):
-        nonlocal action_locked
-        action_locked = True
-        await decide(agent, action, loop)
-        action_locked = False
-
     keyboard = Keyboard()
 
-    while running:
-        action = None
+    action_queue = asyncio.Queue()
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            keyboard.handle_event(event)
+    await asyncio.gather(
+        asyncio.create_task(render_loop(world_renderer, camera, screen)),
+        asyncio.create_task(game_loop(agent, action_queue)),
+        asyncio.create_task(input_loop(keyboard, camera, action_queue)),
+    )
 
-        dx, dy = keyboard.get_movement()
-        camera.move(5 * dx, 5 * dy)
 
-        action = keyboard.get_action()
-        if action and not action_locked:
-            action_locked = True
-            safe_async(handle_action(action), loop)
-
-        screen.fill((0, 0, 0))
-        world_renderer.render_map(camera)
-        pygame.display.flip()
-        clock.tick(60)
 
     pygame.quit()
 
 
 
-
-async def decide(agent: Optional[Human], action: Optional[str], loop: asyncio.AbstractEventLoop):
-    if agent is None:
+async def decide(agent: Optional[Human], action: Optional[str]):
+    if agent is None or action is None:
         return
-    if action is None:
-        return
-
 
     action_map = {
         "stop": lambda: print("STOP"),
-        "walk": lambda: agent.brain.walk(),
+        "walk": lambda: agent.brain.walk(Direction.TOP),
         "hunt": lambda: agent.brain.hunt()
     }
+
 
     func = action_map.get(action)
     if func:
@@ -95,15 +114,5 @@ async def decide(agent: Optional[Human], action: Optional[str], loop: asyncio.Ab
         print(f"[WARN] Unknown action: {action}")
 
 
-
 def get_agent(world_facade: WorldFacade) -> Optional[Human]:
-    agent = world_facade.get_example_agent()
-    return agent
-
-def safe_async(coro, loop: asyncio.AbstractEventLoop):
-    try:
-        asyncio.run_coroutine_threadsafe(coro, loop)
-    except Exception as e:
-        print(f"[ERROR] Failed to schedule async action: {e}")
-
-
+    return world_facade.get_example_agent()

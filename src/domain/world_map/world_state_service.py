@@ -5,6 +5,7 @@ from domain.components.position import Position
 from domain.components.renderable import Renderable
 from domain.organism.instances.human import Human
 from domain.organism.instances.organism import Organism
+
 from domain.organism.organism_id import OrganismID
 
 
@@ -20,6 +21,9 @@ class WorldStateService:
         self._organism_positions[organism] = pos
         self._position_organisms[pos.as_key()].add(organism)
         self._organism_index[organism.id] = organism
+
+    def get_organism_by_id(self, organism_id: OrganismID) -> Optional[Organism]:
+        return self._organism_index[organism_id]
 
     def update_position(self, organism_id: OrganismID, new_position: Position):
         organism = self._organism_index[organism_id]

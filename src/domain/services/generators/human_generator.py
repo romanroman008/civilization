@@ -1,5 +1,5 @@
 import random
-from typing import Sequence
+
 
 from domain.components.position import Position
 from domain.human.brain.brain import Brain
@@ -11,7 +11,7 @@ from domain.organism.human_movement import HumanMovement
 from domain.organism.instances.human import Human
 from domain.organism.prefabs.organism_prefab import OrganismPrefab
 from domain.services.event_bus import EventBus
-from domain.world_map.tile import Tile
+
 from domain.world_map.world_facade import WorldFacade
 
 
@@ -27,8 +27,8 @@ def create_vitals():
 def create_field_of_view(radius: int, world_facade:WorldFacade) -> FieldOfView:
     return FieldOfView(radius, world_facade)
 
-def create_movement(position: Position) -> HumanMovement:
-    return HumanMovement(position)
+def create_movement() -> HumanMovement:
+    return HumanMovement()
 
 def create_brain(world_facade:WorldFacade, movement: HumanMovement, event_bus: EventBus) -> Brain:
     field_of_view = create_field_of_view(CONFIG["human_vision_radius"],world_facade)
@@ -58,9 +58,10 @@ class HumanGenerator:
 
             for position in approved_positions:
                 position = Position(3,3)
-                movement = create_movement(position)
+                movement = create_movement()
                 brain = create_brain(world_facade, movement, event_bus)
-                human = Human(animal_prefab, brain, movement)
+                human = Human(animal_prefab, position, brain, movement, world_facade)
+                human.connect()
                 world_facade.add_organism(human)
 
 

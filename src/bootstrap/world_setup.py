@@ -2,7 +2,7 @@ from logging import Logger
 
 from domain.services.event_bus import EventBus
 from domain.services.generators.human_generator import HumanGenerator
-from domain.world_map.world_map import WorldMap
+
 from domain.services.generators.animals_generator import AnimalsGenerator
 
 from domain.services.generators.elevation_generator import ElevationGenerator

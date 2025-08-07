@@ -13,7 +13,7 @@ from input.game_loop import run_game
 from shared.config import CONFIG
 from shared.logger import get_logger
 
-from apscheduler.schedulers.background import BackgroundScheduler
+
 
 
 def init_db():
@@ -24,7 +24,6 @@ def init_db():
 
 def main():
     logger = get_logger("civilization")
-    scheduler = BackgroundScheduler()
     # aps_logger = logging.getLogger("apscheduler")
     # aps_logger.propagate = False
     # aps_logger.handlers = logger.handlers[:]  # ← Twoje własne handlery
@@ -43,7 +42,6 @@ def main():
     world_facade = world_generator.create(CONFIG["map_width"], CONFIG["map_height"], CONFIG["scale"])
 
 
-    scheduler.remove_all_jobs()
 
 
 
@@ -68,8 +66,10 @@ def main():
     import threading
     threading.Thread(target=loop.run_forever, daemon=True).start()
 
-    run_game(world_facade, loop)
-    scheduler.shutdown(wait=True)
+    asyncio.run(run_game(world_facade))
+
+
+
 
 
 if __name__ == "__main__":

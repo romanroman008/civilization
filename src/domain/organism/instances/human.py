@@ -1,85 +1,28 @@
+
 from itertools import count
 
 from domain.components.position import Position
 from typing import TYPE_CHECKING
 
+from domain.organism.instances.animal import Animal
+from domain.organism.movement import Movement
 from domain.organism.organism_id import OrganismID
+from domain.world_map.position_validator_protocol import PositionValidatorProtocol
 
 if TYPE_CHECKING:
     from domain.human.brain.brain import Brain
 
-
-from domain.organism.human_movement import HumanMovement
-from domain.organism.instances.organism import Organism
 from domain.organism.prefabs.organism_prefab import OrganismPrefab
-from domain.organism.state.human_state import HumanState
-from domain.organism.state.idle_state import IdleState
 
 
-class Human(Organism):
+class Human(Animal):
     _human_counter = count(1)
-
-    def __init__(self, prefab: OrganismPrefab,  brain: "Brain", movement: HumanMovement):
-        self._id = OrganismID("Human", next(self._human_counter))
-        self._prefab = prefab
-        self._movement = movement
-        self._brain = brain
-        self._brain.set_human(self)
-        self._state: HumanState = IdleState()
+    def __init__(self, prefab: OrganismPrefab, position: Position, brain: "Brain", movement: Movement,
+                 position_validator: PositionValidatorProtocol):
+        super().__init__(prefab, position, brain, movement, position_validator)
+        self._id = OrganismID("human", next(self._human_counter))
 
 
     @property
-    def id(self) -> OrganismID:
-        return self._id
-
-    @property
-    def sprite_key(self) -> str:
-        return self._prefab.name
-
-    @property
-    def allowed_terrains(self):
-        return self._prefab.allowed_terrains
-
-    @property
-    def is_moving(self) -> bool:
-        return self._movement.is_moving
-
-
-    @property
-    def position(self) -> Position:
-        return self._movement.position
-
-    @property
-    def rotation(self) -> int:
-        return self._movement.rotation
-
-    @property
-    def offset(self) -> tuple[int, int]:
-        return self._movement.offset_x, self._movement.offset_y
-
-    @property
-    def target_position(self) -> Position:
-        return self._movement.target_position
-
-    async def set_state(self, state: HumanState):
-        if isinstance(self._state, type(state)):
-            return
-        await self._state.on_exit(self)
-
-        self._state = state
-        await self._state.on_enter(self)
-
-    def __call__(self, *args, **kwargs):
-        self._brain.tick(self.position)
-
-    @property
-    def brain(self):
+    def brain(self) -> "Brain":
         return self._brain
-
-    @property
-    def movement(self) -> HumanMovement:
-        return self._movement
-
-    @property
-    def state(self):
-        return self._state

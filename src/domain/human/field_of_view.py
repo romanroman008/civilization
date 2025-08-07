@@ -3,6 +3,7 @@ from typing import Optional
 from domain.components.position import Position
 
 from domain.human.perception.animal_info import AnimalInfo
+from domain.human.perception.organism_info import OrganismInfo
 from domain.human.perception.percived_object import PerceivedObject
 from domain.organism.instances.animal import Animal
 from domain.organism.instances.plant import Plant
@@ -17,15 +18,21 @@ class FieldOfView:
         self._position = None
         self.world_facade = world_facade
         self._perceived_objects: list[PerceivedObject] = []
+        self._organism_data: list[OrganismInfo] = []
 
-    def get_perceived_objects(self):
+    @property
+    def perceived_objects(self):
+        return self._perceived_objects
+
+    def update_perceived_objects(self):
         positions = []
-        x,y = self._position.x, self._position.y
-        for dx in range(x - self._radius,x + self._radius + 1):
-            for dy in range(y - self._radius,y + self._radius + 1):
+        x, y = self._position.x, self._position.y
+        for dx in range(x - self._radius, x + self._radius + 1):
+            for dy in range(y - self._radius, y + self._radius + 1):
                 positions.append(Position(dx, dy))
 
-        return self.world_facade.get_visible_area(self._position, positions)
+        self._perceived_objects.clear()
+        self._perceived_objects.extend(self.world_facade.get_visible_area(self._position, positions))
 
 
     def detect_edible_plants(self) -> list[PerceivedObject]:
@@ -52,10 +59,10 @@ class FieldOfView:
 
     def update(self, position: Position):
         self._position = position
-        self._perceived_objects = self.get_perceived_objects()
+        self.update_perceived_objects()
 
 
 
     def _animal_to_animal_info(self, animal: Animal) -> AnimalInfo:
         relative_position = animal.position - self._position
-        return AnimalInfo(animal.id, relative_position)
+        return AnimalInfo(animal.id, relative_position, animal.is_alive)

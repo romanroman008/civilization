@@ -2,6 +2,7 @@ from itertools import count
 
 from domain.components.position import Position
 from domain.organism.instances.organism import Organism
+
 from domain.organism.organism_id import OrganismID
 from domain.organism.prefabs.plant_prefab import PlantPrefab
 
@@ -15,6 +16,7 @@ class Plant(Organism):
         self._position: Position = position
         self._rotation = 0
         self._offset = (0,0)
+        self._is_alive = True
 
     def __call__(self, *args, **kwargs):
         pass
@@ -46,3 +48,8 @@ class Plant(Organism):
     @property
     def is_edible(self):
         return self._prefab.is_edible
+
+    @property
+    def is_alive(self) -> bool:
+        return self._is_alive
+

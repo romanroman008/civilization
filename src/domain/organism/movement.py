@@ -1,25 +1,23 @@
 import asyncio
+import math
 from abc import abstractmethod, ABC
+from typing import Optional, TYPE_CHECKING
 
 from domain.components.direction import Direction
 from domain.components.position import Position
+if TYPE_CHECKING:
+    from domain.organism.instances.animal import Animal
 from domain.organism.movement_utils import find_divisors, quantize_to_set, find_shortest_rotation, find_target_position
+
 from shared.config import CONFIG
 
 from shared.constans import OFFSET_NORMALIZED_RANGE, ROTATION_SPEED_DELAY_PER_STEP, MOVEMENT_SPEED_DELAY_PER_STEP
 
 
 class Movement(ABC):
-    def __init__(self, position: Position, direction: Direction = Direction.BOT):
-        self._position = position
-        self._target_position = position
-
-        self._rotation = 0
-        self._offset_x = 0
-        self._offset_y = 0
-
-        self._rotation_step = 1
-        self._offset_step = 1
+    def __init__(self, direction: Direction = Direction.BOT):
+        self._animal: Optional[Animal] = None
+        self._target_position: Optional[Position] = None
 
         self._direction = direction
         self._target_direction = direction
@@ -28,25 +26,10 @@ class Movement(ABC):
 
         self._prepare_the_necessary_values(CONFIG["movement_speed"], CONFIG["movement_rotation_speed"])
 
-    @property
-    def position(self) -> Position:
-        return self._position
 
     @property
     def direction(self) -> Direction:
         return self._direction
-
-    @property
-    def offset_x(self) -> int:
-        return self._offset_x
-
-    @property
-    def offset_y(self) -> int:
-        return self._offset_y
-
-    @property
-    def rotation(self) -> int:
-        return self._rotation
 
     @property
     def is_moving(self) -> bool:
@@ -55,6 +38,12 @@ class Movement(ABC):
     @property
     def target_position(self) -> Position:
         return self._target_position
+
+    def set_animal(self, animal:"Animal"):
+        if self._animal is not None:
+            raise RuntimeError(f"The animal is already set.")
+        self._animal = animal
+        self._target_position = animal.position
 
 
     def _prepare_the_necessary_values(self, movement_speed:int, movement_rotation_speed:int):
@@ -65,13 +54,12 @@ class Movement(ABC):
 
     def _prepare_to_move(self, target_direction: Direction):
         self._is_moving = True
-        self._target_position = find_target_position(self._target_position, self._direction)
+        self._target_position = find_target_position(self._target_position, target_direction)
         self._target_direction = target_direction
 
     def _finalize_move(self):
-        self._position = self._target_position
-        self._offset_x = 0
-        self._offset_y = 0
+        self._animal._change_positon(self._target_position, self)
+        self._animal._reset_offset(self)
         self._is_moving = False
         self._direction = self._target_direction
 
@@ -79,29 +67,31 @@ class Movement(ABC):
     async def move_to(self, target_direction: Direction):
         ...
 
-    async def rotate(self):
+    async def _rotate(self):
         target_rotation = find_shortest_rotation(self._direction, self._target_direction)
         total_rotation_steps = target_rotation // self._rotation_step
 
         for _ in range(total_rotation_steps):
-            self._rotation += self._rotation_step
+            self._animal._rotate(self._rotation_step, self)
             await asyncio.sleep(ROTATION_SPEED_DELAY_PER_STEP)
 
-    async def move_offset(self):
-        x_done, y_done = False, False
-        dx = self._target_direction.vector().x * self._offset_step
-        dy = self._target_direction.vector().y * self._offset_step
+    async def _move_offset(self):
+        dx = self._target_direction.vector().x * self._offset_step * 100
+        dy = self._target_direction.vector().y * self._offset_step * 100
 
-        total_offset_x_steps = dx // self._offset_step
-        total_offset_y_steps = dy // self._offset_step
+        total_offset_x_steps = abs(dx // self._offset_step)
+        total_offset_y_steps = abs(dy // self._offset_step)
+
 
         offset_steps = max(total_offset_x_steps, total_offset_y_steps)
 
+
         for _ in range(offset_steps):
-            if not x_done:
-                self._offset_x += dx
-            if not y_done:
-                self._offset_y += dy
+            offset_x, offset_y = self._animal.offset
+            if offset_x != dx:
+                self._animal._move_offset(self._offset_step * math.copysign(1,dx),0, self)
+            if offset_y != dy:
+                self._animal._move_offset(0,self._offset_step * math.copysign(1,dy), self)
             await asyncio.sleep(MOVEMENT_SPEED_DELAY_PER_STEP)
 
 
