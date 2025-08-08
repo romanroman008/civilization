@@ -18,7 +18,7 @@ class WorldStateService:
         self._move_targets: Set[tuple[int, int]] = set()
 
         self._moving_animals: Dict[OrganismID, tuple[Position, Position]] = {}
-        self._reserved_positions: Set[Position] = set()
+
 
     def register_organism(self, organism: Organism):
         pos = organism.position
@@ -32,7 +32,7 @@ class WorldStateService:
 
     def notify_animal_movement_start(self, animal: Animal, target_position: Position):
         self._moving_animals[animal.id] = animal.position, target_position
-        self._move_targets.add((animal.target_position.x, animal.target_position.y))
+        self._move_targets.add((target_position.x, target_position.y))
 
 
     def notify_animal_movement_end(self, animal: Animal):
