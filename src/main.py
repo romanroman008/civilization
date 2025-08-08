@@ -24,11 +24,6 @@ def init_db():
 
 def main():
     logger = get_logger("civilization")
-    # aps_logger = logging.getLogger("apscheduler")
-    # aps_logger.propagate = False
-    # aps_logger.handlers = logger.handlers[:]  # ← Twoje własne handlery
-
-
 
     world_generator = create_world_generator(logger)
 
@@ -36,16 +31,7 @@ def main():
 
     world_service = create_world_service(world_generator)
 
-    world = None
-    #world = world_service.create_new_world(CONFIG["map_width"], CONFIG["map_height"], CONFIG["scale"])
-
     world_facade = world_generator.create(CONFIG["map_width"], CONFIG["map_height"], CONFIG["scale"])
-
-
-
-
-
-
 
 
 

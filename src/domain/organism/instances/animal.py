@@ -12,7 +12,11 @@ from domain.organism.organism_id import OrganismID
 from domain.organism.prefabs.organism_prefab import OrganismPrefab
 from domain.organism.state.idle_state import IdleState
 from domain.organism.state.organism_state import OrganismState
-from domain.world_map.position_validator_protocol import PositionValidatorProtocol
+
+
+def normalize_angle(angle):
+    r = (angle + 180) % 360 - 180
+    return 180 if r == -180 else r
 
 
 class Animal(Organism):
@@ -21,13 +25,11 @@ class Animal(Organism):
                  prefab: OrganismPrefab,
                  position: Position,
                  brain: "Brain",
-                 movement: Movement,
-                 position_validator: PositionValidatorProtocol):
+                 movement: Movement):
         super().__init__(prefab, position)
         self._id = OrganismID("animal", next(self._id_counter))
         self._movement = movement
         self._brain = brain
-        self._position_validator = position_validator
         self._state = IdleState()
 
     @property
@@ -64,11 +66,14 @@ class Animal(Organism):
     def is_alive(self) -> bool:
         return self._brain.is_alive
 
+    async def tick(self):
+        await self._brain.tick()
+
 
     def _rotate(self, angle: int, caller: Movement):
         if caller != self._movement:
             raise PermissionError("Only the registered Movement component can rotate this organism")
-        self._rotation += angle
+        self._rotation = normalize_angle(self._rotation + angle)
 
     def _move_offset(self, dx: int, dy: int, caller: Movement):
         if caller != self._movement:
@@ -92,7 +97,5 @@ class Animal(Organism):
         if caller != self._movement:
             raise PermissionError("Only the registered Movement component can change position of this organism")
 
-        if not self._position_validator.is_position_allowed(position, self._prefab.allowed_terrains):
-            raise ValueError(f"Postion is {position} is not allowed")
-
         self._position = position
+

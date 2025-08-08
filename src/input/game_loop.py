@@ -5,6 +5,7 @@ import pygame
 from asyncio import Queue
 
 from domain.components.direction import Direction
+from domain.organism.instances.animal import Animal
 from domain.organism.instances.human import Human
 from domain.world_map.world_facade import WorldFacade
 from infrastructure.rendering.camera import Camera
@@ -21,7 +22,7 @@ async def render_loop(world_renderer: WorldRenderer, camera: Camera, screen):
         pygame.display.flip()
         await asyncio.sleep(1 / 60)  # ~60 FPS
 
-async def game_loop(agent: Human, action_queue: Queue):
+async def game_loop(agent: Animal, action_queue: Queue):
     action_locked = False
 
     async def handle_action(action: Optional[str]):
@@ -59,7 +60,10 @@ async def input_loop(keyboard: Keyboard, camera: Camera, action_queue: Queue):
 
         await asyncio.sleep(1 / 60)
 
-
+async def organism_loop(world_facade: WorldFacade):
+    while True:
+        await world_facade.tick()
+        await asyncio.sleep(1)
 
 
 async def run_game(world_facade: WorldFacade):
@@ -88,6 +92,8 @@ async def run_game(world_facade: WorldFacade):
         asyncio.create_task(render_loop(world_renderer, camera, screen)),
         asyncio.create_task(game_loop(agent, action_queue)),
         asyncio.create_task(input_loop(keyboard, camera, action_queue)),
+        asyncio.create_task(organism_loop(world_facade)),
+
     )
 
 
@@ -96,14 +102,18 @@ async def run_game(world_facade: WorldFacade):
 
 
 
-async def decide(agent: Optional[Human], action: Optional[str]):
+async def decide(agent: Optional[Animal], action: Optional[str]):
     if agent is None or action is None:
         return
 
     action_map = {
         "stop": lambda: print("STOP"),
-        "walk": lambda: agent.brain.walk(Direction.TOP),
-        "hunt": lambda: agent.brain.hunt()
+        "walk": lambda: agent._brain.walk(Direction.TOP),
+        "hunt": lambda: agent._brain.hunt(),
+        "up": lambda: agent._brain.walk(Direction.TOP),
+        "down": lambda: agent._brain.walk(Direction.BOT),
+        "left": lambda: agent._brain.walk(Direction.LEFT),
+        "right": lambda: agent._brain.walk(Direction.RIGHT),
     }
 
 
@@ -114,5 +124,5 @@ async def decide(agent: Optional[Human], action: Optional[str]):
         print(f"[WARN] Unknown action: {action}")
 
 
-def get_agent(world_facade: WorldFacade) -> Optional[Human]:
+def get_agent(world_facade: WorldFacade) -> Optional[Animal]:
     return world_facade.get_example_agent()

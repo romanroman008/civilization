@@ -60,7 +60,7 @@ class HumanGenerator:
                 position = Position(3,3)
                 movement = create_movement()
                 brain = create_brain(world_facade, movement, event_bus)
-                human = Human(animal_prefab, position, brain, movement, world_facade)
+                human = Human(animal_prefab, position, brain, movement)
                 human.connect()
                 world_facade.add_organism(human)
 

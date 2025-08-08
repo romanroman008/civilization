@@ -31,6 +31,13 @@ class EventBus:
         await asyncio.gather(*(cb(payload) for cb in listeners))
 
 
+    async def emit_async(self, event_type: str, payload: dict):
+        listeners = self._listeners_async.get(event_type, [])
+        if not listeners:
+            return
+        await asyncio.gather(*(cb(payload) for cb in listeners))
+
+
     async def emit_with_response(self, event_type:str, payload: dict) -> Any:
         if event_type not in self._command_handlers:
             raise ValueError(f"No command handler registered for event '{event_type}'")

@@ -12,10 +12,10 @@ class WalkingState(OrganismState):
 
     async def on_enter(self, organism: Organism):
         self._is_busy = True
-        self._logger.info(f"Human {organism.id} has started walking")
+        #self._logger.info(f"Human {organism.id} has started walking")
 
 
     async def on_exit(self, organism: Organism):
         self._is_busy = False
-        self._logger.info(f"Human {organism.id} has stopped walking")
+      #  self._logger.info(f"Human {organism.id} has stopped walking")
 

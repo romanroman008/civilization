@@ -3,7 +3,8 @@ from typing import Dict, Set, Optional, Sequence
 
 from domain.components.position import Position
 from domain.components.renderable import Renderable
-from domain.organism.instances.human import Human
+from domain.organism.instances.animal import Animal
+
 from domain.organism.instances.organism import Organism
 
 from domain.organism.organism_id import OrganismID
@@ -16,6 +17,9 @@ class WorldStateService:
         self._position_organisms: Dict[tuple[int, int], Set[Organism]] = defaultdict(set)
         self._move_targets: Set[tuple[int, int]] = set()
 
+        self._moving_animals: Dict[OrganismID, tuple[Position, Position]] = {}
+        self._reserved_positions: Set[Position] = set()
+
     def register_organism(self, organism: Organism):
         pos = organism.position
         self._organism_positions[organism] = pos
@@ -25,13 +29,21 @@ class WorldStateService:
     def get_organism_by_id(self, organism_id: OrganismID) -> Optional[Organism]:
         return self._organism_index[organism_id]
 
-    def update_position(self, organism_id: OrganismID, new_position: Position):
-        organism = self._organism_index[organism_id]
-        old_pos = self._organism_positions.get(organism)
-        if old_pos:
-            self._position_organisms[(old_pos.x, old_pos.y)].discard(organism)
-        self._organism_positions[organism] = new_position
-        self._position_organisms[(new_position.x, new_position.y)].add(organism)
+
+    def notify_animal_movement_start(self, animal: Animal, target_position: Position):
+        self._moving_animals[animal.id] = animal.position, target_position
+        self._move_targets.add((animal.target_position.x, animal.target_position.y))
+
+
+    def notify_animal_movement_end(self, animal: Animal):
+        prev_pos, act_pos = self._moving_animals[animal.id]
+        del self._moving_animals[animal.id]
+        self._move_targets.discard((act_pos.x, act_pos.y))
+        self._position_organisms[(prev_pos.x, prev_pos.y)].discard(animal)
+        self._organism_positions[animal] = act_pos
+        self._position_organisms[(act_pos.x, act_pos.y)].add(animal)
+
+
 
     def get_organism_position(self, organism: Organism) -> Position:
         return self._organism_positions.get(organism)
@@ -51,17 +63,19 @@ class WorldStateService:
     def is_reserved(self, position: Position) -> bool:
         return (position.x, position.y) in self._move_targets
 
-    def clear_reservations(self):
-        self._move_targets.clear()
+    def remove_reservation(self, position: Position):
+        self._move_targets.discard((position.x, position.y))
 
     def get_all_renderable(self) -> Sequence[Renderable]:
         return list(self._organism_positions.keys())
 
+    def get_all_organisms(self) -> Sequence[Organism]:
+        return list(self._organism_positions.keys())
 
-
-    def get_example_agent(self) -> Optional[Human]:
+    def get_example_agent(self) -> Optional[Animal]:
         for organism in self._organism_positions:
-            if isinstance(organism, Human):
+            if isinstance(organism, Animal):
                 return organism
         return None
+
 

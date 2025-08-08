@@ -44,6 +44,8 @@ class Organism(ABC):
     @abstractmethod
     def is_alive(self) -> bool: ...
 
+    async def tick(self): pass
+
 
 
 

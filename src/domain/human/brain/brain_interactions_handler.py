@@ -29,8 +29,6 @@ class BrainInteractionsHandler:
         self._event_bus = event_bus
         self._register_handlers()
 
-
-
     def _register_handlers(self):
         self._event_bus.on_async("position update", self.update_field_view)
         self._event_bus.on_async("death", self.register_organism_death)
@@ -46,10 +44,10 @@ class BrainInteractionsHandler:
 
     async def notify_position_change(self):
         payload = {
-            "organism_id": self._organism.id,
+            "organism": self._organism,
             "position": self._organism.position
         }
-        await self._event_bus.emit("position_change", payload)
+        await self._event_bus.emit_async("position_changed", payload)
 
     async def emit_kill_decision(self, target_id: OrganismID):
         result = await self._event_bus.emit("kill_request", {
@@ -61,7 +59,7 @@ class BrainInteractionsHandler:
     async def emit_walking_decision(self, move_direction: Direction):
         target_position = self._direction_to_position(move_direction)
 
-        result = await self._event_bus.emit_with_response("change_state_requested",{
+        result = await self._event_bus.emit_with_response("walk_request",{
             "organism": self._organism,
             "target_position": target_position
         })

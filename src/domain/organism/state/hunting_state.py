@@ -13,11 +13,11 @@ class HuntingState(OrganismState):
 
     async def on_enter(self, organism: Organism):
         self._is_busy = True
-        self._logger.info(f"Organism {organism.id} has started hunting")
+       # self._logger.info(f"Organism {organism.id} has started hunting")
 
     async def on_exit(self, organism: Organism):
         self._is_busy = False
-        self._logger.info(f"Organism {organism.id} has stopped hunting")
+      #  self._logger.info(f"Organism {organism.id} has stopped hunting")
 
 
 

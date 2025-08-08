@@ -1,12 +1,10 @@
 from collections import defaultdict
-from itertools import chain
+
 
 import pygame
 
 from domain.components.position import Position
 from domain.world_map.world_facade import WorldFacade
-from domain.world_map.world_map import WorldMap
-from domain.world_map.world_state_service import WorldStateService
 from infrastructure.rendering.camera import Camera
 from infrastructure.rendering.sprite import Sprite
 

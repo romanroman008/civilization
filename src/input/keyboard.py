@@ -16,9 +16,13 @@ NAME_TO_PYGAME_KEY = {
 }
 
 ACTION_KEYS = {
-   pygame.K_1: "stop",
+   pygame.K_1: "left",
     pygame.K_2: "walk",
     pygame.K_3: "hunt",
+    pygame.K_UP: "up",
+    pygame.K_DOWN: "down",
+    pygame.K_LEFT: "left",
+    pygame.K_RIGHT: "right",
 }
 
 class Keyboard:

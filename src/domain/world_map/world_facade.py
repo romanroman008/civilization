@@ -1,3 +1,5 @@
+import asyncio
+import logging
 from itertools import chain
 from typing import Sequence, Iterable, Optional
 
@@ -21,6 +23,8 @@ from domain.world_map.world_interactions_validator import WorldInteractionsValid
 from domain.world_map.world_map import WorldMap
 
 from domain.world_map.world_state_service import WorldStateService
+from shared.logger import get_logger
+
 
 def _tile_to_perceived_object(relative_positon: Position, terrain: Terrain, organism:Optional[Organism]) -> PerceivedObject:
     if organism:
@@ -43,6 +47,8 @@ class WorldFacade:
         self._event_bus = event_bus
         self._world_interactions_validator = self._create_world_interactions_validator()
         self._create_world_interactions_handler()
+        self._logger = get_logger("WorldFacade", level=logging.INFO,
+                                  log_filename="world_interactions_handler.log")
 
     @property
     def height(self) -> int:
@@ -70,14 +76,11 @@ class WorldFacade:
     def add_organism(self, organism: Organism):
         self._world_state_service.register_organism(organism)
 
-    def update_position(self, organism_id: OrganismID, new_position: Position):
-        self._world_state_service.update_position(organism_id, new_position)
 
     def is_position_allowed(self, position: Position, allowed_terrains: set[Terrain]) -> bool:
         return self._world_interactions_validator.is_position_allowed(position, allowed_terrains)
 
-    def reserve_position(self, position: Position):
-        self._world_state_service.reserve_position(position)
+
 
 
     def get_visible_area(self, observer_position, positions: list[Position]) -> list[PerceivedObject]:
@@ -100,7 +103,15 @@ class WorldFacade:
 
 
 
-    def get_example_agent(self) -> Optional[Human]:
+    def get_example_agent(self) -> Optional[Animal]:
         return self._world_state_service.get_example_agent()
+
+    async def tick(self):
+        tasks = [
+            organism.tick()
+            for organism in self._world_state_service.get_all_organisms()
+        ]
+        await asyncio.gather(*tasks)
+
 
 

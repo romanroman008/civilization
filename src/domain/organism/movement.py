@@ -1,10 +1,13 @@
 import asyncio
+import logging
 import math
 from abc import abstractmethod, ABC
 from typing import Optional, TYPE_CHECKING
 
 from domain.components.direction import Direction
 from domain.components.position import Position
+from shared.logger import get_logger
+
 if TYPE_CHECKING:
     from domain.organism.instances.animal import Animal
 from domain.organism.movement_utils import find_divisors, quantize_to_set, find_shortest_rotation, find_target_position
@@ -26,6 +29,7 @@ class Movement(ABC):
 
         self._prepare_the_necessary_values(CONFIG["movement_speed"], CONFIG["movement_rotation_speed"])
 
+        self._logger = get_logger(f"Movement: ", level=logging.INFO, log_filename="movement.log")
 
     @property
     def direction(self) -> Direction:
@@ -61,19 +65,23 @@ class Movement(ABC):
         self._animal._change_positon(self._target_position, self)
         self._animal._reset_offset(self)
         self._is_moving = False
-        self._direction = self._target_direction
+
 
     @abstractmethod
     async def move_to(self, target_direction: Direction):
         ...
 
     async def _rotate(self):
+
         target_rotation = find_shortest_rotation(self._direction, self._target_direction)
-        total_rotation_steps = target_rotation // self._rotation_step
+        total_rotation_steps = abs(target_rotation // self._rotation_step)
+
 
         for _ in range(total_rotation_steps):
-            self._animal._rotate(self._rotation_step, self)
+            self._animal._rotate(self._rotation_step * math.copysign(1, target_rotation), self)
             await asyncio.sleep(ROTATION_SPEED_DELAY_PER_STEP)
+
+        self._direction = self._target_direction
 
     async def _move_offset(self):
         dx = self._target_direction.vector().x * self._offset_step * 100
@@ -95,6 +103,13 @@ class Movement(ABC):
             await asyncio.sleep(MOVEMENT_SPEED_DELAY_PER_STEP)
 
 
+
+
+
+
+    async def log(self, target_rotation: int):
+        self._logger.info(f"Actual direction: {self.direction} to {self._target_direction}")
+        self._logger.info(f"Actual rotation: {self._animal.rotation} to {target_rotation}")
 
 
 

@@ -1,4 +1,4 @@
-import asyncio
+
 import logging
 from collections import deque
 from typing import Optional
@@ -22,6 +22,8 @@ from domain.organism.movement import Movement
 from domain.organism.state.hunting_state import HuntingState
 from domain.organism.state.idle_state import IdleState
 from domain.organism.state.walking_state import WalkingState
+
+from domain.organism.strategy.random_walk_strategy import RandomWalkStrategy
 from domain.services.event_bus import EventBus
 from domain.services.movement.move_result import MoveResult
 from shared.logger import get_logger
@@ -73,6 +75,8 @@ class Brain:
         self._animal: Optional[Animal] = None
         self._movement = movement
 
+        self._decision_strategy = RandomWalkStrategy()
+
 
         self._target: Optional[OrganismInfo] = None
 
@@ -100,6 +104,13 @@ class Brain:
                                         vitals=self._vitals,
                                         movement=self._movement,
                                         event_bus=self._event_bus)
+
+
+
+
+    async def tick(self):
+        if not self._is_busy and self._is_alive:
+            await self._decision_strategy.decide(self)
 
 
     def set_animal(self, animal: Animal):

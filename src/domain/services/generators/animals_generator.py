@@ -1,5 +1,5 @@
 import random
-from threading import Event
+
 
 from domain.components.position import Position
 from domain.human.brain.brain import Brain
@@ -7,9 +7,9 @@ from domain.human.field_of_view import FieldOfView
 from domain.human.vitals import Vitals
 from domain.organism.animal_movement import AnimalMovement
 from domain.organism.instances.animal import Animal
-from domain.organism.movement import Movement
+
 from domain.organism.prefabs.organism_prefab import OrganismPrefab
-from domain.services import event_bus
+
 from domain.services.event_bus import EventBus
 from domain.world_map.world_facade import WorldFacade
 from shared.config import CONFIG
@@ -19,11 +19,11 @@ def _get_random_positions(positions: list[Position], amount: int) -> list[Positi
     return random.sample(positions, k=min(amount, len(positions)))
 
 def create_animal(animal_prefab: OrganismPrefab, position: Position, world_facade: WorldFacade, event_bus: EventBus) -> Animal:
-    movement = AnimalMovement(world_facade)
+    movement = AnimalMovement()
     vitals = Vitals()
     field_of_view = FieldOfView(CONFIG["human_vision_radius"], world_facade)
     brain = Brain(field_of_view, vitals, movement, event_bus)
-    animal = Animal(animal_prefab, position, brain, movement, world_facade)
+    animal = Animal(animal_prefab, position, brain, movement)
     animal.connect()
     return animal
 

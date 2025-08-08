@@ -11,12 +11,8 @@ class Plant(Organism):
     _id_counter = count(1)
 
     def __init__(self, prefab: PlantPrefab, position: Position):
+        super().__init__(prefab, position)
         self._id = OrganismID("plant", next(self._id_counter))
-        self._prefab: PlantPrefab = prefab
-        self._position: Position = position
-        self._rotation = 0
-        self._offset = (0,0)
-        self._is_alive = True
 
     def __call__(self, *args, **kwargs):
         pass
