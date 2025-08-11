@@ -22,6 +22,8 @@ class AnimalInfo(OrganismInfo):
         self._is_visible = True
 
 
+
+
     @property
     def last_seen_position(self):
         return self._relative_position

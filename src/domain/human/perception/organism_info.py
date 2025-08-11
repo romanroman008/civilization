@@ -24,9 +24,16 @@ class OrganismInfo(Protocol):
     def is_visible(self) -> bool:
         return self._is_visible
 
+    @property
+    def is_alive(self) -> bool:
+        return self._is_alive
+
     def got_sighting(self, position: Position):
         pass
 
     def lost_sighting(self) -> bool:
         pass
+
+    def notify_its_death(self):
+        self._is_alive = False
 

@@ -1,6 +1,7 @@
 
 import logging
 from collections import deque
+from operator import truediv
 from typing import Optional
 
 from domain.components.direction import Direction
@@ -129,44 +130,62 @@ class Brain:
 
    
 
-    async def walk(self, direction: Direction):
+    async def walk(self, direction: Direction) -> MoveResult:
         result = await self._brain_interactions_handler.emit_walking_decision(direction)
         if result is MoveResult.SUCCESS:
             await self._animal.set_state(WalkingState())
             await self._movement.move_to(direction)
             await self._brain_interactions_handler.notify_position_change()
             await self._animal.set_state(IdleState())
+        return result
 
 
 
     async def hunt(self):
-        closest_animal = self._field_of_view.detect_closest_animal()
+
+        self._field_of_view.update(self._animal.position)
+        closest_animal = self._field_of_view.detect_closest_animal(self._animal)
         if closest_animal is None:
             return []
         self._target = closest_animal
-        self._logger.info(f"has started hunting for: {self._target.id}, "
-                          f"position {self._target.relative_position},"
-                          f"last seen {self._target.last_seen_position}")
-
-
         path = self._plan_path_to_target()
 
         self._logger.info(f"walking sequence: {path}")
         await self._animal.set_state(HuntingState())
-
         i = 0
-        while i < len(path) - 1:
-            direction = path[i]
-            await self._movement.move_to(direction)
-            self._field_of_view.update(self._animal.position)
-            updated_path = self._plan_path_to_target()
-            if updated_path == path:
-                i+=1
-            else:
-                i = 0
+        while True:
+            if self._is_target_in_range():
+                await self._kill()
+                break
+            direction = path[0]
+            i+=1
+
+            result = await self.walk(direction)
+            if result is MoveResult.SUCCESS:
+                self._field_of_view.update(self._animal.position)
+                self._update_target_position()
+                self._logger.info(f"Iteracja {i}, pozycja targetu: {self._target.relative_position}")
+                path = self._plan_path_to_target()
+                if path is None:
+                    self._logger.info(f"Path to target position: {self._target.relative_position} cannot be found from {self._animal.position}")
 
 
         await self._animal.set_state(IdleState())
+
+    async def _kill(self):
+       await self._brain_interactions_handler.emit_kill_decision(self._target.id)
+
+    def _is_target_in_range(self):
+        if self._target.relative_position.distance_to(Position(0,0)) <= self._range:
+            return True
+        return False
+
+
+    def _update_target_position(self):
+        updated_pos = self._field_of_view.get_target_position(self._target)
+        if updated_pos is None:
+            return
+        self._target.got_sighting(updated_pos)
 
 
 
@@ -187,17 +206,6 @@ class Brain:
 
 
 
-    def _is_target_in_range(self) -> bool:
-        if not self._target:
-            return False
-        if self._target.is_visible:
-            return False
-        if self._target.relative_position.distance_to(self._animal.position) < self._range:
-            return True
-        return False
-
-
-
     def _check_target_visibility(self):
         if self._target is None:
             return
@@ -213,6 +221,8 @@ class Brain:
             self._target.got_sighting(match.organism_info.relative_position)
         else:
             self._target.lost_sighting()
+
+
 
 
 

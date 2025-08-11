@@ -6,7 +6,7 @@ import pygame
 from domain.components.position import Position
 from domain.world_map.world_facade import WorldFacade
 from infrastructure.rendering.camera import Camera
-from infrastructure.rendering.sprite import Sprite
+from infrastructure.rendering.sprite.sprite import Sprite
 
 from infrastructure.rendering.world_presenter import WorldPresenter
 
@@ -34,7 +34,6 @@ class WorldRenderer:
         self.tile_size = tile_size
 
     def render_map(self, camera):
-
         sprites = self.get_sprites_in_viewport()
         sprites_by_layer = get_sprites_by_layer(sprites)
 
@@ -52,8 +51,21 @@ class WorldRenderer:
 
     def get_sprites_in_viewport(self):
         renderables = self.world_facade.get_all_renderable()
+        # occupied = self.world_facade.get_occupied()
+        # reserved = self.world_facade.get_reserved()
         start_x, end_x, start_y, end_y = self.camera.get_viewport()
-        return [
+
+        sprites =  [
             self.world_presenter.present(r) for r in renderables
             if start_x <= r.position.x <= end_x and start_y <= r.position.y <= end_y
         ]
+        # occu = [
+        #     self.world_presenter.present_occ(r) for r in occupied
+        #     if start_x <= r.position.x <= end_x and start_y <= r.position.y <= end_y
+        # ]
+        # res = [
+        #     self.world_presenter.present_res(r) for r in reserved
+        #     if start_x <= r.position.x <= end_x and start_y <= r.position.y <= end_y
+        # ]
+
+        return sprites

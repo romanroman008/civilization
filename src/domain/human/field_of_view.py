@@ -19,6 +19,9 @@ class FieldOfView:
         self.world_facade = world_facade
         self._perceived_objects: list[PerceivedObject] = []
         self._organism_data: list[OrganismInfo] = []
+        self._target: Optional[OrganismInfo] = None
+
+
 
     @property
     def perceived_objects(self):
@@ -47,19 +50,35 @@ class FieldOfView:
             if (isinstance(perc_obj.organism_info, AnimalInfo))
         ]
 
-    def detect_closest_animal(self) -> Optional[AnimalInfo]:
-        animals = self.detect_animals()
+    def detect_closest_animal(self, viewer: Animal) -> Optional[AnimalInfo]:
+        animals = [a for a in self.detect_animals() if a.id != viewer.id and a.is_alive]
         if not animals:
             return None
 
-        return min(animals,
-                   key=lambda animal: animal.relative_position.distance_to(Position(0,0))
-                   )
-
+        return min(
+            animals,
+            key=lambda animal: animal.relative_position.distance_to(Position(0, 0))
+        )
 
     def update(self, position: Position):
         self._position = position
         self.update_perceived_objects()
+        self._update_target()
+
+    def _update_target(self):
+        if self._target is None:
+            return
+        for perc_obj in self._perceived_objects:
+            if perc_obj.organism_info is not None and perc_obj.organism_info.id == self._target.id:
+                self._target.got_sighting(perc_obj.relative_position)
+                if not perc_obj.organism_info.is_alive:
+                    self._target.notify_its_death()
+
+    def get_target_position(self, target: OrganismInfo) -> Optional[Position]:
+        for po in self._perceived_objects:
+            if po.organism_info is not None and po.organism_info.id == target.id:
+                return po.organism_info.relative_position
+        return None
 
 
 

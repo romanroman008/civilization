@@ -9,8 +9,8 @@ CONFIG = {
     "screen_height": 600,
     "tile_size": 32,
     "fps": 60,
-    "map_height": 4,
-    "map_width": 4,
+    "map_height": 10,
+    "map_width": 10,
     "scale": 50,
     "climate_zones": "climate_zones.json",
     "elevation_seed": 1200,
@@ -20,9 +20,9 @@ CONFIG = {
         Octave(2.0, 0.5),
         Octave(4.0, 0.25),
     ],
-    "animals_count": 10,
-    "plants_count": 1,
-    "human_count": 0,
+    "animals_count": 20,
+    "plants_count": 10,
+    "human_count": 1,
     "human_vision_radius": 5,
 
     "allowed_rotation_speed": [1, 2, 3, 5, 6, 9, 10, 15, 18, 30, 45, 90],
@@ -41,14 +41,14 @@ DEFAULT_KEY_BINDINGS = {
 }
 
 PLANTS_DIST = [
-    (PlantPrefab(name="Berries", allowed_terrains={Terrain.GRASS}, is_edible=True), 1),
-    (PlantPrefab(name="Tree", allowed_terrains={Terrain.GRASS}, is_edible=False, block_radius=1), 1)
+    (PlantPrefab(name="BERRIES", allowed_terrains={Terrain.GRASS}, is_edible=True), 1),
+    (PlantPrefab(name="TREE", allowed_terrains={Terrain.GRASS}, is_edible=False, block_radius=1), 1)
 ]
 
 ANIMALS_DIST = [
-    (OrganismPrefab(name="Rabbit", allowed_terrains={Terrain.GRASS}), 1)
+    (OrganismPrefab(name="RABBIT", allowed_terrains={Terrain.GRASS}), 1)
 ]
 
 HUMAN_DIST = [
-    (OrganismPrefab(name="Human", allowed_terrains={Terrain.GRASS}), 1)
+    (OrganismPrefab(name="HUMAN", allowed_terrains={Terrain.GRASS}), 1)
 ]

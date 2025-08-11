@@ -101,15 +101,33 @@ class WorldFacade:
         organisms = self._world_state_service.get_all_renderable()
         return chain(tiles,organisms)
 
+    def get_occupied(self):
+        tiles = []
+        for tuple in self._world_state_service.get_all_occupied():
+            tiles.append(self._world_map._tile_by_coords[tuple])
+        return tiles
 
 
-    def get_example_agent(self) -> Optional[Animal]:
+    def get_reserved(self):
+        tiles = []
+        reserved_tuples = self._world_state_service.get_all_reserved()
+        for reserved_tuple in reserved_tuples:
+            tiles.append(self._world_map._tile_by_coords[reserved_tuple])
+        return tiles
+
+
+
+
+
+
+    def get_example_agent(self) -> Optional[Human]:
         return self._world_state_service.get_example_agent()
 
     async def tick(self):
         tasks = [
             organism.tick()
             for organism in self._world_state_service.get_all_organisms()
+
         ]
         await asyncio.gather(*tasks)
 

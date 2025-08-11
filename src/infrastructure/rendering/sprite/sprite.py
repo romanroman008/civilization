@@ -2,7 +2,7 @@ import pygame
 
 from domain.components.position import Position
 
-from infrastructure.rendering.sprite_asset import SpriteAsset
+from infrastructure.rendering.sprite.sprite_asset import SpriteAsset
 
 
 class Sprite:

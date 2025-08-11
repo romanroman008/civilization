@@ -4,6 +4,7 @@ from typing import Dict, Set, Optional, Sequence
 from domain.components.position import Position
 from domain.components.renderable import Renderable
 from domain.organism.instances.animal import Animal
+from domain.organism.instances.human import Human
 
 from domain.organism.instances.organism import Organism
 
@@ -72,10 +73,16 @@ class WorldStateService:
     def get_all_organisms(self) -> Sequence[Organism]:
         return list(self._organism_positions.keys())
 
-    def get_example_agent(self) -> Optional[Animal]:
+    def get_example_agent(self) -> Optional[Human]:
         for organism in self._organism_positions:
-            if isinstance(organism, Animal):
+            if isinstance(organism, Human):
                 return organism
         return None
+
+    def get_all_occupied(self) -> set[tuple[int, int]]:
+        return {pos for pos, organisms in self._position_organisms.items() if organisms}
+
+    def get_all_reserved(self) -> set[tuple[int, int]]:
+        return self._move_targets
 
 

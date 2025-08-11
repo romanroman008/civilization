@@ -22,7 +22,7 @@ async def render_loop(world_renderer: WorldRenderer, camera: Camera, screen):
         pygame.display.flip()
         await asyncio.sleep(1 / 60)  # ~60 FPS
 
-async def game_loop(agent: Animal, action_queue: Queue):
+async def game_loop(agent: Human, action_queue: Queue):
     action_locked = False
 
     async def handle_action(action: Optional[str]):
@@ -124,5 +124,5 @@ async def decide(agent: Optional[Animal], action: Optional[str]):
         print(f"[WARN] Unknown action: {action}")
 
 
-def get_agent(world_facade: WorldFacade) -> Optional[Animal]:
+def get_agent(world_facade: WorldFacade) -> Optional[Human]:
     return world_facade.get_example_agent()

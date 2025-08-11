@@ -47,11 +47,11 @@ class WorldInteractionsHandler:
 
 
     async def _notify_organism_death(self, organism_id: OrganismID):
-        await self._event_bus.emit("death", {"organism_id": organism_id})
+        await self._event_bus.emit_async("death", {"organism_id": organism_id})
 
 
     async def _notify_position_changed(self):
-        await self._event_bus.emit("position update", {})
+        await self._event_bus.emit_async("position update", {})
 
 
     async def _on_position_changed(self, payload: dict):

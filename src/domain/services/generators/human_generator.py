@@ -3,6 +3,7 @@ import random
 
 from domain.components.position import Position
 from domain.human.brain.brain import Brain
+from domain.human.brain.human_brain import HumanBrain
 
 from domain.human.field_of_view import FieldOfView
 from domain.human.vitals import Vitals
@@ -34,7 +35,7 @@ def create_brain(world_facade:WorldFacade, movement: HumanMovement, event_bus: E
     field_of_view = create_field_of_view(CONFIG["human_vision_radius"],world_facade)
     vitals = create_vitals()
 
-    return Brain(field_of_view, vitals, movement, event_bus)
+    return HumanBrain(field_of_view, vitals, movement, event_bus)
 
 
 

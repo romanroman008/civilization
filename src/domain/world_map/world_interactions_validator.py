@@ -42,8 +42,6 @@ class WorldInteractionsValidator:
         if not killer.is_alive or not victim.is_alive:
             return False
 
-        if range <= self.get_organisms_distance(killer_id, victim_id):
-            return False
 
         return True
 

@@ -49,11 +49,12 @@ class BrainInteractionsHandler:
         }
         await self._event_bus.emit_async("position_changed", payload)
 
-    async def emit_kill_decision(self, target_id: OrganismID):
-        result = await self._event_bus.emit("kill_request", {
+    async def emit_kill_decision(self, target_id: OrganismID) -> bool:
+        return await self._event_bus.emit_with_response("kill_request", {
             "killer_id": self._organism.id,
             "victim_id": target_id
         })
+
 
 
     async def emit_walking_decision(self, move_direction: Direction):
