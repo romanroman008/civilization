@@ -49,7 +49,7 @@ def test_is_valid_position_returns_true_when_tile_terrain_allowed(monkeypatch):
     generator = AnimalsGenerator(count=0, species_distribution=[])
     # ustawiamy generator.world tak, by get_tile_by_position zwracało kafel z danym terenem
     fake_tile = Mock(terrain=Terrain.GRASS)
-    generator.world = Mock(get_tile_by_position=lambda pos: fake_tile)
+    generator.world_facade = Mock(get_tile_by_position=lambda pos: fake_tile)
 
     pos = Position(1, 2)
     assert generator._is_valid_position(pos, Mock(allowed_terrains=[Terrain.GRASS]))
@@ -58,7 +58,7 @@ def test_is_valid_position_returns_true_when_tile_terrain_allowed(monkeypatch):
 def test_is_valid_position_returns_false_when_tile_terrain_not_allowed(monkeypatch):
     generator = AnimalsGenerator(count=0, species_distribution=[])
     fake_tile = Mock(terrain=Terrain.WATER)  # niepasujący teren
-    generator.world = Mock(get_tile_by_position=lambda pos: fake_tile)
+    generator.world_facade = Mock(get_tile_by_position=lambda pos: fake_tile)
 
     pos = Position(0, 0)
     assert not generator._is_valid_position(pos, Mock(allowed_terrains=[Terrain.GRASS]))
@@ -88,7 +88,7 @@ def test_generate_returns_same_world_and_sets_world_attribute(dummy_world, simpl
     returned = gen.generate(dummy_world)
     assert returned is dummy_world
     # world atrybut został ustawiony
-    assert gen.world is dummy_world
+    assert gen.world_facade is dummy_world
 
 def test_generate_calls_add_organism_expected_number_of_times(dummy_world, simple_distribution, monkeypatch):
     # 50% z 6 → int(0.5*6)=3

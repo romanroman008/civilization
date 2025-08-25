@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 
 from domain.components.position import Position
-from domain.human.perception.organism_info import OrganismInfo
+from domain.organism.perception.organism_info import OrganismInfo
 
 @dataclass
 class AnimalInfo(OrganismInfo):

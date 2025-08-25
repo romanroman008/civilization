@@ -14,6 +14,7 @@ from domain.services.generators.plants_generator import PlantsGenerator
 from domain.services.tile_adapter import TileAdapter
 
 from domain.world_map.world_state_service import WorldStateService
+from infrastructure.rendering.world_snapshot_adapter import WorldSnapshotAdapter
 
 
 def create_world_facade(world_map: WorldMap,
@@ -50,7 +51,7 @@ class WorldGenerator:
         self.width = 100
         self.scale = 100
 
-    def create(self, width, height, scale) -> WorldFacade:
+    def create_world_facade_and_its_adapter(self, width, height, scale) -> tuple[WorldFacade,WorldSnapshotAdapter]:
         world_array = self._generate_map_array(width, height, scale)
         tiles: list[Tile] = TileAdapter.to_tiles(world_array)
         world_map = WorldMap(1,"Brave new world", width, height, tiles)
@@ -59,8 +60,9 @@ class WorldGenerator:
        # world = self._generate_plants(world)
         world_facade = self._generate_animals(world_facade)
         world_facade = self._generate_humans(world_facade)
+        world_snapshot_adapter = WorldSnapshotAdapter(world_state_service, world_map)
 
-        return world_facade
+        return world_facade, world_snapshot_adapter
 
 
     def _generate_map_array(self, width, height, scale):

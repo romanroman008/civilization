@@ -25,6 +25,7 @@ def find_target_position(actual:Position, direction: Direction, distance: int = 
     return actual + direction.vector() * distance
 
 
+
 def find_shortest_rotation(current: Direction, desired: Direction) -> int:
     current_angle = current.angle
     desired_angle = desired.angle

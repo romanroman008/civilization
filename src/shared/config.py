@@ -20,7 +20,7 @@ CONFIG = {
         Octave(2.0, 0.5),
         Octave(4.0, 0.25),
     ],
-    "animals_count": 20,
+    "animals_count": 5,
     "plants_count": 10,
     "human_count": 1,
     "human_vision_radius": 5,

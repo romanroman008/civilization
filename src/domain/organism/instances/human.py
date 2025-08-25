@@ -5,11 +5,12 @@ from domain.components.position import Position
 from typing import TYPE_CHECKING
 
 from domain.organism.instances.animal import Animal
-from domain.organism.movement import Movement
+from domain.organism.movement.movement import Movement
+
 from domain.organism.organism_id import OrganismID
 
 if TYPE_CHECKING:
-    from domain.human.brain.brain import Brain
+    from domain.organism.brain.brain import Brain
 
 from domain.organism.prefabs.organism_prefab import OrganismPrefab
 

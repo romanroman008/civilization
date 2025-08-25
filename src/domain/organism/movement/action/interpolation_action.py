@@ -1,0 +1,78 @@
+import math
+
+from domain.components.direction import Direction
+from domain.organism.movement.action.action_status import ActionStatus
+from domain.organism.movement.action.motion_action import MotionAction
+from domain.organism.movement.transform import Transform
+from domain.organism.transform_readonly import TransformReadOnly
+
+
+class InterpolationAction(MotionAction):
+    def __init__(self, transform: Transform, step: float = 1):
+        super().__init__(transform, step)
+        self._target_x = transform.x
+        self._target_y = transform.y
+
+        self._x_iterations = self._iterations
+        self._y_iterations = self._iterations
+
+        self._step_x = step
+        self._step_y = step
+
+        self._x_rest = 0
+        self._y_rest = 0
+
+        self._x_done = False
+        self._y_done = False
+
+    def set_target(self, target: TransformReadOnly):
+        self._target_x = target.x
+        self._target_y = target.y
+
+    def start(self):
+        self._running = True
+
+    def step(self) -> ActionStatus:
+        if not self._running:
+            return ActionStatus.IDLE
+
+        if self._current_iteration < self._x_iterations - 1:
+            self._transform.interpolate_x(self._step_x)
+
+        if self._current_iteration < self._y_iterations - 1:
+            self._transform.interpolate_y(self._step_y)
+
+        if self.current_iteration == self._x_iterations - 1:
+            self._transform.interpolate_x(self._x_rest)
+            self._x_done = True
+
+        if self.current_iteration == self._y_iterations - 1:
+            self._transform.interpolate_y(self._y_rest)
+            self._y_done = True
+
+        if self._x_done and self._y_done:
+            self._finish()
+            return ActionStatus.SUCCESS
+
+        self._current_iteration += 1
+        return ActionStatus.RUNNING
+
+    def _set_step_x_sign(self):
+        self._step_x = self._step * math.copysign(1, self._target_x)
+
+    def _set_step_y_sign(self):
+        self._step_y = self._step * math.copysign(1, self._target_y)
+
+    def _set_iterations(self):
+        self._iterations = max(self._target_x // self._step_x, self._target_y // self._step_y)
+
+    def _set_rest(self):
+        self._rest = max(self._target_x % self._step_x, self._target_y % self._step_y)
+
+    def _finish(self):
+        self._target_x = self._transform.x
+        self._target_y = self._transform.y
+        self.current_iteration = 0
+        self._running = False
+        self._x_done = False
+        self._y_done = False

@@ -4,7 +4,7 @@ from domain.components.direction import Direction
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from domain.human.brain.brain import Brain
+    from domain.organism.brain.brain import Brain
 from domain.organism.strategy.decision_strategy import DecisionStrategy
 
 

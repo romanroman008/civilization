@@ -3,7 +3,7 @@ from typing import Optional
 
 from domain.components.position import Position
 from domain.components.terrain import Terrain
-from domain.human.perception.organism_info import OrganismInfo
+from domain.organism.perception.organism_info import OrganismInfo
 
 
 @dataclass(frozen=True)

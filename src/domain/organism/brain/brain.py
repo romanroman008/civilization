@@ -1,24 +1,19 @@
-
 import logging
 from collections import deque
-from operator import truediv
 from typing import Optional
 
 from domain.components.direction import Direction
 from domain.components.position import Position
 from domain.components.terrain import Terrain
-from domain.human.brain.brain_interactions_handler import BrainInteractionsHandler
-from domain.human.field_of_view import FieldOfView
-from domain.human.perception.animal_info import AnimalInfo
+from domain.organism.brain.brain_interactions_handler import BrainInteractionsHandler
+from domain.organism.perception.field_of_view import FieldOfView
+from domain.organism.perception.animal_info import AnimalInfo
 
-from domain.human.perception.organism_info import OrganismInfo
-from domain.human.perception.percived_object import PerceivedObject
-from domain.human.vitals import Vitals
+from domain.organism.perception.organism_info import OrganismInfo
+from domain.organism.perception.percived_object import PerceivedObject
+from domain.organism.vitals import Vitals
 from domain.organism.instances.animal import Animal
-
-
-
-from domain.organism.movement import Movement
+from domain.organism.movement.movement import Movement
 
 from domain.organism.state.hunting_state import HuntingState
 from domain.organism.state.idle_state import IdleState
@@ -28,6 +23,9 @@ from domain.organism.strategy.random_walk_strategy import RandomWalkStrategy
 from domain.services.event_bus import EventBus
 from domain.services.movement.move_result import MoveResult
 from shared.logger import get_logger
+
+
+
 
 
 def _get_possible_move_neighbours(position: Position, perceived_objects: list[PerceivedObject]) -> dict[
@@ -88,6 +86,7 @@ class Brain:
         self._is_alive = True
 
 
+
         self._range = 1
 
     @property
@@ -106,12 +105,11 @@ class Brain:
                                         movement=self._movement,
                                         event_bus=self._event_bus)
 
+    def tick(self):
+        if not self._is_alive or self._is_busy:
+            return
+        self._is_busy = True
 
-
-
-    async def tick(self):
-        if not self._is_busy and self._is_alive:
-            await self._decision_strategy.decide(self)
 
 
     def set_animal(self, animal: Animal):

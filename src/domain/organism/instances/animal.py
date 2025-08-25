@@ -2,11 +2,13 @@ from itertools import count
 from typing import TYPE_CHECKING
 
 from domain.components.position import Position
+from domain.organism.movement.movement import Movement
+
 if TYPE_CHECKING:
-    from domain.human.brain.brain import Brain
+    from domain.organism.brain.brain import Brain
 from domain.organism.instances.organism import Organism
 
-from domain.organism.movement import Movement
+
 from domain.organism.organism_id import OrganismID
 
 from domain.organism.prefabs.organism_prefab import OrganismPrefab
@@ -14,7 +16,8 @@ from domain.organism.state.idle_state import IdleState
 from domain.organism.state.organism_state import OrganismState
 
 
-def normalize_angle(angle):
+def normalize_angle(angle) -> int:
+    angle = int(round(angle))
     r = (angle + 180) % 360 - 180
     return 180 if r == -180 else r
 
@@ -66,8 +69,8 @@ class Animal(Organism):
     def is_alive(self) -> bool:
         return self._brain.is_alive
 
-    async def tick(self):
-        await self._brain.tick()
+    def tick(self):
+        self._brain.tick()
 
 
     def _rotate(self, angle: int, caller: Movement):
@@ -78,8 +81,8 @@ class Animal(Organism):
     def _move_offset(self, dx: int, dy: int, caller: Movement):
         if caller != self._movement:
             raise PermissionError("Only the registered Movement component can change offset of this organism")
-        self._offset_x += dx
-        self._offset_y += dy
+        self._offset_x += int(dx)
+        self._offset_y += int(dy)
 
     def _reset_offset(self, caller: Movement):
         if caller != self._movement:

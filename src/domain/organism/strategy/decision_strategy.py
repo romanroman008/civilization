@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from domain.human.brain.brain import Brain
+    from domain.organism.brain.brain import Brain
 
 
 class DecisionStrategy(ABC):

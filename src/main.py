@@ -31,7 +31,7 @@ def main():
 
     world_service = create_world_service(world_generator)
 
-    world_facade = world_generator.create(CONFIG["map_width"], CONFIG["map_height"], CONFIG["scale"])
+    world_facade, world_snapshot_adapter = world_generator.create_world_facade_and_its_adapter(CONFIG["map_width"], CONFIG["map_height"], CONFIG["scale"])
 
 
 
@@ -52,7 +52,7 @@ def main():
     import threading
     threading.Thread(target=loop.run_forever, daemon=True).start()
 
-    asyncio.run(run_game(world_facade))
+    asyncio.run(run_game(world_facade, world_snapshot_adapter))
 
 
 

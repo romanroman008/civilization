@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from domain.organism.strategy.decision_strategy import DecisionStrategy
 
 if TYPE_CHECKING:
-    from domain.human.brain.brain import Brain
+    from domain.organism.brain.brain import Brain
 
 
 class IdleStrategy(DecisionStrategy):

@@ -1,9 +1,15 @@
+from array import array
+
+import pygame
 
 from domain.components.renderable import Renderable
 
 from domain.components.terrain import Terrain
 from domain.organism.instances.animal import Animal
-from domain.organism.instances.organism import Organism
+from infrastructure.rendering.camera import Camera
+
+from infrastructure.rendering.soa.organism_soa import OrganismSoA
+from infrastructure.rendering.soa.tile_soa import TileSoA
 from infrastructure.rendering.sprite.sprite import Sprite
 from infrastructure.rendering.sprite.sprite_asset import SpriteAsset
 
@@ -25,13 +31,13 @@ TILE_COLORS_RGB = {
 }
 
 sprite_assets = {
-    "GRASS": SpriteAsset("Grass", "assets/terrain/grass.png", (1,1), (0,0), 0),
-    "WATER": SpriteAsset("Water", "assets/terrain/water.png", (1,1), (0,0), 0),
-    "Tree": SpriteAsset("Tree", "assets/plants/tree.png", (3, 3), (1, 1), 2),
-    "BERRIES":SpriteAsset("Berry", "assets/plants/berry.png", (1, 1), (0, 0), 1),
-    "RABBIT":SpriteAsset("Rabbit", "assets/animals/rabbit.png", (1, 1), (0, 0), 2),
+    1: SpriteAsset("Grass", "assets/terrain/grass.png", (1,1), (0,0), 0),
+    2: SpriteAsset("Water", "assets/terrain/water.png", (1,1), (0,0), 0),
+    3: SpriteAsset("Tree", "assets/plants/tree.png", (3, 3), (1, 1), 2),
+    4:SpriteAsset("Berry", "assets/plants/berry.png", (1, 1), (0, 0), 1),
+    5:SpriteAsset("Rabbit", "assets/animals/rabbit.png", (1, 1), (0, 0), 2),
     "RABBIT_DEAD": SpriteAsset("Dead rabbit", "assets/animals/rabbit_dead.png", (1, 1), (0, 0), 2),
-    "HUMAN":SpriteAsset("Human", "assets/human/human.png", (1, 1), (0, 0), 2),
+    6:SpriteAsset("Human", "assets/human/human.png", (1, 1), (0, 0), 2),
     "RESERVED": SpriteAsset("reserved", "assets/terrain/reserved.png", (1, 1), (0, 0), 0),
     "OCCUPIED": SpriteAsset("occupied", "assets/terrain/occupied.png", (1, 1), (0, 0), 0),
 
@@ -40,11 +46,61 @@ sprite_assets = {
 
 
 
-class WorldPresenter:
-    def __init__(self):
-        self.sprite_assets = sprite_assets
 
-    def present(self, entity: Renderable):
+class WorldPresenter:
+    def __init__(self, screen_surface: pygame.Surface, tile_size: int, camera: Camera):
+        self.sprite_assets = sprite_assets
+        self.surface = screen_surface
+        self.tile_size = tile_size
+        self.camera = camera
+
+
+
+    def present_tiles(self, tile_soa: TileSoA, visible_indexes: array):
+        xs, ys, sprites = tile_soa.xs, tile_soa.ys, tile_soa.sprites
+        tile_size = self.tile_size
+        blit = self.surface.blit
+        camera_offset_x, camera_offset_y = self.camera.offset_x, self.camera.offset_y
+
+        for i in visible_indexes:
+            source = sprite_assets[sprites[i]].image
+            dest_rect = pygame.Rect(xs[i] * tile_size - camera_offset_x, ys[i] * tile_size - camera_offset_x, tile_size, tile_size)
+            blit(source, dest_rect)
+
+
+    def preset_organisms(self, organism_soa: OrganismSoA, visible_indexes: array):
+        xs, ys = organism_soa.xs, organism_soa.ys
+        rots, offx, offy = organism_soa.rots, organism_soa.offxs, organism_soa.offys
+        sprites, alives = organism_soa.sprites, organism_soa.alives
+        blit = self.surface.blit
+        tile_size = self.tile_size
+        camera_offset_x, camera_offset_y = self.camera.offset_x, self.camera.offset_y
+       # norm_offx, norm_offy = offx / 100 * tile_size, offy / 100 * tile_size
+
+
+
+        for i in visible_indexes:
+            source = sprite_assets[sprites[i]].image
+            px = xs[i] * tile_size - camera_offset_x
+            py = ys[i] * tile_size - camera_offset_y
+            norm_offx, norm_offy = offx[i] / 100 * tile_size, offy[i] / 100 * tile_size
+
+            val1, val2 = int(px - norm_offx), int(py - norm_offy)
+            dest_rect = pygame.Rect(val1, val2, tile_size, tile_size)
+            rotated_source = pygame.transform.rotate(source, -rots[i])
+            blit(rotated_source, dest_rect)
+
+
+
+
+
+
+
+
+
+
+
+    def present_depr(self, entity: Renderable):
         sprite_key = entity.sprite_key
         position = entity.position
         rotation = getattr(entity, "rotation", 0.0)
@@ -62,27 +118,7 @@ class WorldPresenter:
 
         return Sprite(self.sprite_assets[sprite_key], position, rotation, offset)
 
-    def present_occ(self, entity: Renderable):
-        terrain = "OCCUPIED"
-        position = entity.position
-        rotation = getattr(entity, "rotation", 0.0)
-        offset = getattr(entity, "offset", (0.0, 0.0))
 
-        if terrain not in self.sprite_assets:
-            raise ValueError(f"Unknown sprite key: '{terrain}'")
-
-        return Sprite(self.sprite_assets[terrain], position, rotation, offset)
-
-    def present_res(self, entity: Renderable):
-        terrain = "RESERVED"
-        position = entity.position
-        rotation = getattr(entity, "rotation", 0.0)
-        offset = getattr(entity, "offset", (0.0, 0.0))
-
-        if terrain not in self.sprite_assets:
-            raise ValueError(f"Unknown sprite key: '{terrain}'")
-
-        return Sprite(self.sprite_assets[terrain], position, rotation, offset)
 
 
 

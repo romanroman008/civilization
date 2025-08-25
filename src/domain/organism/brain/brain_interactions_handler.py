@@ -3,11 +3,11 @@ from typing import TYPE_CHECKING
 from domain.components.direction import Direction
 from domain.components.position import Position
 if TYPE_CHECKING:
-    from domain.human.brain.brain import Brain
-from domain.human.field_of_view import FieldOfView
-from domain.human.vitals import Vitals
+    from domain.organism.brain.brain import Brain
+from domain.organism.perception.field_of_view import FieldOfView
+from domain.organism.vitals import Vitals
 from domain.organism.instances.organism import Organism
-from domain.organism.movement import Movement
+from domain.organism.movement_depr import Movement
 from domain.organism.organism_id import OrganismID
 from domain.services.event_bus import EventBus
 

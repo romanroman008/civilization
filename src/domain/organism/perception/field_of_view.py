@@ -2,9 +2,9 @@ from typing import Optional
 
 from domain.components.position import Position
 
-from domain.human.perception.animal_info import AnimalInfo
-from domain.human.perception.organism_info import OrganismInfo
-from domain.human.perception.percived_object import PerceivedObject
+from domain.organism.perception.animal_info import AnimalInfo
+from domain.organism.perception.organism_info import OrganismInfo
+from domain.organism.perception.percived_object import PerceivedObject
 from domain.organism.instances.animal import Animal
 from domain.organism.instances.plant import Plant
 

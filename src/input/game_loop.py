@@ -1,128 +1,111 @@
-import asyncio
-from typing import Optional
-
 import pygame
-from asyncio import Queue
 
 from domain.components.direction import Direction
-from domain.organism.instances.animal import Animal
-from domain.organism.instances.human import Human
 from domain.world_map.world_facade import WorldFacade
 from infrastructure.rendering.camera import Camera
-from infrastructure.rendering.world_presenter import WorldPresenter
+
 from infrastructure.rendering.world_renderer import WorldRenderer
+from infrastructure.rendering.world_snapshot_adapter import WorldSnapshotAdapter
 from input.keyboard import Keyboard
 from shared.config import CONFIG
 
-
-async def render_loop(world_renderer: WorldRenderer, camera: Camera, screen):
-    while True:
-        screen.fill((0, 0, 0))
-        world_renderer.render_map(camera)
-        pygame.display.flip()
-        await asyncio.sleep(1 / 60)  # ~60 FPS
-
-async def game_loop(agent: Human, action_queue: Queue):
-    action_locked = False
-
-    async def handle_action(action: Optional[str]):
-        nonlocal action_locked
-        action_locked = True
-        await decide(agent, action)
-        action_locked = False
-
-    while True:
-        action = await action_queue.get()
-        if not action_locked:
-            await handle_action(action)
+TARGET_DT = 1.0 / 50.0   # 50 Hz logiki
+MAX_ACCUM = 0.2          # anty-spirala: maks. 0.2 s zaległości
 
 
-
-
-from asyncio import Queue
-
-async def input_loop(keyboard: Keyboard, camera: Camera, action_queue: Queue):
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                exit(0)
-
-            keyboard.handle_event(event)
-
-        dx, dy = keyboard.get_movement()
-        if dx != 0 or dy != 0:
-            camera.move(5 * dx, 5 * dy)
-
-        action = keyboard.get_action()
-        if action:
-            await action_queue.put(action)
-
-        await asyncio.sleep(1 / 60)
-
-async def organism_loop(world_facade: WorldFacade):
-    while True:
-        await world_facade.tick()
-        await asyncio.sleep(1)
-
-
-async def run_game(world_facade: WorldFacade):
+def run_game(world_facade: WorldFacade, world_snapshot_adapter: WorldSnapshotAdapter):
     pygame.init()
     screen = pygame.display.set_mode((CONFIG["screen_width"], CONFIG["screen_height"]))
     pygame.display.set_caption("Civilization")
 
-    tile_presenter = WorldPresenter()
-    camera = Camera(0, 0,
-                    CONFIG["screen_width"],
-                    CONFIG["screen_height"],
-                    CONFIG["map_width"],
-                    CONFIG["map_height"],
-                    CONFIG["tile_size"])
-    world_renderer = WorldRenderer(screen,
-                                   world_facade,
-                                   tile_presenter,
-                                   camera,
-                                   tile_size=CONFIG["tile_size"])
-    agent = get_agent(world_facade)
+    camera = Camera(0, 0, CONFIG["screen_width"], CONFIG["screen_height"],
+                    CONFIG["map_width"], CONFIG["map_height"], CONFIG["tile_size"])
+
+    renderer = WorldRenderer(screen,world_snapshot_adapter, camera, tile_size=CONFIG["tile_size"])
     keyboard = Keyboard()
+    agent = world_facade.get_example_agent()
 
-    action_queue = asyncio.Queue()
-
-    await asyncio.gather(
-        asyncio.create_task(render_loop(world_renderer, camera, screen)),
-        asyncio.create_task(game_loop(agent, action_queue)),
-        asyncio.create_task(input_loop(keyboard, camera, action_queue)),
-        asyncio.create_task(organism_loop(world_facade)),
-
-    )
-
-
-
+    game = Game(world_facade,world_snapshot_adapter, renderer, camera, keyboard, agent)
+    game.run()
     pygame.quit()
 
 
 
-async def decide(agent: Optional[Animal], action: Optional[str]):
-    if agent is None or action is None:
-        return
+class Game:
+    def __init__(self, world: WorldFacade, world_snapshot_adapter: WorldSnapshotAdapter, renderer: WorldRenderer, camera, keyboard, agent):
+        self.world_facade = world
+        self.world_snapshot_adapter = world_snapshot_adapter
+        self.renderer = renderer
+        self.camera = camera
+        self.keyboard = keyboard
+        self.agent = agent
+        self.running = True
+        self.accum = 0.0
+        self.prev_snap = world_snapshot_adapter.make_snapshot()
+        self.curr_snap = self.prev_snap
+        self.clock = pygame.time.Clock()
 
-    action_map = {
-        "stop": lambda: print("STOP"),
-        "walk": lambda: agent._brain.walk(Direction.TOP),
-        "hunt": lambda: agent._brain.hunt(),
-        "up": lambda: agent._brain.walk(Direction.TOP),
-        "down": lambda: agent._brain.walk(Direction.BOT),
-        "left": lambda: agent._brain.walk(Direction.LEFT),
-        "right": lambda: agent._brain.walk(Direction.RIGHT),
-    }
+    # --- Fazy pętli: małe, czytelne metody ---
+
+    def process_events(self) -> None:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+            self.keyboard.handle_event(event)
+
+    def update_camera(self) -> None:
+        dx, dy = self.keyboard.get_movement()
+        if dx or dy:
+            self.camera.move(5 * dx, 5 * dy)
+
+    def process_actions(self) -> None:
+        action = self.keyboard.get_action()
+        if not action or not self.agent:
+            return
+        # bez await — szybkie akcje; dłuższe rzeczy batchujemy w ticku
+        action_map = {
+            "stop": lambda: None,
+            "walk": lambda: self.agent._brain.walk(Direction.TOP),
+            "hunt": lambda: self.agent._brain.hunt(),
+            "up":   lambda: self.agent._brain.walk(Direction.TOP),
+            "down": lambda: self.agent._brain.walk(Direction.BOT),
+            "left": lambda: self.agent._brain.walk(Direction.LEFT),
+            "right":lambda: self.agent._brain.walk(Direction.RIGHT),
+        }
+        func = action_map.get(action)
+        if func:
+            func()
+
+    def step_fixed_logic(self, dt: float) -> None:
+        """Jeden deterministyczny krok logiki + przygotowanie snapshotu."""
+        self.prev_snap = self.curr_snap
+        self.world_facade.tick()
+        self.curr_snap = self.world_snapshot_adapter.make_snapshot()
+
+    def update_logic_accumulated(self) -> float:
+        """Aktualizuje logikę stałym krokiem, zwraca alpha do interpolacji."""
+        dt_real = self.clock.tick(120) / 1000.0
+        self.accum = min(self.accum + dt_real, MAX_ACCUM)
+        while self.accum >= TARGET_DT:
+            self.step_fixed_logic(TARGET_DT)
+            self.accum -= TARGET_DT
+        return self.accum / TARGET_DT
+
+    def render_frame(self, alpha: float) -> None:
+        # self.renderer.clear()
+        # self.renderer.render_map_interpolated(self.camera, self.prev_snap, self.curr_snap, alpha)
+        # self.renderer.present_depr()
+        self.renderer.surface.fill((0, 0, 0))
+        self.renderer.render_map()
+        pygame.display.flip()
 
 
-    func = action_map.get(action)
-    if func:
-        await func()
-    else:
-        print(f"[WARN] Unknown action: {action}")
+    # --- Pętla główna ---
 
-
-def get_agent(world_facade: WorldFacade) -> Optional[Human]:
-    return world_facade.get_example_agent()
+    def run(self) -> None:
+        while self.running:
+            self.process_events()
+            self.update_camera()
+            self.process_actions()
+            alpha = self.update_logic_accumulated()
+            self.render_frame(alpha)

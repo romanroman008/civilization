@@ -1,4 +1,4 @@
-from infrastructure.rendering.sprite_loader import SpriteLoader
+from infrastructure.rendering.sprite.sprite_loader import SpriteLoader
 
 
 class SpriteAsset:

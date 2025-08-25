@@ -61,7 +61,7 @@ def test_create_delegates_to_internal_steps_and_returns_worldmap(monkeypatch, wo
     monkeypatch.setattr(world_generator, '_generate_plants', lambda w: "AFTER_PLANTS")
     monkeypatch.setattr(world_generator, '_generate_animals', lambda w: "AFTER_ANIMALS")
 
-    result = world_generator.create(width=1, height=1, scale=5)
+    result = world_generator.create_world_facade_and_its_adapter(width=1, height=1, scale=5)
     assert result == "AFTER_ANIMALS"
 
 def test__generate_plants_logs_and_delegates(world_generator, dummy_logger, dummy_plants_generator):

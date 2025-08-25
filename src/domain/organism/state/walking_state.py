@@ -11,11 +11,11 @@ class WalkingState(OrganismState):
         super().__init__()
 
     async def on_enter(self, organism: Organism):
-        self._is_busy = True
+      pass
         #self._logger.info(f"Human {organism.id} has started walking")
 
 
     async def on_exit(self, organism: Organism):
-        self._is_busy = False
+       pass
       #  self._logger.info(f"Human {organism.id} has stopped walking")
 

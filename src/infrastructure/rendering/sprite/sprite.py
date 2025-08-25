@@ -1,12 +1,12 @@
 import pygame
 
-from domain.components.position import Position
+
 
 from infrastructure.rendering.sprite.sprite_asset import SpriteAsset
 
 
 class Sprite:
-    def __init__(self, asset: SpriteAsset, position: Position, rotation: float, offset: tuple[float, float]):
+    def __init__(self, asset: SpriteAsset, position: tuple[int, int], rotation: int, offset: tuple[int, int]):
         self.asset = asset
         self.position = position
         self.rotation = rotation

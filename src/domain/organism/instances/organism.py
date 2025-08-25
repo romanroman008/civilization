@@ -11,9 +11,7 @@ class Organism(ABC):
     def __init__(self, prefab: OrganismPrefab, position: Position):
         self._prefab = prefab
         self._position = position
-        self._rotation = 0
-        self._offset_x = 0
-        self._offset_y = 0
+
 
 
     @property
@@ -33,8 +31,17 @@ class Organism(ABC):
         return self._position
 
     @property
-    def rotation(self) -> int:
-        return self._rotation
+    @abstractmethod
+    def rotation(self) -> int: pass
+
+    @property
+    @abstractmethod
+    def x(self) -> float: pass
+
+    @property
+    @abstractmethod
+    def y(self) -> float: pass
+
 
     @property
     def offset(self) -> tuple[int,int]:
@@ -44,7 +51,7 @@ class Organism(ABC):
     @abstractmethod
     def is_alive(self) -> bool: ...
 
-    async def tick(self): pass
+    def tick(self): pass
 
 
 

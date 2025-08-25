@@ -19,7 +19,7 @@ class WorldService:
         self.world_generator = world_generator
 
     def create_new_world(self, width, height, scale) -> WorldMap:
-        return self.world_generator.create(width, height, scale)
+        return self.world_generator.create_world_facade_and_its_adapter(width, height, scale)
 
     def save_world(self, world: WorldMap):
         with get_session() as session:

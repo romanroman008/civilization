@@ -6,8 +6,8 @@ from domain.components.position import Position
 from domain.components.direction import Direction
 from domain.components.terrain import Terrain
 
-from domain.human.brain import Brain
-from domain.human.perception.percived_object import PerceivedObject
+from domain.organism.brain import Brain
+from domain.organism.perception.percived_object import PerceivedObject
 
 
 def make_brain() -> Brain:

@@ -2,12 +2,12 @@ import logging
 
 from typing import Optional
 
-from domain.human.brain.brain import Brain
-from domain.human.field_of_view import FieldOfView
+from domain.organism.brain.brain import Brain
+from domain.organism.perception.field_of_view import FieldOfView
 
-from domain.human.perception.organism_info import OrganismInfo
-from domain.human.perception.percived_object import PerceivedObject
-from domain.human.vitals import Vitals
+from domain.organism.perception.organism_info import OrganismInfo
+from domain.organism.perception.percived_object import PerceivedObject
+from domain.organism.vitals import Vitals
 from domain.organism.human_movement import HumanMovement
 from domain.organism.instances.human import Human
 from domain.organism.strategy.idle_strategy import IdleStrategy

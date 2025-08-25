@@ -2,9 +2,9 @@ import random
 
 
 from domain.components.position import Position
-from domain.human.brain.brain import Brain
-from domain.human.field_of_view import FieldOfView
-from domain.human.vitals import Vitals
+from domain.organism.brain.brain import Brain
+from domain.organism.perception.field_of_view import FieldOfView
+from domain.organism.vitals import Vitals
 from domain.organism.animal_movement import AnimalMovement
 from domain.organism.instances.animal import Animal
 
