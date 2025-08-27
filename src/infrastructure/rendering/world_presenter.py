@@ -70,12 +70,12 @@ class WorldPresenter:
 
     def preset_organisms(self, organism_soa: OrganismSoA, visible_indexes: array):
         xs, ys = organism_soa.xs, organism_soa.ys
-        rots, offx, offy = organism_soa.rots, organism_soa.offxs, organism_soa.offys
+        rots = organism_soa.rots
         sprites, alives = organism_soa.sprites, organism_soa.alives
         blit = self.surface.blit
         tile_size = self.tile_size
         camera_offset_x, camera_offset_y = self.camera.offset_x, self.camera.offset_y
-       # norm_offx, norm_offy = offx / 100 * tile_size, offy / 100 * tile_size
+
 
 
 
@@ -83,18 +83,11 @@ class WorldPresenter:
             source = sprite_assets[sprites[i]].image
             px = xs[i] * tile_size - camera_offset_x
             py = ys[i] * tile_size - camera_offset_y
-            norm_offx, norm_offy = offx[i] / 100 * tile_size, offy[i] / 100 * tile_size
 
-            val1, val2 = int(px - norm_offx), int(py - norm_offy)
-            dest_rect = pygame.Rect(val1, val2, tile_size, tile_size)
+
+            dest_rect = pygame.Rect(px, py, tile_size, tile_size)
             rotated_source = pygame.transform.rotate(source, -rots[i])
             blit(rotated_source, dest_rect)
-
-
-
-
-
-
 
 
 

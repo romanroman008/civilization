@@ -33,11 +33,9 @@ class _OrganismBuffer:
 
     def __init__(self):
         self.ids = array("I")
-        self.xs = array("H")
-        self.ys = array("H")
-        self.rots = array("h")
-        self.offxs = array("b")
-        self.offys = array("b")
+        self.xs = array("f")
+        self.ys = array("f")
+        self.rots = array("f")
         self.sprites = array("B")
         self.alives = array("B")
         self._bind_appends()
@@ -47,20 +45,18 @@ class _OrganismBuffer:
         self._ax = self.xs.append
         self._ay = self.ys.append
         self._arot = self.rots.append
-        self._aoffx = self.offxs.append
-        self._aoffy = self.offys.append
         self._aspirte = self.sprites.append
         self._aalive = self.alives.append
 
     def clear(self):
         del self.ids[:]; del self.xs[:]; del self.ys[:]
-        del self.rots[:]; del self.offxs[:]; del self.offys[:]
+        del self.rots[:]
         del self.sprites[:]; del self.alives[:]
 
     def soa(self):
-        return OrganismSoA(ids=self.ids, xs=self.xs, ys=self.ys,
-                           rots=self.rots, offxs=self.offxs, offys=self.offys,
-                           sprites=self.sprites, alives=self.alives)
+        return OrganismSoA(ids=self.ids, sprites=self.sprites,
+                           xs=self.xs, ys=self.ys, rots=self.rots,
+                           alives=self.alives)
 
 
 class _TileBuffer:
@@ -124,15 +120,14 @@ class WorldSnapshotAdapter:
 
     def _adapt_organisms(self, tb: _OrganismBuffer):
         tb.clear()
-        aid, ax, ay = tb._aid, tb._ax, tb._ay
-        arot, aoffx, aoffy = tb._arot, tb._aoffx, tb._aoffy
-        asprite, aalive = tb._aspirte, tb._aalive
+        aid, asprite,  = tb._aid, tb._aspirte,
+        ax, ay, arot = tb._ax, tb._ay, tb._arot
+        aalive = tb._aalive
 
         for organism in self._world_state_service.get_all_organisms():
             aid(render_uid(kind_id=get_kind_id(organism.id.kind), organism_id=organism.id.id))
-            ax(organism.position.x); ay(organism.position.y)
+            ax(organism.x); ay(organism.y)
             arot(organism.rotation)
-            aoffx(organism.offset[0]); aoffy(organism.offset[1])
             asprite(get_sprite_id(organism.sprite_key))
             aalive(get_alive_val(organism.is_alive))
 

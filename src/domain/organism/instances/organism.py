@@ -1,17 +1,19 @@
 from abc import ABC, abstractmethod
+from typing import TypeVar
 
 from domain.components.position import Position
 from domain.components.terrain import Terrain
 from domain.organism.organism_id import OrganismID
-from domain.organism.prefabs.organism_prefab import OrganismPrefab
 
+from domain.organism.transform.transform import Transform
 
+P = TypeVar("P", bound="OrganismPrefab")
 
 class Organism(ABC):
-    def __init__(self, prefab: OrganismPrefab, position: Position):
+    def __init__(self, prefab: P, position: Position, transform: Transform):
         self._prefab = prefab
         self._position = position
-
+        self._transform = transform
 
 
     @property
@@ -31,27 +33,25 @@ class Organism(ABC):
         return self._position
 
     @property
-    @abstractmethod
-    def rotation(self) -> int: pass
+    def rotation(self) -> float:
+        return self._transform.rotation
 
     @property
-    @abstractmethod
-    def x(self) -> float: pass
+    def x(self) -> float:
+        return self._transform.x
 
     @property
-    @abstractmethod
-    def y(self) -> float: pass
-
-
-    @property
-    def offset(self) -> tuple[int,int]:
-        return self._offset_x, self._offset_y
+    def y(self) -> float:
+        return self._transform.y
 
     @property
     @abstractmethod
     def is_alive(self) -> bool: ...
 
+    @abstractmethod
     def tick(self): pass
+
+
 
 
 

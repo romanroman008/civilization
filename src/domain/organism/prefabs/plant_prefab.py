@@ -4,5 +4,5 @@ from domain.organism.prefabs.organism_prefab import OrganismPrefab
 
 @dataclass(frozen=True)
 class PlantPrefab(OrganismPrefab):
-    is_edible: bool
+    is_edible: bool = False
     block_radius: int = 0

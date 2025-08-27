@@ -8,7 +8,5 @@ class OrganismSoA:
     xs: array
     ys: array
     rots: array
-    offxs: array
-    offys: array
     sprites: array
     alives: array

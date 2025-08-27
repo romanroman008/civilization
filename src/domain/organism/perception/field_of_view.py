@@ -7,16 +7,16 @@ from domain.organism.perception.organism_info import OrganismInfo
 from domain.organism.perception.percived_object import PerceivedObject
 from domain.organism.instances.animal import Animal
 from domain.organism.instances.plant import Plant
+from domain.world_map.vision_port import VisionPort
 
 
-from domain.world_map.world_facade import WorldFacade
 
 
 class FieldOfView:
-    def __init__(self, radius, world_facade: WorldFacade):
+    def __init__(self, radius, vision_port: VisionPort):
         self._radius = radius
         self._position = None
-        self.world_facade = world_facade
+        self._vision_port: VisionPort = vision_port
         self._perceived_objects: list[PerceivedObject] = []
         self._organism_data: list[OrganismInfo] = []
         self._target: Optional[OrganismInfo] = None
@@ -35,7 +35,7 @@ class FieldOfView:
                 positions.append(Position(dx, dy))
 
         self._perceived_objects.clear()
-        self._perceived_objects.extend(self.world_facade.get_visible_area(self._position, positions))
+        self._perceived_objects.extend(self._vision_port.get_vision(self._position, positions))
 
 
     def detect_edible_plants(self) -> list[PerceivedObject]:

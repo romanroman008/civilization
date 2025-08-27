@@ -1,7 +1,7 @@
+from __future__ import annotations
 import logging
 from itertools import chain
 from typing import Iterable, Optional
-
 
 from domain.components.position import Position
 from domain.components.renderable import Renderable
@@ -14,6 +14,7 @@ from domain.organism.instances.human import Human
 from domain.organism.instances.organism import Organism
 
 from domain.services.event_bus import EventBus
+
 from domain.world_map.world_interactions_handler import WorldInteractionsHandler
 from domain.world_map.world_interactions_validator import WorldInteractionsValidator
 
@@ -49,6 +50,7 @@ class WorldFacade:
                                   log_filename="world_interactions_handler.log")
 
         self._world_adapter = WorldSnapshotAdapter(world_state_service, world_map)
+        self._vision_port = VisionPort(self)
 
     @property
     def height(self) -> int:
@@ -61,6 +63,10 @@ class WorldFacade:
     @property
     def event_bus(self):
         return self._event_bus
+
+    @property
+    def vision_port(self) -> "VisionPort":
+        return self._vision_port
 
     def _create_world_interactions_validator(self):
         return WorldInteractionsValidator(world_map=self._world_map,
@@ -79,8 +85,6 @@ class WorldFacade:
 
     def is_position_allowed(self, position: Position, allowed_terrains: set[Terrain]) -> bool:
         return self._world_interactions_validator.is_position_allowed(position, allowed_terrains)
-
-
 
 
     def get_visible_area(self, observer_position, positions: list[Position]) -> list[PerceivedObject]:
@@ -104,14 +108,23 @@ class WorldFacade:
 
 
 
-
-
     def get_example_agent(self) -> Optional[Human]:
         return self._world_state_service.get_example_agent()
 
     def tick(self):
         for organism in self._world_state_service.get_all_organisms():
             organism.tick()
+
+
+
+class VisionPort:
+    __slots__ = "_world_facade"
+    def __init__(self, world_facade: "WorldFacade"):
+        self._world_facade = world_facade
+
+
+    def get_vision(self, observer_position, positions: list["Position"]) -> list["PerceivedObject"]:
+        return self._world_facade.get_visible_area(observer_position, positions)
 
 
 

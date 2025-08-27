@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 
 from domain.components.position import Position
 from domain.organism.movement.movement import Movement
+from domain.organism.transform.transform import Transform
 
 if TYPE_CHECKING:
     from domain.organism.brain.brain import Brain
@@ -13,7 +14,7 @@ from domain.organism.organism_id import OrganismID
 
 from domain.organism.prefabs.organism_prefab import OrganismPrefab
 from domain.organism.state.idle_state import IdleState
-from domain.organism.state.organism_state import OrganismState
+
 
 
 def normalize_angle(angle) -> int:
@@ -28,42 +29,19 @@ class Animal(Organism):
                  prefab: OrganismPrefab,
                  position: Position,
                  brain: "Brain",
-                 movement: Movement):
-        super().__init__(prefab, position)
+                 transform: Transform):
+        super().__init__(prefab, position, transform)
         self._id = OrganismID("animal", next(self._id_counter))
-        self._movement = movement
         self._brain = brain
         self._state = IdleState()
+        self._set_transform_finalize()
+
+    def _set_transform_finalize(self):
+        self._transform.set_change_position_callback(self._change_position)
 
     @property
     def id(self) -> OrganismID:
         return self._id
-
-    @property
-    def is_moving(self) -> bool:
-        return self._movement.is_moving
-
-    @property
-    def offset(self) -> tuple[int, int]:
-        return self._offset_x, self._offset_y
-
-    @property
-    def target_position(self) -> Position:
-        return self._movement.target_position
-
-    async def set_state(self, state: OrganismState):
-        if isinstance(self._state, type(state)):
-            return
-        await self._state.on_exit(self)
-
-        self._state = state
-        await self._state.on_enter(self)
-
-    def connect(self):
-        self._brain.set_animal(self)
-        self._movement.set_animal(self)
-
-
 
     @property
     def is_alive(self) -> bool:
@@ -72,33 +50,7 @@ class Animal(Organism):
     def tick(self):
         self._brain.tick()
 
+    def _change_position(self, target_position: Position):
+        self._position = target_position
 
-    def _rotate(self, angle: int, caller: Movement):
-        if caller != self._movement:
-            raise PermissionError("Only the registered Movement component can rotate this organism")
-        self._rotation = normalize_angle(self._rotation + angle)
-
-    def _move_offset(self, dx: int, dy: int, caller: Movement):
-        if caller != self._movement:
-            raise PermissionError("Only the registered Movement component can change offset of this organism")
-        self._offset_x += int(dx)
-        self._offset_y += int(dy)
-
-    def _reset_offset(self, caller: Movement):
-        if caller != self._movement:
-            raise PermissionError("Only the registered Movement component can reset offset of this organism")
-        self._offset_x = 0
-        self._offset_y = 0
-
-    def _reset_rotation(self, caller: Movement):
-        if caller != self._movement:
-            raise PermissionError("Only the registered Movement component can reset rotation of this organism")
-        self._rotation = 0
-
-
-    def _change_positon(self, position: Position, caller: Movement):
-        if caller != self._movement:
-            raise PermissionError("Only the registered Movement component can change position of this organism")
-
-        self._position = position
 

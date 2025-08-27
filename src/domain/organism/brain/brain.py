@@ -6,11 +6,13 @@ from domain.components.direction import Direction
 from domain.components.position import Position
 from domain.components.terrain import Terrain
 from domain.organism.brain.brain_interactions_handler import BrainInteractionsHandler
+from domain.organism.organism_id import OrganismID
 from domain.organism.perception.field_of_view import FieldOfView
 from domain.organism.perception.animal_info import AnimalInfo
 
 from domain.organism.perception.organism_info import OrganismInfo
 from domain.organism.perception.percived_object import PerceivedObject
+from domain.organism.transform.transform_readonly import TransformReadOnly
 from domain.organism.vitals import Vitals
 from domain.organism.instances.animal import Animal
 from domain.organism.movement.movement import Movement
@@ -67,12 +69,22 @@ def find_shortest_path(goal: Position, perceived_objects: list[PerceivedObject])
     return None
 
 
+
+_SENTINEL = object()
+
 class Brain:
-    def __init__(self, field_of_view: FieldOfView, vitals: Vitals, movement: Movement, event_bus: EventBus):
+    def __init__(self,
+                 field_of_view: FieldOfView,
+                 vitals: Vitals,
+                 movement: Movement,
+                 transform_readonly: TransformReadOnly,
+                 event_bus: EventBus):
+        self._owner_id: OrganismID | None = None
+
         self._field_of_view = field_of_view
         self._vitals = vitals
-        self._animal: Optional[Animal] = None
         self._movement = movement
+        self._transform_readonly = transform_readonly
 
         self._decision_strategy = RandomWalkStrategy()
 
@@ -80,7 +92,7 @@ class Brain:
         self._target: Optional[OrganismInfo] = None
 
         self._event_bus: EventBus = event_bus
-        self._brain_interactions_handler: Optional[BrainInteractionsHandler]
+        self._brain_interactions_handler: BrainInteractionsHandler | _SENTINEL = _SENTINEL
 
         self._is_busy = False
         self._is_alive = True
@@ -89,20 +101,20 @@ class Brain:
 
         self._range = 1
 
+
     @property
     def is_alive(self) -> bool:
         return self._is_alive
 
 
     def _initialize_logger(self):
-        self._logger = get_logger(f"Organism {self._animal.id}", level=logging.INFO, log_filename="organism.log")
+        self._logger = get_logger(f"Organism {self._owner_id}", level=logging.INFO, log_filename="organism.log")
 
     def _create_brain_interactions_handler(self):
-        return BrainInteractionsHandler(organism=self._animal,
+        return BrainInteractionsHandler(owner_id=self._owner_id,
                                         brain=self,
+                                        transform_readonly=self._transform_readonly,
                                         field_of_view=self._field_of_view,
-                                        vitals=self._vitals,
-                                        movement=self._movement,
                                         event_bus=self._event_bus)
 
     def tick(self):
@@ -112,17 +124,17 @@ class Brain:
 
 
 
-    def set_animal(self, animal: Animal):
-        if self._animal is not None:
-            raise RuntimeError("Animal already set")
-        self._animal = animal
+    def set_owner_id(self, organism_id: OrganismID):
+        if self._owner_id is not _SENTINEL:
+            raise RuntimeError(f"Brain {organism_id} already has an owner")
+        self._owner_id = organism_id
         self._brain_interactions_handler = self._create_brain_interactions_handler()
-        self._field_of_view.update(self._animal.position)
+        self._field_of_view.update(self._transform_readonly.position)
         self._check_target_visibility()
         self._initialize_logger()
 
     async def update(self, payload):
-        self._field_of_view.update(self._animal.position)
+        self._field_of_view.update(self._transform_readonly.position)
         self._check_target_visibility()
 
 
@@ -160,12 +172,12 @@ class Brain:
 
             result = await self.walk(direction)
             if result is MoveResult.SUCCESS:
-                self._field_of_view.update(self._animal.position)
+                self._field_of_view.update(self._transform_readonly.position)
                 self._update_target_position()
                 self._logger.info(f"Iteracja {i}, pozycja targetu: {self._target.relative_position}")
                 path = self._plan_path_to_target()
                 if path is None:
-                    self._logger.info(f"Path to target position: {self._target.relative_position} cannot be found from {self._animal.position}")
+                    self._logger.info(f"Path to target position: {self._target.relative_position} cannot be found from {self._transform_readonly.position}")
 
 
         await self._animal.set_state(IdleState())
