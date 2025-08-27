@@ -26,7 +26,7 @@ class Camera:
         end_y = (self.offset_y + self.screen_height) // self.tile_size
         return start_x, end_x, start_y, end_y
 
-    def move(self, dx: float, dy: float, speed: int = 10):
+    def move(self, dx: float, dy: float, speed: int = 50):
 
         new_offset_x = self.offset_x + dx *  speed
         new_offset_y = self.offset_y + dy *  speed

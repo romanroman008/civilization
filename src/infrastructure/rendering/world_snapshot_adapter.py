@@ -132,7 +132,7 @@ class WorldSnapshotAdapter:
             aalive(get_alive_val(organism.is_alive))
 
 
-    def make_snapshot(self):
+    def make_snapshot(self) -> WorldFrameSnapshot:
         tile_buffor = self._current_tiles()
         organism_buffor = self._current_organisms()
 

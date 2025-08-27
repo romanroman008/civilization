@@ -10,6 +10,7 @@ from domain.components.position import Position
 from infrastructure.rendering.camera import Camera
 from infrastructure.rendering.soa.organism_soa import OrganismSoA
 from infrastructure.rendering.soa.tile_soa import TileSoA
+from infrastructure.rendering.soa.world_frame_snapshot import WorldFrameSnapshot
 
 from infrastructure.rendering.sprite.sprite import Sprite
 
@@ -29,12 +30,10 @@ def get_sprites_by_layer(sprites: list[Sprite]) -> dict[int, list[Sprite]]:
 class WorldRenderer:
     def __init__(self,
                  surface: pygame.Surface,
-                 world_snapshot_adapter: WorldSnapshotAdapter,
                  camera: Camera,
                  chunk_size: int = 16,
                  tile_size: int = 32):
         self.surface = surface
-        self.world_snapshot_adapter = world_snapshot_adapter
         self.world_presenter:WorldPresenter = WorldPresenter(surface, tile_size, camera)
         self.camera = camera
         self.chunk_size = chunk_size
@@ -44,8 +43,7 @@ class WorldRenderer:
         self._visible_organisms_indexes = array("I")
 
 
-    def render_map(self):
-        world_frame_snapshot = self.world_snapshot_adapter.make_snapshot()
+    def render_map(self, world_frame_snapshot: WorldFrameSnapshot):
 
         visible_indexes = self._get_indexes_in_viewport(world_frame_snapshot.tiles)
         visible_organism_indexes = self._get_organisms_indexes_in_viewport(world_frame_snapshot.organisms)

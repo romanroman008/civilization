@@ -3,14 +3,13 @@ import pygame
 from domain.components.direction import Direction
 from domain.world_map.world_facade import WorldFacade
 from infrastructure.rendering.camera import Camera
+from infrastructure.rendering.soa.world_frame_snapshot import WorldFrameSnapshot
 
 from infrastructure.rendering.world_renderer import WorldRenderer
 from infrastructure.rendering.world_snapshot_adapter import WorldSnapshotAdapter
 from input.keyboard import Keyboard
 from shared.config import CONFIG
 
-TARGET_DT = 1.0 / 50.0   # 50 Hz logiki
-MAX_ACCUM = 0.2          # anty-spirala: maks. 0.2 s zaległości
 
 
 def run_game(world_facade: WorldFacade, world_snapshot_adapter: WorldSnapshotAdapter):
@@ -18,10 +17,10 @@ def run_game(world_facade: WorldFacade, world_snapshot_adapter: WorldSnapshotAda
     screen = pygame.display.set_mode((CONFIG["screen_width"], CONFIG["screen_height"]))
     pygame.display.set_caption("Civilization")
 
-    camera = Camera(0, 0, CONFIG["screen_width"], CONFIG["screen_height"],
-                    CONFIG["map_width"], CONFIG["map_height"], CONFIG["tile_size"])
+    camera = Camera(offset_x=0, offset_y=0, screen_width=CONFIG["screen_width"],screen_height=CONFIG["screen_height"],
+                    map_width= CONFIG["map_width"], map_height= CONFIG["map_height"], tile_size=CONFIG["tile_size"])
 
-    renderer = WorldRenderer(screen,world_snapshot_adapter, camera, tile_size=CONFIG["tile_size"])
+    renderer = WorldRenderer(screen, camera, tile_size=CONFIG["tile_size"])
     keyboard = Keyboard()
     agent = world_facade.get_example_agent()
 
@@ -40,9 +39,9 @@ class Game:
         self.keyboard = keyboard
         self.agent = agent
         self.running = True
-        self.accum = 0.0
-        self.prev_snap = world_snapshot_adapter.make_snapshot()
-        self.curr_snap = self.prev_snap
+
+        self.prev_snap: WorldFrameSnapshot = world_snapshot_adapter.make_snapshot()
+        self.curr_snap: WorldFrameSnapshot = self.prev_snap
         self.clock = pygame.time.Clock()
 
     # --- Fazy pętli: małe, czytelne metody ---
@@ -56,7 +55,7 @@ class Game:
     def update_camera(self) -> None:
         dx, dy = self.keyboard.get_movement()
         if dx or dy:
-            self.camera.move(5 * dx, 5 * dy)
+            self.camera.move(dx,dy)
 
     def process_actions(self) -> None:
         action = self.keyboard.get_action()
@@ -76,27 +75,17 @@ class Game:
         if func:
             func()
 
-    def step_fixed_logic(self, dt: float) -> None:
+    def step_fixed_logic(self) -> None:
         """Jeden deterministyczny krok logiki + przygotowanie snapshotu."""
         self.prev_snap = self.curr_snap
         self.world_facade.tick()
         self.curr_snap = self.world_snapshot_adapter.make_snapshot()
 
-    def update_logic_accumulated(self) -> float:
-        """Aktualizuje logikę stałym krokiem, zwraca alpha do interpolacji."""
-        dt_real = self.clock.tick(120) / 1000.0
-        self.accum = min(self.accum + dt_real, MAX_ACCUM)
-        while self.accum >= TARGET_DT:
-            self.step_fixed_logic(TARGET_DT)
-            self.accum -= TARGET_DT
-        return self.accum / TARGET_DT
 
-    def render_frame(self, alpha: float) -> None:
-        # self.renderer.clear()
-        # self.renderer.render_map_interpolated(self.camera, self.prev_snap, self.curr_snap, alpha)
-        # self.renderer.present_depr()
+
+    def render_frame(self) -> None:
         self.renderer.surface.fill((0, 0, 0))
-        self.renderer.render_map()
+        self.renderer.render_map(self.curr_snap)
         pygame.display.flip()
 
 
@@ -107,5 +96,5 @@ class Game:
             self.process_events()
             self.update_camera()
             self.process_actions()
-            alpha = self.update_logic_accumulated()
-            self.render_frame(alpha)
+            self.step_fixed_logic()
+            self.render_frame()

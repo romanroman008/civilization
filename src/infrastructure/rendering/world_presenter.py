@@ -64,7 +64,7 @@ class WorldPresenter:
 
         for i in visible_indexes:
             source = sprite_assets[sprites[i]].image
-            dest_rect = pygame.Rect(xs[i] * tile_size - camera_offset_x, ys[i] * tile_size - camera_offset_x, tile_size, tile_size)
+            dest_rect = pygame.Rect(xs[i] * tile_size - camera_offset_x, ys[i] * tile_size - camera_offset_y, tile_size, tile_size)
             blit(source, dest_rect)
 
 
