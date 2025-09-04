@@ -7,12 +7,13 @@ from domain.components.renderable import Renderable
 from domain.components.terrain import Terrain
 from domain.organism.instances.animal import Animal
 from infrastructure.rendering.camera import Camera
+from infrastructure.rendering.soa import tile_soa
 
 from infrastructure.rendering.soa.organism_soa import OrganismSoA
 from infrastructure.rendering.soa.tile_soa import TileSoA
 from infrastructure.rendering.sprite.sprite import Sprite
 from infrastructure.rendering.sprite.sprite_asset import SpriteAsset
-
+from shared.constans import OFFSET_TO_POSITION_RATIO
 
 TILE_COLORS = {
     1: "#3b83bd",  # WATER – chłodny niebieski
@@ -70,19 +71,22 @@ class WorldPresenter:
 
     def preset_organisms(self, organism_soa: OrganismSoA, visible_indexes: array):
         xs, ys = organism_soa.xs, organism_soa.ys
+        offxs, offys = organism_soa.offset_xs, organism_soa.offset_ys
         rots = organism_soa.rots
         sprites, alives = organism_soa.sprites, organism_soa.alives
         blit = self.surface.blit
         tile_size = self.tile_size
         camera_offset_x, camera_offset_y = self.camera.offset_x, self.camera.offset_y
 
+        offset_indicator = tile_size / OFFSET_TO_POSITION_RATIO
+
 
 
 
         for i in visible_indexes:
             source = sprite_assets[sprites[i]].image
-            px = xs[i] * tile_size - camera_offset_x
-            py = ys[i] * tile_size - camera_offset_y
+            px = xs[i] * tile_size + offxs[i] * offset_indicator - camera_offset_x
+            py = ys[i] * tile_size + offys[i] * offset_indicator - camera_offset_y
 
 
             dest_rect = pygame.Rect(px, py, tile_size, tile_size)

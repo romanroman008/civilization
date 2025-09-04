@@ -5,9 +5,7 @@ from domain.organism.movement.action.motion_action import MotionAction
 from domain.organism.movement.action.sequence_action import SequenceAction
 from domain.organism.movement.movement import Movement
 from domain.organism.movement.pose import Pose
-
-from domain.organism.transform.transform_readonly import TransformReadOnly
-from domain.organism.transform.transform_writer import TransformWriter
+from domain.organism.transform.transform import TransformWriter, TransformReadOnly
 
 
 class HumanMovement(Movement):
@@ -25,8 +23,8 @@ class HumanMovement(Movement):
 
     def _prepare_actions_list(self, target_direction: Direction) -> list[MotionAction]:
         target_rotation = self._transform_readonly.rotation
-        target_x, target_y = self._transform_readonly.translated_xy(target_direction)
-        target = Pose(target_x, target_y, target_rotation)
+
+        target = Pose(target_direction, target_rotation)
 
 
         self._interpolation_action.set_target(target)

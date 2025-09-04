@@ -7,5 +7,5 @@ if TYPE_CHECKING:
 
 class DecisionStrategy(ABC):
     @abstractmethod
-    async def decide(self, brain: "Brain") -> None:
+    def decide(self, brain: "Brain") -> None:
         pass

@@ -31,7 +31,7 @@ class Animal(Organism):
                  brain: "Brain",
                  transform: Transform):
         super().__init__(prefab, position, transform)
-        self._id = OrganismID("animal", next(self._id_counter))
+        self._id = OrganismID("Animal", next(self._id_counter))
         self._brain = brain
         self._state = IdleState()
         self._set_transform_finalize()

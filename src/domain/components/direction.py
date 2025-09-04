@@ -1,4 +1,8 @@
+
+
 from enum import Enum
+from functools import lru_cache
+from typing import Optional
 
 from domain.components.position import Position
 
@@ -19,3 +23,17 @@ class Direction(Enum):
     @classmethod
     def min_rotation_degrees(cls):
         return 90
+
+    @classmethod
+    @lru_cache(maxsize=1)
+    def _vector_to_direction(cls):
+        return {d.value[0]: d for d in cls}
+
+    @classmethod
+    def to_direction(cls, delta:tuple[int, int]) -> Optional["Direction"]:
+        dx, dy = delta
+
+        ndx = (dx > 0) - (dx < 0)
+        ndy = (dy > 0) - (dy < 0)
+        return cls._vector_to_direction().get((ndx, ndy))
+

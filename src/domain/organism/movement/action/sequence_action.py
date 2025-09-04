@@ -25,10 +25,11 @@ class SequenceAction:
         status = self._current_action.step()
         if status == ActionStatus.SUCCESS:
             if  self._is_last_action():
-                return ActionStatus.SUCCESS
+                self._finish()
+                return ActionStatus.IDLE
             self._start_new_action()
 
-        return ActionStatus.SUCCESS
+        return ActionStatus.RUNNING
 
 
     def _is_last_action(self):

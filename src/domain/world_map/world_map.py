@@ -1,10 +1,11 @@
 from dataclasses import dataclass, field
-from typing import Sequence, Optional
+from typing import Sequence, Optional, Tuple
 
 from domain.components.position import Position
 from domain.components.renderable import Renderable
 from domain.components.terrain import Terrain
 from domain.world_map.tile import Tile
+from shared.id_registry import IdRegistry
 
 
 def _is_terrain_allowed(tile: Tile, allowed_terrains: set[Terrain]):
@@ -19,6 +20,7 @@ class WorldMap:
     _width: int
     _height: int
     _tiles: list[Tile]
+    _id_registry: IdRegistry
 
     _tile_by_coords: dict[tuple[int, int], Tile] = field(init=False, repr=False)
 
@@ -61,13 +63,27 @@ class WorldMap:
             return None
         return tile.terrain
 
+
+    def get_tiles_at_positions(self, positions: list[Position]) -> list[Tile]:
+        tiles = self._tile_by_coords
+        collected = []
+        append = collected.append
+
+        for x,y in positions:
+            tile = tiles.get((x, y))
+            if tile:
+                append(tile)
+
+        return collected
+
+
     def is_position_in_bounds(self, position: Position) -> bool:
         if 0 <= position.x < self.width and 0 <= position.y < self.height:
             return True
         return False
 
-    def is_position_allowed(self, position:Position, allowed_terrains: set[Terrain]) -> bool:
-        tile = self._get_tile_by_coords(position.x, position.y)
+    def is_position_allowed(self, position: Position, allowed_terrains: set[Terrain]) -> bool:
+        tile = self._get_tile_by_coords(position[0], position[1])
         if tile is None:
             return False
         return _is_terrain_allowed(tile, allowed_terrains)

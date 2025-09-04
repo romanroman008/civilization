@@ -9,6 +9,11 @@ from domain.organism.strategy.decision_strategy import DecisionStrategy
 
 
 class RandomWalkStrategy(DecisionStrategy):
-    async def decide(self, brain: "Brain"):
-        direction = random.choice(list(Direction))
-        await brain.walk(direction)
+
+    def decide(self, brain: "Brain"):
+        directions = [d for delta in brain.get_possible_moves()
+                      if (d := Direction.to_direction(delta)) is not None]
+
+
+        direction = random.choice(directions)
+        brain.walk(direction)

@@ -26,37 +26,42 @@ from infrastructure.rendering.soa.world_frame_snapshot import WorldFrameSnapshot
 
 
 class _OrganismBuffer:
-    __slots__ = ("ids", "xs", "ys",
-                 "rots", "offxs", "offys", "sprites", "alives",
-                 "_aid", "_akind", "_ax", "_ay",
-                 "_arot", "_aoffx", "_aoffy", "_aspirte", "_aalive")
+    __slots__ = ("_ids", "_xs", "_ys", "_offset_xs", "_offset_ys",
+                 "_rots", "_sprites", "_alives",
+                 "append_id", "append_x", "append_y",
+                 "append_rot", "append_offset_x", "append_offset_y", "append_spirte", "append_alive")
 
     def __init__(self):
-        self.ids = array("I")
-        self.xs = array("f")
-        self.ys = array("f")
-        self.rots = array("f")
-        self.sprites = array("B")
-        self.alives = array("B")
+        self._ids = array("I")
+        self._xs = array("f")
+        self._ys = array("f")
+        self._offset_xs = array("b")
+        self._offset_ys = array("b")
+        self._rots = array("f")
+        self._sprites = array("B")
+        self._alives = array("B")
         self._bind_appends()
 
     def _bind_appends(self):
-        self._aid = self.ids.append
-        self._ax = self.xs.append
-        self._ay = self.ys.append
-        self._arot = self.rots.append
-        self._aspirte = self.sprites.append
-        self._aalive = self.alives.append
+        self.append_id = self._ids.append
+        self.append_x = self._xs.append
+        self.append_y = self._ys.append
+        self.append_offset_x = self._offset_xs.append
+        self.append_offset_y = self._offset_ys.append
+        self.append_rot = self._rots.append
+        self.append_spirte = self._sprites.append
+        self.append_alive = self._alives.append
 
     def clear(self):
-        del self.ids[:]; del self.xs[:]; del self.ys[:]
-        del self.rots[:]
-        del self.sprites[:]; del self.alives[:]
+        del self._ids[:]; del self._xs[:]; del self._ys[:]
+        del self._rots[:]; del self._offset_xs[:]; del self._offset_ys[:]
+        del self._sprites[:]; del self._alives[:]
 
     def soa(self):
-        return OrganismSoA(ids=self.ids, sprites=self.sprites,
-                           xs=self.xs, ys=self.ys, rots=self.rots,
-                           alives=self.alives)
+        return OrganismSoA(ids=self._ids, sprites=self._sprites,
+                           xs=self._xs, ys=self._ys,
+                           offset_xs=self._offset_xs, offset_ys=self._offset_ys, rots=self._rots,
+                           alives=self._alives)
 
 
 class _TileBuffer:
@@ -120,13 +125,15 @@ class WorldSnapshotAdapter:
 
     def _adapt_organisms(self, tb: _OrganismBuffer):
         tb.clear()
-        aid, asprite,  = tb._aid, tb._aspirte,
-        ax, ay, arot = tb._ax, tb._ay, tb._arot
-        aalive = tb._aalive
+        aid, asprite,  = tb.append_id, tb.append_spirte,
+        ax, ay, arot = tb.append_x, tb.append_y, tb.append_rot
+        aoffx, aoffy = tb.append_offset_x, tb.append_offset_y
+        aalive = tb.append_alive
 
         for organism in self._world_state_service.get_all_organisms():
             aid(render_uid(kind_id=get_kind_id(organism.id.kind), organism_id=organism.id.id))
             ax(organism.x); ay(organism.y)
+            aoffx(organism.offset_x); aoffy(organism.offset_y)
             arot(organism.rotation)
             asprite(get_sprite_id(organism.sprite_key))
             aalive(get_alive_val(organism.is_alive))

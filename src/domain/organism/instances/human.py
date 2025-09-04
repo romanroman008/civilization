@@ -24,5 +24,5 @@ class Human(Animal):
                  brain: "Brain",
                  transform: Transform):
         super().__init__(prefab, position, brain, transform)
-        self._id = OrganismID("human", next(self._human_counter))
+        self._id = OrganismID("Human", next(self._human_counter))
 

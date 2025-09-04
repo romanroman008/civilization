@@ -45,6 +45,14 @@ class Organism(ABC):
         return self._transform.y
 
     @property
+    def offset_x(self) -> int:
+        return self._transform.offset_x
+
+    @property
+    def offset_y(self)-> int:
+        return self._transform.offset_y
+
+    @property
     @abstractmethod
     def is_alive(self) -> bool: ...
 

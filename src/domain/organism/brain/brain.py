@@ -6,15 +6,17 @@ from domain.components.direction import Direction
 from domain.components.position import Position
 from domain.components.terrain import Terrain
 from domain.organism.brain.brain_interactions_handler import BrainInteractionsHandler
+from domain.organism.brain.path_planner import PathPlanner
+from domain.organism.movement.action.action_status import ActionStatus
 from domain.organism.organism_id import OrganismID
-from domain.organism.perception.field_of_view import FieldOfView
-from domain.organism.perception.animal_info import AnimalInfo
 
-from domain.organism.perception.organism_info import OrganismInfo
-from domain.organism.perception.percived_object import PerceivedObject
-from domain.organism.transform.transform_readonly import TransformReadOnly
+
+from domain.organism.perception.target_info import TargetInfo
+from domain.organism.perception.vision import Vision
+from domain.organism.transform.transform import TransformReadOnly
+
 from domain.organism.vitals import Vitals
-from domain.organism.instances.animal import Animal
+
 from domain.organism.movement.movement import Movement
 
 from domain.organism.state.hunting_state import HuntingState
@@ -28,73 +30,35 @@ from shared.logger import get_logger
 
 
 
-
-
-def _get_possible_move_neighbours(position: Position, perceived_objects: list[PerceivedObject]) -> dict[
-    Direction, Position]:
-    neighbours: dict[Direction, Position] = {}
-    perceived_map = {
-        obj.relative_position: obj
-        for obj in perceived_objects
-    }
-
-    for direction in Direction:
-        neighbour_pos = position + direction.vector()
-        obj = perceived_map.get(neighbour_pos)
-        if obj and obj.terrain == Terrain.GRASS:
-            neighbours[direction] = neighbour_pos
-
-    return neighbours
-
-
-def find_shortest_path(goal: Position, perceived_objects: list[PerceivedObject]) -> Optional[list[Direction]]:
-    queue = deque()
-    start = Position(0, 0)
-    queue.append((start, []))
-    visited = set()
-    visited.add(start)
-
-    while queue:
-        current, path = queue.popleft()
-
-        if current == goal:
-            return path
-
-        for direction, neighbour_pos in _get_possible_move_neighbours(current, perceived_objects).items():
-            if neighbour_pos in visited:
-                continue
-            visited.add(neighbour_pos)
-            queue.append((neighbour_pos, path + [direction]))
-
-    return None
-
-
-
-_SENTINEL = object()
-
 class Brain:
     def __init__(self,
-                 field_of_view: FieldOfView,
+                 vision: Vision,
                  vitals: Vitals,
                  movement: Movement,
+                 path_planner: PathPlanner,
                  transform_readonly: TransformReadOnly,
+                 available_terrains: set[Terrain],
                  event_bus: EventBus):
+
+
         self._owner_id: OrganismID | None = None
 
-        self._field_of_view = field_of_view
+        self._vision = vision
         self._vitals = vitals
         self._movement = movement
+        self._path_planner = path_planner
         self._transform_readonly = transform_readonly
+        self._available_terrains = available_terrains
 
         self._decision_strategy = RandomWalkStrategy()
 
 
-        self._target: Optional[OrganismInfo] = None
+        self._target: Optional[TargetInfo] = None
 
         self._event_bus: EventBus = event_bus
-        self._brain_interactions_handler: BrainInteractionsHandler | _SENTINEL = _SENTINEL
+        self._brain_interactions_handler: BrainInteractionsHandler | None = None
 
-        self._is_busy = False
+        self._status: ActionStatus = ActionStatus.IDLE
         self._is_alive = True
 
 
@@ -114,40 +78,43 @@ class Brain:
         return BrainInteractionsHandler(owner_id=self._owner_id,
                                         brain=self,
                                         transform_readonly=self._transform_readonly,
-                                        field_of_view=self._field_of_view,
+                                        vision=self._vision,
                                         event_bus=self._event_bus)
 
     def tick(self):
-        if not self._is_alive or self._is_busy:
+        if not self._is_alive:
             return
-        self._is_busy = True
-
+        self._vision.update()
+        self._status = self._movement.tick()
+        if self._status is ActionStatus.IDLE:
+            self._decision_strategy.decide(self)
 
 
     def set_owner_id(self, organism_id: OrganismID):
-        if self._owner_id is not _SENTINEL:
+        if self._owner_id:
             raise RuntimeError(f"Brain {organism_id} already has an owner")
         self._owner_id = organism_id
         self._brain_interactions_handler = self._create_brain_interactions_handler()
-        self._field_of_view.update(self._transform_readonly.position)
-        self._check_target_visibility()
         self._initialize_logger()
 
-    async def update(self, payload):
-        self._field_of_view.update(self._transform_readonly.position)
-        self._check_target_visibility()
+
+    def walk(self, direction: Direction):
+        if not self._is_alive and not self._status is ActionStatus.IDLE:
+            return
+
+        result = self._brain_interactions_handler.emit_walking_decision(direction)
+        if result == MoveResult.SUCCESS:
+            self._logger.info(f"Brain {self._owner_id} has started walking to {direction}")
+            self._movement.move(direction)
+        else:
+            self._logger.error(f"Brain {self._owner_id} has failed to walk {direction} due to {result}")
 
 
-   
+    def get_possible_moves(self):
+        return [d - self._transform_readonly.position
+            for d in self._vision.get_possible_move_positions(self._available_terrains)
+            ]
 
-    async def walk(self, direction: Direction) -> MoveResult:
-        result = await self._brain_interactions_handler.emit_walking_decision(direction)
-        if result is MoveResult.SUCCESS:
-            await self._animal.set_state(WalkingState())
-            await self._movement.move_to(direction)
-            await self._brain_interactions_handler.notify_position_change()
-            await self._animal.set_state(IdleState())
-        return result
 
 
 
@@ -191,48 +158,15 @@ class Brain:
         return False
 
 
-    def _update_target_position(self):
-        updated_pos = self._field_of_view.get_target_position(self._target)
-        if updated_pos is None:
-            return
-        self._target.got_sighting(updated_pos)
-
-
-
-
     def _plan_path_to_target(self) -> list[Direction]:
-        destination = self._target.relative_position
-        if isinstance(self._target, AnimalInfo):
-            destination = (
-                self._target.relative_position if self._target.is_visible
-                else self._target.last_seen_position
-            )
-        return find_shortest_path(destination, self._field_of_view.perceived_objects)
-
+        destination = (
+            self._target.relative_position if self._target.is_visible
+            else self._target.last_seen_position
+        )
+        return self._path_planner.find_shortest_path(destination)
 
 
     def kill_itself(self):
         self._is_alive = False
-
-
-
-    def _check_target_visibility(self):
-        if self._target is None:
-            return
-
-        match = next(
-            (
-                (perc_obj for perc_obj in self._field_of_view.perceived_objects()
-                 if perc_obj.organism_info and perc_obj.organism_info.id == self._target.id)
-            ),
-            None
-        )
-        if match:
-            self._target.got_sighting(match.organism_info.relative_position)
-        else:
-            self._target.lost_sighting()
-
-
-
 
 

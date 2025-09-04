@@ -2,13 +2,15 @@ from typing import Tuple, Callable
 
 from domain.components.direction import Direction
 from domain.components.position import Position
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from domain.organism.transform.transform_readonly import TransformReadOnly
-    from domain.organism.transform.transform_writer import TransformWriter
 
 
-def normalize_angle(angle) -> float:
+from shared.constans import OFFSET_TO_POSITION_RATIO
+
+
+
+
+
+def normalize_angle(angle) -> int:
     r = (angle + 180) % 360 - 180
     return 180 if r == -180 else r
 
@@ -19,11 +21,18 @@ ROTATION_TO_DIRECTION = {
     -90.0: Direction.RIGHT,
 }
 
+
+
 class Transform:
-    def __init__(self, x: float, y: float, rotation: float):
-        self._x: float = x
-        self._y: float = y
-        self._rotation: float = normalize_angle(rotation)
+    __slots__ = ("_x", "_y", "_offset_x", "_offset_y",
+                 "_rotation", "_direction",
+                 "_readonly", "_writer", "_on_arrival")
+    def __init__(self, x: int, y: int, rotation: float):
+        self._x: int = x
+        self._y: int = y
+        self._offset_x: int = 0
+        self._offset_y: int = 0
+        self._rotation: int = normalize_angle(rotation)
         self._direction: Direction = ROTATION_TO_DIRECTION.get(self._rotation, Direction.BOT)
 
         self._readonly: TransformReadOnly = TransformReadOnly(self)
@@ -40,15 +49,31 @@ class Transform:
     def finalize_move(self, target_position: Position):
         self._on_arrival(target_position)
 
-    def interpolate_x(self, x:float):
-        self._x += x
+    def interpolate_x(self, offset_x:int):
+        total_offset = self._offset_x + offset_x
+        ratio = OFFSET_TO_POSITION_RATIO
+        delta = total_offset // ratio if total_offset >= 0 else -((-total_offset) // ratio)
+        if delta == 0:
+            self._offset_x = total_offset
+            return
+        self._x += delta
+        self._offset_x = total_offset - delta * ratio
 
-    def interpolate_y(self, y:float):
-        self._y += y
+    def interpolate_y(self, offset_y:int):
+        total_offset = self._offset_y + offset_y
+        ratio = OFFSET_TO_POSITION_RATIO
+        delta = total_offset // ratio if total_offset >= 0 else -((-total_offset) // ratio)
+        if delta == 0:
+            self._offset_y = total_offset
+            return
+        self._y += delta
+        self._offset_y = total_offset - delta * ratio
 
-    def rotate(self, value: float):
-        self._rotation = normalize_angle(self._rotation + value)
-        self._set_proper_direction()
+    def rotate(self, value: int) -> None:
+        r = self._rotation + value
+        r %= 360
+        self._rotation = r - 360 if r > 180 else r
+        self._direction = ROTATION_TO_DIRECTION.get(self._rotation, self._direction)
 
     def translated_xy(self, direction: Direction) -> Tuple[float, float]:
         return self._x + direction.vector().x, self._y + direction.vector().y
@@ -66,6 +91,14 @@ class Transform:
         return self._y
 
     @property
+    def offset_x(self):
+        return self._offset_x
+
+    @property
+    def offset_y(self):
+        return self._offset_y
+
+    @property
     def rotation(self):
         return self._rotation
 
@@ -75,7 +108,7 @@ class Transform:
 
     @property
     def position(self) -> "Position":
-        return Position(round(self._x), round(self._y))
+        return Position(self._x, self._y)
 
     @property
     def readonly(self) -> "TransformReadOnly":
@@ -85,21 +118,30 @@ class Transform:
     def writer(self) -> "TransformWriter":
         return self._writer
 
-
-
 class TransformReadOnly:
     __slots__ = ("_transform",)
+
     def __init__(self, transform: "Transform"):
         object.__setattr__(self, "_transform", transform)
 
     @property
-    def x(self) -> float: return self._transform.x
+    def x(self) -> int: return self._transform.x
+
     @property
-    def y(self) -> float: return self._transform.y
+    def y(self) -> int: return self._transform.y
+
     @property
-    def rotation(self) -> float: return self._transform.rotation
+    def offset_x(self) -> int: return self._transform.offset_x
+
+    @property
+    def offset_y(self) -> float: return self._transform.offset_y
+
+    @property
+    def rotation(self) -> int: return self._transform.rotation
+
     @property
     def direction(self) -> "Direction": return self._transform.direction
+
     @property
     def position(self) -> "Position": return self._transform.position
 
@@ -117,10 +159,18 @@ class TransformWriter:
     def __init__(self, transform: "Transform"):
         self._transform = transform
 
-    def interpolate_x(self, delta_x: float) -> None: self._transform.interpolate_x(delta_x)
+    def interpolate_x(self, delta_x: int) -> None: self._transform.interpolate_x(delta_x)
 
-    def interpolate_y(self, delta_y: float) -> None: self._transform.interpolate_y(delta_y)
+    def reset_offset_x(self) -> None: self._transform._offset_x = 0
 
-    def rotate(self, delta_degrees: float) -> None:  self._transform.rotate(delta_degrees)
+    def reset_offset_y(self) -> None:self._transform._offset_y = 0
+
+    def match_rotation_to_direction(self) -> None: self._transform._rotation = self._transform.direction.angle
+
+    def interpolate_y(self, delta_y: int) -> None: self._transform.interpolate_y(delta_y)
+
+    def rotate(self, delta_degrees: int) -> None:  self._transform.rotate(delta_degrees)
 
     def finalize_move(self, target_position: Position) -> None: self._transform.finalize_move(target_position)
+
+

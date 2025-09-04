@@ -2,13 +2,11 @@ from abc import ABC
 
 from domain.organism.movement.action.action_status import ActionStatus
 from domain.organism.movement.pose import Pose
-from domain.organism.transform.transform_readonly import TransformReadOnly
-
-from domain.organism.transform.transform_writer import TransformWriter
+from domain.organism.transform.transform import TransformWriter, TransformReadOnly
 
 
 class MotionAction(ABC):
-    def __init__(self, transform_writer: TransformWriter, transform_readonly: TransformReadOnly, step: float = 1):
+    def __init__(self, transform_writer: TransformWriter, transform_readonly: TransformReadOnly, step: int = 1):
         if step < 0:
             raise ValueError("Step must be > 0")
         self._transform_writer: TransformWriter = transform_writer
@@ -16,8 +14,8 @@ class MotionAction(ABC):
         self._running = False
         self._current_iteration: int = 0
         self._iterations: int = 0
-        self._step: float = step
-        self._rest: float = 0
+        self._step: int = step
+        self._rest: int = 0
 
     def set_target(self, target: Pose): pass
 

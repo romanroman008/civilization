@@ -1,7 +1,9 @@
 from dataclasses import dataclass
 
+from domain.components.direction import Direction
+
+
 @dataclass(frozen=True, slots = True)
 class Pose:
-    x:float
-    y:float
+    direction: Direction
     rotation:float

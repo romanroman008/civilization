@@ -35,7 +35,7 @@ class HumanGenerator:
     def generate(self, world_facade: WorldFacade) -> WorldFacade:
         self._world_facade = world_facade
         event_bus = world_facade.event_bus
-        self._human_factory = HumanFactory(world_facade.vision_port, event_bus)
+        self._human_factory = HumanFactory(world_facade.vision_port, world_facade.id_registry, event_bus)
 
 
         for prefab, fraction in self._species_distribution:
@@ -59,7 +59,7 @@ class HumanGenerator:
             Position(x, y)
             for y in range (height)
             for x in range (width)
-            if self._world_facade.is_position_allowed(Position(x, y), organism.allowed_terrains)
+            if self._world_facade.is_position_allowed((x, y), organism.allowed_terrains)
         ]
 
 

@@ -55,6 +55,7 @@ class WorldRenderer:
     def _get_indexes_in_viewport(self, tile_soa: TileSoA) -> array:
         start_x, end_x, start_y, end_y = self.camera.get_viewport()
         xs, ys, sprites = tile_soa.xs, tile_soa.ys, tile_soa.sprites
+
         n = len(xs)
 
         idxs = self._visible_indexes

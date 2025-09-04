@@ -26,7 +26,7 @@ class AnimalsGenerator:
     def generate(self, world_facade: WorldFacade) -> WorldFacade:
         self._world_facade = world_facade
         event_bus = world_facade.event_bus
-        self._animal_factory = AnimalFactory(world_facade.vision_port, event_bus)
+        self._animal_factory = AnimalFactory(world_facade.vision_port, world_facade.id_registry, event_bus)
 
         for prefab, fraction in self._species_distribution:
             amount = int(fraction * self._count)
@@ -46,5 +46,5 @@ class AnimalsGenerator:
             Position(x, y)
             for y in range(height)
             for x in range(width)
-            if self._world_facade.is_position_allowed(Position(x, y), organism.allowed_terrains)
+            if self._world_facade.is_position_allowed((x, y), organism.allowed_terrains)
         ]

@@ -2,9 +2,7 @@ from abc import ABC, abstractmethod
 
 
 from domain.components.direction import Direction
-
-from domain.organism.transform.transform_readonly import TransformReadOnly
-from domain.organism.transform.transform_writer import TransformWriter
+from domain.organism.transform.transform import TransformWriter, TransformReadOnly
 
 
 class Movement(ABC):
@@ -15,5 +13,9 @@ class Movement(ABC):
 
     @abstractmethod
     def move(self, target_direction: Direction):
+        ...
+
+    @abstractmethod
+    def tick(self):
         ...
 

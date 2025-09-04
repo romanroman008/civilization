@@ -7,8 +7,8 @@ from domain.organism.movement.action.sequence_action import SequenceAction
 from domain.organism.movement.movement import Movement
 
 from domain.organism.movement.movement_utils import find_shortest_rotation
-from domain.organism.transform.transform_readonly import TransformReadOnly
-from domain.organism.transform.transform_writer import TransformWriter
+from domain.organism.movement.pose import Pose
+from domain.organism.transform.transform import TransformWriter, TransformReadOnly
 
 
 class AnimalMovement(Movement):
@@ -23,14 +23,14 @@ class AnimalMovement(Movement):
         self._sequence_action.start(self._prepare_actions_list(target_direction))
 
 
-    def tick(self):
+    def tick(self) -> ActionStatus:
         self._move_status = self._sequence_action.step()
+        return self._move_status
 
 
     def _prepare_actions_list(self, target_direction: Direction) -> list[MotionAction]:
         target_rotation = find_shortest_rotation(self._transform_readonly.direction, target_direction)
-        target_x, target_y = self._transform_readonly.translated_xy(target_direction)
-        target = TransformReadOnly(target_x, target_y, target_rotation)
+        target = Pose(target_direction, target_rotation)
 
         self._rotation_action.set_target(target)
         self._interpolation_action.set_target(target)
