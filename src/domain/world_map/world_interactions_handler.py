@@ -56,8 +56,7 @@ class WorldInteractionsHandler:
 
 
     def _on_position_changed(self, payload: dict):
-        organism = self._world_state_service.get_organism_by_id(payload["organism_id"])
-        self._world_state_service.notify_animal_movement_end(organism)
+        self._world_state_service.notify_animal_movement_end(payload["organism_id"])
         self._notify_position_changed()
 
 
@@ -71,7 +70,7 @@ class WorldInteractionsHandler:
             return result
 
 
-        self._world_state_service.notify_animal_movement_start(organism, target_position)
+        self._world_state_service.notify_animal_movement_start(organism.id, target_position)
 
         self._event_bus.emit("organism_moved", {
             "organism" : organism,

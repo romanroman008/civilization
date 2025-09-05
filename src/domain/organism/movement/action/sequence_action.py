@@ -26,7 +26,7 @@ class SequenceAction:
         if status == ActionStatus.SUCCESS:
             if  self._is_last_action():
                 self._finish()
-                return ActionStatus.IDLE
+                return ActionStatus.SUCCESS
             self._start_new_action()
 
         return ActionStatus.RUNNING

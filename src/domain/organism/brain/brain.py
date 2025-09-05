@@ -85,7 +85,15 @@ class Brain:
         if not self._is_alive:
             return
         self._vision.update()
-        self._status = self._movement.tick()
+
+
+        status = self._movement.tick()
+        if status == ActionStatus.SUCCESS:
+            self._brain_interactions_handler.notify_position_change()
+            self._status = ActionStatus.IDLE
+
+        self._status = status
+
         if self._status is ActionStatus.IDLE:
             self._decision_strategy.decide(self)
 

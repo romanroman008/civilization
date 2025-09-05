@@ -30,11 +30,11 @@ class BrainInteractionsHandler:
         self._register_handlers()
 
     def _register_handlers(self):
-        self._event_bus.on("position update", self.update_field_view)
+        self._event_bus.on("position update", self.update_vision)
         self._event_bus.on("death", self.register_organism_death)
 
-    def update_field_view(self, payload):
-        self._field_of_view.update(self._transform_readonly.position)
+    def update_vision(self, payload):
+        self._vision.update()
 
     def register_organism_death(self, payload):
         organism_id = payload["organism_id"]

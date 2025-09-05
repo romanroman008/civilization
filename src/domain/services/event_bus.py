@@ -18,13 +18,14 @@ class EventBus:
         self._command_handlers[command_type] = handler
 
     def emit(self, event_type: str, payload: dict) -> None:
-        for cb in list(self._listeners_sync.get(event_type, ())):  # kopia na wypadek modyfikacji listy
+        for cb in list(self._listeners_sync.get(event_type, ())):
             try:
                 cb(payload)
             except Exception as e:
-                # zaloguj / zbierz błędy
-                # print(f"Listener {cb} failed: {e}")
                 pass
+
+
+
 
 
 
