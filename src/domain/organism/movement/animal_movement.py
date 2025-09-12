@@ -1,3 +1,5 @@
+import logging
+
 from domain.components.direction import Direction
 from domain.organism.movement.action.action_status import ActionStatus
 from domain.organism.movement.action.interpolation_action import InterpolationAction
@@ -9,6 +11,7 @@ from domain.organism.movement.movement import Movement
 from domain.organism.movement.movement_utils import find_shortest_rotation
 from domain.organism.movement.pose import Pose
 from domain.organism.transform.transform import TransformWriter, TransformReadOnly
+from shared.logger import get_logger
 
 
 class AnimalMovement(Movement):
@@ -18,6 +21,8 @@ class AnimalMovement(Movement):
         self._interpolation_action = InterpolationAction(transform_writer, transform_readonly)
         self._sequence_action = SequenceAction()
         self._move_status = ActionStatus.IDLE
+        self._logger = get_logger("Movement", level=logging.INFO,
+                                  log_filename="movement.log")
 
     def move(self, target_direction: Direction):
         self._sequence_action.start(self._prepare_actions_list(target_direction))

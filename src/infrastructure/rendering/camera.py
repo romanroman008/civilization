@@ -19,14 +19,23 @@ class Camera:
         self.map_height = map_height
         self.tile_size = tile_size
 
-    def get_viewport(self):
+    def get_viewport(self) -> tuple[int, int, int, int]:
         start_x = self.offset_x //  self.tile_size
         start_y = self.offset_y //  self.tile_size
         end_x = (self.offset_x + self.screen_width) // self.tile_size
         end_y = (self.offset_y + self.screen_height) // self.tile_size
         return start_x, end_x, start_y, end_y
 
-    def move(self, dx: float, dy: float, speed: int = 50):
+    def get_viewport_as_pixels(self) -> tuple[int, int, int, int]:
+        start_x = self.offset_x
+        start_y = self.offset_y
+        end_x = (self.offset_x + self.screen_width)
+        end_y = (self.offset_y + self.screen_height)
+        return start_x, end_x, start_y, end_y
+
+
+
+    def move(self, dx: int, dy: int, speed: int = 50):
 
         new_offset_x = self.offset_x + dx *  speed
         new_offset_y = self.offset_y + dy *  speed
@@ -34,5 +43,5 @@ class Camera:
         max_offset_x = (self.map_width *  self.tile_size) - self.screen_width
         max_offset_y = (self.map_height *  self.tile_size) - self.screen_height
 
-        self.offset_x = max(0.0, min(new_offset_x, max_offset_x))
-        self.offset_y = max(0.0, min(new_offset_y, max_offset_y))
+        self.offset_x = max(0, min(new_offset_x, max_offset_x))
+        self.offset_y = max(0, min(new_offset_y, max_offset_y))

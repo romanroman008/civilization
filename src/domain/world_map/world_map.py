@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Sequence, Optional, Tuple
+from typing import Sequence, Optional, Tuple, Iterator
 
 from domain.components.position import Position
 from domain.components.renderable import Renderable
@@ -92,6 +92,25 @@ class WorldMap:
         renderable = []
         renderable.extend(self.tiles)
         return renderable
+
+
+    def get_tiles_in_viewport(self, start_x, end_x, start_y, end_y) -> Iterator[Tile]:
+        width, height = self.width, self.height
+        if (not self.is_position_in_bounds(Position(start_x, start_y))
+            or not self.is_position_in_bounds(Position(end_x, end_y))):
+
+            start_x, start_y = 0, 0
+            end_x, end_y = width, height
+
+        end_x = min(end_x + 1, width - 1)
+        end_y = min(end_y + 1, height - 1)
+
+        for x in range(start_x, end_x + 1):
+            for y in range(start_y, end_y + 1):
+                yield self._get_tile_by_coords(x, y)
+
+
+
 
 
 

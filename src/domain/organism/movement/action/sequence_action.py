@@ -1,5 +1,8 @@
+import logging
+
 from domain.organism.movement.action.action_status import ActionStatus
 from domain.organism.movement.action.motion_action import MotionAction
+from shared.logger import get_logger
 
 
 class SequenceAction:
@@ -8,6 +11,7 @@ class SequenceAction:
         self._current_action: MotionAction | None = None
         self._running = False
         self._i = 0
+
 
     def start(self, actions:list[MotionAction]):
         if not actions:

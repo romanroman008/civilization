@@ -1,9 +1,8 @@
 from collections import defaultdict
-from typing import Dict, Set, Optional, Sequence, Tuple
+from typing import Dict, Set, Optional, Sequence, Tuple, Iterator
 
 from domain.components.position import Position
-from domain.organism import organism_id
-from domain.organism.instances import animal
+
 
 from domain.organism.instances.human import Human
 
@@ -14,7 +13,7 @@ from shared.id_registry import IdRegistry
 
 
 class WorldStateService:
-    def __init__(self, id_registry: IdRegistry):
+    def __init__(self, id_registry: IdRegistry, world_width:int, world_height:int):
         self._id_registry = id_registry
 
         self._id_to_organism: Dict[OrganismID, Organism] = {}
@@ -23,6 +22,9 @@ class WorldStateService:
         self._reserved: Dict[Position, OrganismID] = {}
         self._organisms_to_occupied: Dict[OrganismID, Position] = {}
         self._organisms_to_reserved: Dict[OrganismID, Position] = {}
+
+        self._world_width = world_width
+        self._world_height = world_height
 
 
     def register_organism(self, organism: Organism):
@@ -82,8 +84,20 @@ class WorldStateService:
             return True
         return False
 
-    def get_all_organisms(self) -> Sequence[Organism]:
+    def get_all_organisms(self) -> list[Organism]:
         return [self._id_to_organism[oid] for oid in self._organisms_to_occupied]
+
+
+    def get_organisms_in_viewport(self, start_x: int, end_x: int, start_y: int, end_y: int) -> Iterator[Organism]:
+        end_x = min(end_x + 1, self._world_width)
+        end_y = min(end_y + 1, self._world_height)
+
+        for x in range(start_x, end_x):
+            for y in range(start_y, end_y):
+                organism = self.get_organism_at_position(Position(x, y))
+                if not organism:
+                    continue
+                yield organism
 
 
     def get_example_agent(self) -> Optional[Human]:

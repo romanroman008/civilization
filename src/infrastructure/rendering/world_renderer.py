@@ -44,12 +44,20 @@ class WorldRenderer:
 
 
     def render_map(self, world_frame_snapshot: WorldFrameSnapshot):
+        if not self.world_presenter._map_built:
+            self.world_presenter.build_full_map_surface(world_frame_snapshot.tiles)
 
-        visible_indexes = self._get_indexes_in_viewport(world_frame_snapshot.tiles)
-        visible_organism_indexes = self._get_organisms_indexes_in_viewport(world_frame_snapshot.organisms)
+        self.world_presenter.blit_map_surface_camera_view()
+        self.world_presenter.present_organisms_effectively(world_frame_snapshot.organisms)
 
-        self.world_presenter.present_tiles(world_frame_snapshot.tiles, visible_indexes)
-        self.world_presenter.preset_organisms(world_frame_snapshot.organisms, visible_organism_indexes)
+        # tiles = world_frame_snapshot.tiles
+        # n_1 = len(tiles.xs)
+        # organisms = world_frame_snapshot.organisms
+        # n_2 = len(organisms.xs)
+        #
+        #
+        # self.world_presenter.present_tiles_effectively(world_frame_snapshot.tiles)
+        # self.world_presenter.present_organisms_effectively(world_frame_snapshot.organisms)
 
 
     def _get_indexes_in_viewport(self, tile_soa: TileSoA) -> array:

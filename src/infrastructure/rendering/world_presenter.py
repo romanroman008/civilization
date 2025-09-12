@@ -1,12 +1,14 @@
 from array import array
 
 import pygame
+from codetiming import Timer
 
 from domain.components.renderable import Renderable
 
 from domain.components.terrain import Terrain
 from domain.organism.instances.animal import Animal
 from infrastructure.rendering.camera import Camera
+from infrastructure.rendering.rotated_sprite_cache import RotatedSpriteCache
 from infrastructure.rendering.soa import tile_soa
 
 from infrastructure.rendering.soa.organism_soa import OrganismSoA
@@ -55,6 +57,43 @@ class WorldPresenter:
         self.tile_size = tile_size
         self.camera = camera
 
+        self._full_map_surface = pygame.Surface((self.camera.map_width * tile_size, self.camera.map_height * tile_size))
+        self._map_built = False
+
+
+    def build_full_map_surface(self, tile_soa: TileSoA):
+        xs, ys, sprites = tile_soa.xs, tile_soa.ys, tile_soa.sprites
+        tile_size = self.tile_size
+        blit = self._full_map_surface.blit
+        camera_offset_x, camera_offset_y = self.camera.offset_x, self.camera.offset_y
+        n = len(xs)
+
+        for i in range(n):
+            source = sprite_assets[sprites[i]].image
+            blit(source,
+                 (xs[i] * tile_size - camera_offset_x, ys[i] * tile_size - camera_offset_y))
+        self._map_built = True
+
+
+    def blit_map_surface_camera_view(self) -> None:
+        x_start, x_end, y_start, y_end = self.camera.get_viewport_as_pixels()
+        view = pygame.Rect(x_start, y_start, x_end - x_start, y_end - y_start)
+        self.surface.blit(self._full_map_surface, (0,0), area=view)
+
+
+
+    def present_tiles_effectively(self, tile_soa: TileSoA):
+        xs, ys, sprites = tile_soa.xs, tile_soa.ys, tile_soa.sprites
+        tile_size = self.tile_size
+        blit = self.surface.blit
+        camera_offset_x, camera_offset_y = self.camera.offset_x, self.camera.offset_y
+        n = len(xs)
+
+
+        for i in range(n):
+            source = sprite_assets[sprites[i]].image
+            blit(source,
+                 (xs[i] * tile_size - camera_offset_x, ys[i] * tile_size - camera_offset_y))
 
 
     def present_tiles(self, tile_soa: TileSoA, visible_indexes: array):
@@ -63,10 +102,13 @@ class WorldPresenter:
         blit = self.surface.blit
         camera_offset_x, camera_offset_y = self.camera.offset_x, self.camera.offset_y
 
+
         for i in visible_indexes:
             source = sprite_assets[sprites[i]].image
             dest_rect = pygame.Rect(xs[i] * tile_size - camera_offset_x, ys[i] * tile_size - camera_offset_y, tile_size, tile_size)
             blit(source, dest_rect)
+
+
 
 
     def preset_organisms(self, organism_soa: OrganismSoA, visible_indexes: array):
@@ -81,8 +123,6 @@ class WorldPresenter:
         offset_indicator = tile_size / OFFSET_TO_POSITION_RATIO
 
 
-
-
         for i in visible_indexes:
             source = sprite_assets[sprites[i]].image
             px = xs[i] * tile_size + offxs[i] * offset_indicator - camera_offset_x
@@ -94,6 +134,25 @@ class WorldPresenter:
             blit(rotated_source, dest_rect)
 
 
+    def present_organisms_effectively(self, organism_soa: OrganismSoA):
+        xs, ys = organism_soa.xs, organism_soa.ys
+        offxs, offys = organism_soa.offset_xs, organism_soa.offset_ys
+        rots = organism_soa.rots
+        sprites, alives = organism_soa.sprites, organism_soa.alives
+        blit = self.surface.blit
+        tile_size = self.tile_size
+        camera_offset_x, camera_offset_y = self.camera.offset_x, self.camera.offset_y
+        n = len(xs)
+
+        offset_indicator = tile_size / OFFSET_TO_POSITION_RATIO
+
+
+        for i in range(n):
+            source = sprite_assets[sprites[i]].image
+            px = xs[i] * tile_size + offxs[i] * offset_indicator - camera_offset_x
+            py = ys[i] * tile_size + offys[i] * offset_indicator - camera_offset_y
+            rotated = pygame.transform.rotate(source, -rots[i])
+            blit(rotated, (int(px), int(py)))
 
 
 

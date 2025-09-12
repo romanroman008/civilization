@@ -84,18 +84,21 @@ class Brain:
     def tick(self):
         if not self._is_alive:
             return
-        self._vision.update()
+       # self._vision.update()
 
 
         status = self._movement.tick()
         if status == ActionStatus.SUCCESS:
             self._brain_interactions_handler.notify_position_change()
-            self._status = ActionStatus.IDLE
+            status = ActionStatus.IDLE
 
         self._status = status
 
         if self._status is ActionStatus.IDLE:
+            self._vision.update()
             self._decision_strategy.decide(self)
+
+
 
 
     def set_owner_id(self, organism_id: OrganismID):
@@ -112,7 +115,7 @@ class Brain:
 
         result = self._brain_interactions_handler.emit_walking_decision(direction)
         if result == MoveResult.SUCCESS:
-            self._logger.info(f"Brain {self._owner_id} has started walking to {direction}")
+          #  self._logger.info(f"Brain {self._owner_id} has started walking to {direction}")
             self._movement.move(direction)
         else:
             self._logger.error(f"Brain {self._owner_id} has failed to walk {direction} due to {result}")

@@ -56,7 +56,7 @@ class WorldGenerator:
         tiles: list[Tile] = TileAdapter.to_tiles(world_array)
         id_registry = IdRegistry()
         world_map = WorldMap(1,"Brave new world", width, height, tiles, id_registry)
-        world_state_service = WorldStateService(id_registry)
+        world_state_service = WorldStateService(id_registry, width, height)
         world_interactions_validator_protocol = WorldInteractionsValidator(world_map, world_state_service)
         world_perception_adapter = WorldPerceptionAdapter(world_state_service, world_map,world_interactions_validator_protocol,id_registry)
         vision_port = VisionPort(world_perception_adapter, world_map.width, world_map.height)

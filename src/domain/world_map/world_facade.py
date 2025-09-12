@@ -3,16 +3,16 @@ import logging
 from itertools import chain
 from typing import Iterable, Optional, Tuple
 
-from domain.components.position import Position
-from domain.components.renderable import Renderable
+
 from domain.components.terrain import Terrain
 
-from domain.organism.instances.animal import Animal
 from domain.organism.instances.human import Human
 from domain.organism.instances.organism import Organism
+
 from domain.organism.perception.world_perception_adapter_protocol import WorldPerceptionAdapterProtocol
 
 from domain.services.event_bus import EventBus
+
 from domain.world_map.vision_port_protocol import VisionPortProtocol
 
 from domain.world_map.world_interactions_handler import WorldInteractionsHandler
@@ -99,6 +99,9 @@ class WorldFacade:
     def tick(self):
         for organism in self._world_state_service.get_all_organisms():
             organism.tick()
+
+
+
 
 
 
