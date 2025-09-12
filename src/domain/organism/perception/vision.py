@@ -1,3 +1,5 @@
+from codetiming import Timer
+
 from domain.components.position import Position
 from domain.components.terrain import Terrain
 from domain.organism.organism_id import OrganismID
@@ -15,24 +17,41 @@ class Vision:
                  transform:TransformReadOnly,
                  vision_port: VisionPortProtocol,
                  id_registry: IdRegistry,
+                 allowed_terrains: set[Terrain],
                  range = 5):
         self._vision_port = vision_port
         self._id_registry = id_registry
         self._transform = transform
         self._range = range
+        self._available_terrain_ids = [id_registry.code_object(terrain) for terrain in allowed_terrains]
         self._perception: Perception = self._vision_port.get_vision(transform.position, 5)
+
+        self._pos_to_idx : dict[tuple[int,int], int] = {}
+        self._reindex_perception()
+
+
+
+    def _reindex_perception(self):
+        m = self._pos_to_idx
+        m.clear()
+        xs, ys = self._perception.xs, self._perception.ys
+        n = len(xs)
+        for i in range(n):
+            m[(xs[i], ys[i])] = i
 
 
 
     def update(self, target: TargetInfo | None = None) -> TargetInfo | None:
         self._perception = self._vision_port.get_vision(self._transform.position, self._range)
+        self._reindex_perception()
         if target:
             i = self.get_index_by_id(target.id)
             if i == -1:
                 target.update()
                 return target
             perception = self._perception
-            target.update(Position(perception.xs[i], perception.ys[i]))
+            target.update(Position(perception.xs[i], perception.ys[i
+            ]))
             return target
         return None
 
@@ -42,7 +61,7 @@ class Vision:
         organism_id = organism_id.id
         for i in range(len(perception.xs)):
             if perception.organisms[i] == organism_kind_id:
-                if perception.xs[i] == organism_id:
+                if perception.organisms_id[i] == organism_id:
                     return i
         return -1
 
@@ -63,12 +82,12 @@ class Vision:
                     append(i)
         return indexes
 
-    def get_available_positions_in_sight(self, available_terrains:set[Terrain]):
+    def get_available_positions_in_sight(self, allowed_terrains:set[Terrain]):
         perception = self._perception
         code_terrain = self._id_registry.code_object
         available_positions = []
         append = available_positions.append
-        for terrain in available_terrains:
+        for terrain in allowed_terrains:
             terrain_id = code_terrain(terrain)
             for i in range(len(perception.xs)):
                 if perception.terrains[i] == terrain_id:
@@ -76,19 +95,22 @@ class Vision:
         return available_positions
 
 
-    def get_possible_move_positions(self, available_terrains:set[Terrain]) -> list[Position]:
+    def get_possible_move_positions(self) -> list[Position]:
         neighbours = self._transform.position.neighbors()
         possible_moves = []
-        terrain_ids = [self._id_registry.code_object(terrain) for terrain in available_terrains]
+        terrain_ids = self._available_terrain_ids
         append = possible_moves.append
-        indexes = self.get_indexes_by_positions(neighbours)
         perception = self._perception
-        for i in indexes:
+        pos_to_idx = self._pos_to_idx
+
+        for neighbour in neighbours:
+            i = pos_to_idx.get((neighbour.x, neighbour.y))
+            if i is None:
+                continue
             if perception.terrains[i] in terrain_ids and perception.allowed[i] == 1:
                 append(Position(self._perception.xs[i], self._perception.ys[i]))
 
         return possible_moves
-
 
 
     def detect_closest_animal(self):

@@ -47,8 +47,8 @@ class Animal(Organism):
     def is_alive(self) -> bool:
         return self._brain.is_alive
 
-    def tick(self):
-        self._brain.tick()
+    def tick(self, tick: int):
+        self._brain.tick(tick)
 
     def _change_position(self, target_position: Position):
         self._position = target_position

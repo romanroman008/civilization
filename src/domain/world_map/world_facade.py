@@ -96,9 +96,9 @@ class WorldFacade:
     def get_example_agent(self) -> Optional[Human]:
         return self._world_state_service.get_example_agent()
 
-    def tick(self):
+    def tick(self, tick:int):
         for organism in self._world_state_service.get_all_organisms():
-            organism.tick()
+            organism.tick(tick)
 
 
 

@@ -57,7 +57,7 @@ class Organism(ABC):
     def is_alive(self) -> bool: ...
 
     @abstractmethod
-    def tick(self): pass
+    def tick(self, tick:int): pass
 
 
 

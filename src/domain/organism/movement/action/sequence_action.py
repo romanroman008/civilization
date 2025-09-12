@@ -1,5 +1,7 @@
 import logging
 
+from codetiming import Timer
+
 from domain.organism.movement.action.action_status import ActionStatus
 from domain.organism.movement.action.motion_action import MotionAction
 from shared.logger import get_logger
@@ -21,6 +23,7 @@ class SequenceAction:
         self._actions = actions
         self._current_action = self._actions[self._i]
         self._current_action.start()
+
 
     def step(self) -> ActionStatus:
         if not self._running:

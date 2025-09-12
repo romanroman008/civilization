@@ -8,7 +8,7 @@ from domain.components.renderable import Renderable
 from domain.components.terrain import Terrain
 from domain.organism.instances.animal import Animal
 from infrastructure.rendering.camera import Camera
-from infrastructure.rendering.rotated_sprite_cache import RotatedSpriteCache
+
 from infrastructure.rendering.soa import tile_soa
 
 from infrastructure.rendering.soa.organism_soa import OrganismSoA

@@ -31,7 +31,7 @@ def run_game(world_facade: WorldFacade, world_snapshot_adapter: WorldSnapshotAda
     pygame.quit()
 
 RENDER_HZ = 60
-LOGIC_HZ = 60
+LOGIC_HZ = 120
 
 class Game:
     def __init__(self, world: WorldFacade, world_snapshot_adapter: WorldSnapshotAdapter, renderer: WorldRenderer, camera, keyboard, agent):
@@ -62,6 +62,8 @@ class Game:
         self.max_logic_ticks_per_frame = 8
         self.remaining_ticks_amount = 0
 
+        self.tick_id = 0
+
 
     # --- Fazy pętli: małe, czytelne metody ---
 
@@ -81,17 +83,18 @@ class Game:
     @Timer(name="logic", text="logic: {milliseconds:.1f}ms")
     def step_fixed_logic(self, steps: int = 1) -> None:
         max_ticks = self.max_logic_ticks_per_frame
+        tick_id = self.tick_id
         if steps > max_ticks:
             self.remaining_ticks_amount += steps - max_ticks
             steps = max_ticks
-        for _ in range(steps):
-            self.world_facade.tick()
+        for i in range(steps):
+            self.world_facade.tick(tick_id + i)
 
-    @Timer(name="snapshot", text="snapshot: {milliseconds:.1f}ms")
+
     def build_snapshot(self):
         self.curr_snap = self.world_snapshot_adapter.make_snapshot(False)
 
-    @Timer(name="render", text="render: {milliseconds:.1f}ms")
+
     def render_frame(self) -> None:
      #   self.renderer.surface.fill((0, 0, 0))
         self.renderer.render_map(self.curr_snap)
@@ -113,6 +116,7 @@ class Game:
             if event.type == pygame.QUIT:
                 self.running = False
             elif event.type == self.LOGIC_EVENT:
+                self.tick_id += 1
                 logic_ticks += 1
             elif event.type == self.RENDER_EVENT:
                 render_request = True

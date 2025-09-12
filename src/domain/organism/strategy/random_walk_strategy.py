@@ -1,5 +1,7 @@
 import random
 
+from codetiming import Timer
+
 from domain.components.direction import Direction
 from typing import TYPE_CHECKING
 
@@ -9,6 +11,7 @@ from domain.organism.strategy.decision_strategy import DecisionStrategy
 
 
 class RandomWalkStrategy(DecisionStrategy):
+
 
     def decide(self, brain: "Brain"):
         directions = [d for delta in brain.get_possible_moves()

@@ -31,6 +31,8 @@ from shared.logger import get_logger
 
 
 class Brain:
+    DECIDE_BUCKETS = 20
+
     def __init__(self,
                  vision: Vision,
                  vitals: Vitals,
@@ -39,6 +41,7 @@ class Brain:
                  transform_readonly: TransformReadOnly,
                  available_terrains: set[Terrain],
                  event_bus: EventBus):
+
 
 
         self._owner_id: OrganismID | None = None
@@ -61,9 +64,9 @@ class Brain:
         self._status: ActionStatus = ActionStatus.IDLE
         self._is_alive = True
 
-
-
         self._range = 1
+
+        self._phase = 0
 
 
     @property
@@ -81,7 +84,10 @@ class Brain:
                                         vision=self._vision,
                                         event_bus=self._event_bus)
 
-    def tick(self):
+    def _can_decide_this_tick(self, tick:int):
+        return (tick % self.DECIDE_BUCKETS) == self._phase
+
+    def tick(self, tick:int):
         if not self._is_alive:
             return
        # self._vision.update()
@@ -94,7 +100,7 @@ class Brain:
 
         self._status = status
 
-        if self._status is ActionStatus.IDLE:
+        if self._status is ActionStatus.IDLE and self._can_decide_this_tick(tick):
             self._vision.update()
             self._decision_strategy.decide(self)
 
@@ -106,6 +112,7 @@ class Brain:
             raise RuntimeError(f"Brain {organism_id} already has an owner")
         self._owner_id = organism_id
         self._brain_interactions_handler = self._create_brain_interactions_handler()
+        self._phase = organism_id.id % self.DECIDE_BUCKETS
         self._initialize_logger()
 
 
@@ -123,7 +130,7 @@ class Brain:
 
     def get_possible_moves(self):
         return [d - self._transform_readonly.position
-            for d in self._vision.get_possible_move_positions(self._available_terrains)
+            for d in self._vision.get_possible_move_positions()
             ]
 
 
