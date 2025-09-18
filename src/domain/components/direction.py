@@ -2,7 +2,9 @@
 
 from enum import Enum
 from functools import lru_cache
-from typing import Optional
+from typing import Optional, Union
+
+
 
 from domain.components.position import Position
 
@@ -29,6 +31,12 @@ class Direction(Enum):
     def _vector_to_direction(cls):
         return {d.value[0]: d for d in cls}
 
+    @staticmethod
+    def _normalize(dx: int, dy: int) -> tuple[int, int]:
+        ndx = (dx > 0) - (dx < 0)
+        ndy = (dy > 0) - (dy < 0)
+        return ndx, ndy
+
     @classmethod
     def to_direction(cls, delta:tuple[int, int]) -> Optional["Direction"]:
         dx, dy = delta
@@ -36,4 +44,26 @@ class Direction(Enum):
         ndx = (dx > 0) - (dx < 0)
         ndy = (dy > 0) - (dy < 0)
         return cls._vector_to_direction().get((ndx, ndy))
+
+    @classmethod
+    def reverse_direction(cls, direction: Union["Direction", tuple[int,int], Position]) -> Optional["Direction"]:
+        if isinstance(direction, Direction):
+            dx, dy = direction.value[0]
+            ndx, ndy = -dx, -dy
+
+        elif isinstance(direction, Position):
+            dx, dy = direction
+            ndx, ndy = cls._normalize(-dx, -dy)
+
+        else:
+            dx,dy = direction
+            ndx, ndy = cls._normalize(-dx, -dy)
+
+        if ndx == 0 and ndy == 0:
+            return None
+
+        return cls._vector_to_direction().get((ndx, ndy))
+
+
+
 

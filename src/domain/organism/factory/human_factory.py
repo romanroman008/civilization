@@ -26,7 +26,7 @@ class HumanFactory:
         transform = Transform(position.x, position.y, prefab.initial_rotation)
         movement = HumanMovement(transform_writer=transform.writer, transform_readonly=transform.readonly)
         vitals = Vitals()
-        vision = Vision(transform.readonly, self._vision_port, self._id_registry)
+        vision = Vision(transform.readonly, self._vision_port, self._id_registry, prefab.allowed_terrains)
         path_planner = PathPlanner(vision, transform.readonly, prefab.allowed_terrains)
         brain = HumanBrain(vision=vision,
                            vitals=vitals,

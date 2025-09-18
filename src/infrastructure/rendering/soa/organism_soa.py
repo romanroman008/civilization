@@ -11,4 +11,4 @@ class OrganismSoA:
     offset_ys: array
     rots: array
     sprites: array
-    alives: array
+    dead: array

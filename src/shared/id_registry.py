@@ -37,10 +37,11 @@ KIND_MASK = (1 << KIND_BITS) - 1
 
 
 class IdRegistry:
-    __slots__ = ("_name_to_id", "_id_to_name")
+    __slots__ = ("_name_to_id", "_id_to_name", "_id_to_group")
     def __init__(self):
         self._name_to_id: dict[str, int] = {}
         self._id_to_name: dict[int, str] = {}
+        self._id_to_group: dict[int, str] = {}
         self._register_all_objects()
 
     @staticmethod
@@ -48,8 +49,10 @@ class IdRegistry:
         return name.strip().casefold()
 
     def _register_all_objects(self):
+
         for group_name, group  in GROUP_DICT.items():
             group_id = GROUP_IDS[group_name]
+            self._id_to_group[group_id] = group_name
             for kind_name, kind_id in group.items():
                 id = group_id << KIND_BITS | kind_id & KIND_MASK
                 self._name_to_id[kind_name] = id
@@ -59,7 +62,13 @@ class IdRegistry:
         return self._name_to_id.get(kind_name.casefold(),-1)
 
     def decode_object(self, id:int):
-        return self._id_to_name.get(id, "UNKNOWN").casefold()
+        return self._id_to_name.get(id, "UNKNOWN").upper()
+
+    def get_organism_group_from_id(self, id: int):
+        group_id = id >> KIND_BITS
+        return self._id_to_group.get(group_id, "UNKNOWN").casefold()
+
+
 
 
 

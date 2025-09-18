@@ -19,10 +19,11 @@ class Plant(Organism):
                  event_bus: EventBus
                  ):
         super().__init__(prefab, position, transform)
-        self._id = OrganismID("Plant", next(self._id_counter))
+        self._id = OrganismID(prefab.name, next(self._id_counter))
         self._event_bus = event_bus
         self._is_alive = True
 
+    def tick(self, number:int): pass
 
     @property
     def id(self) -> OrganismID:

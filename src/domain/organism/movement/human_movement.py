@@ -20,6 +20,7 @@ class HumanMovement(Movement):
 
     def tick(self):
         self._move_status = self._sequence_action.step()
+        return self._move_status
 
     def _prepare_actions_list(self, target_direction: Direction) -> list[MotionAction]:
         target_rotation = self._transform_readonly.rotation

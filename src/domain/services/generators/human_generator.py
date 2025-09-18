@@ -45,7 +45,7 @@ class HumanGenerator:
 
 
             for position in approved_positions:
-                position = Position(3,3)
+                #position = Position(0,0)
                 human = self._human_factory.create(prefab, position)
                 world_facade.add_organism(human)
 

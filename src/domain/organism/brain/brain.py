@@ -13,6 +13,7 @@ from domain.organism.organism_id import OrganismID
 
 from domain.organism.perception.target_info import TargetInfo
 from domain.organism.perception.vision import Vision
+from domain.organism.strategy.idle_strategy import IdleStrategy
 from domain.organism.transform.transform import TransformReadOnly
 
 from domain.organism.vitals import Vitals
@@ -90,7 +91,6 @@ class Brain:
     def tick(self, tick:int):
         if not self._is_alive:
             return
-       # self._vision.update()
 
 
         status = self._movement.tick()
@@ -117,7 +117,7 @@ class Brain:
 
 
     def walk(self, direction: Direction):
-        if not self._is_alive and not self._status is ActionStatus.IDLE:
+        if (not self._is_alive) or (self._status is not ActionStatus.IDLE):
             return
 
         result = self._brain_interactions_handler.emit_walking_decision(direction)
@@ -135,53 +135,12 @@ class Brain:
 
 
 
-
-    async def hunt(self):
-
-        self._field_of_view.update(self._animal.position)
-        closest_animal = self._field_of_view.detect_closest_animal(self._animal)
-        if closest_animal is None:
-            return []
-        self._target = closest_animal
-        path = self._plan_path_to_target()
-
-        self._logger.info(f"walking sequence: {path}")
-        await self._animal.set_state(HuntingState())
-        i = 0
-        while True:
-            if self._is_target_in_range():
-                await self._kill()
-                break
-            direction = path[0]
-            i+=1
-
-            result = await self.walk(direction)
-            if result is MoveResult.SUCCESS:
-                self._field_of_view.update(self._transform_readonly.position)
-                self._update_target_position()
-                self._logger.info(f"Iteracja {i}, pozycja targetu: {self._target.relative_position}")
-                path = self._plan_path_to_target()
-                if path is None:
-                    self._logger.info(f"Path to target position: {self._target.relative_position} cannot be found from {self._transform_readonly.position}")
-
-
-        await self._animal.set_state(IdleState())
-
-    async def _kill(self):
-       await self._brain_interactions_handler.emit_kill_decision(self._target.id)
-
     def _is_target_in_range(self):
-        if self._target.relative_position.distance_to(Position(0,0)) <= self._range:
+        if self._target.position.distance_to(Position(0, 0)) <= self._range:
             return True
         return False
 
 
-    def _plan_path_to_target(self) -> list[Direction]:
-        destination = (
-            self._target.relative_position if self._target.is_visible
-            else self._target.last_seen_position
-        )
-        return self._path_planner.find_shortest_path(destination)
 
 
     def kill_itself(self):

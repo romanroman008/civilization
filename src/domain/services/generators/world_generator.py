@@ -67,7 +67,7 @@ class WorldGenerator:
                                            world_interactions_validator_protocol,
                                            id_registry,
                                            self.event_bus)
-       # world = self._generate_plants(world)
+        world_facade = self._generate_plants(world_facade)
         world_facade = self._generate_animals(world_facade)
         world_facade = self._generate_humans(world_facade)
         world_snapshot_adapter = WorldSnapshotAdapter(world_state_service, world_map)

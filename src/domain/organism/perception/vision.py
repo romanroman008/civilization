@@ -1,3 +1,5 @@
+from typing import Optional
+
 from codetiming import Timer
 
 from domain.components.position import Position
@@ -50,10 +52,28 @@ class Vision:
                 target.update()
                 return target
             perception = self._perception
-            target.update(Position(perception.xs[i], perception.ys[i
-            ]))
+            target.update(Position(perception.xs[i], perception.ys[i]), (perception.offsets_x[i], perception.offsets_y[i]))
             return target
         return None
+
+
+    def get_animals_in_given_distance(self, required_distance: int = 2):
+        perception = self._perception
+        position = self._transform.position
+        get_organism_group = self._id_registry.get_organism_group_from_id
+        decode = self._id_registry.decode_object
+        for i in range(len(perception.xs)):
+            if perception.organisms_id[i] == 0:
+                continue
+            group_name = get_organism_group(perception.organisms[i])
+            if group_name == "animal":
+                distance = (abs(position.x - (perception.xs[i] + perception.offsets_x[i] / 100))
+                            + abs(position.y - (perception.ys[i] + perception.offsets_y[i] / 100)))
+                if distance <= required_distance:
+                    yield OrganismID(decode(perception.organisms[i]), perception.organisms_id[i])
+
+
+
 
     def get_index_by_id(self, organism_id:OrganismID):
         perception = self._perception
@@ -95,8 +115,11 @@ class Vision:
         return available_positions
 
 
-    def get_possible_move_positions(self) -> list[Position]:
-        neighbours = self._transform.position.neighbors()
+    def get_possible_move_positions(self, anchor: Position = None) -> list[Position]:
+        if anchor:
+            neighbours = anchor.neighbors()
+        else:
+            neighbours = self._transform.position.neighbors()
         possible_moves = []
         terrain_ids = self._available_terrain_ids
         append = possible_moves.append
@@ -112,30 +135,64 @@ class Vision:
 
         return possible_moves
 
+    def get_neighbours_with_allowed_terrains(self, position: Position) -> list[Position]:
+        neighbours = position.neighbors()
+        possible_moves = []
+        terrain_ids = self._available_terrain_ids
+        append = possible_moves.append
+        perception = self._perception
+        pos_to_idx = self._pos_to_idx
 
-    def detect_closest_animal(self):
+        for neighbour in neighbours:
+            i = pos_to_idx.get((neighbour.x, neighbour.y))
+            if i is None:
+                continue
+            if perception.terrains[i] in terrain_ids:
+                append(Position(self._perception.xs[i], self._perception.ys[i]))
+
+        return possible_moves
+
+
+
+    def detect_closest_alive_animal(self) -> Optional[TargetInfo]:
         animals_indexes = self.get_animals_indexes()
         perception = self._perception
         min_distance = 2 * self._range
         x, y = self._transform.position.x, self._transform.position.y
         current = -1
         for i in animals_indexes:
+            if perception.organisms_alive[i] == 0:
+                continue
             d = abs(perception.xs[i] - x) + abs(perception.ys[i] - y)
             if d < min_distance:
                 min_distance = d
                 current = i
+        if current == -1:
+            return None
 
-        #zwroc perceived_obj
+        position = Position(perception.xs[current], perception.ys[current])
+        id = perception.organisms_id[current]
+        organism_kind = self._id_registry.decode_object(perception.organisms[current])
+        is_alive = bool(perception.organisms_alive[current])
+        return TargetInfo(OrganismID(organism_kind, id),position, (perception.offsets_x[current], perception.offsets_y[current]), is_alive)
+
+
 
     def get_animals_indexes(self):
-        animal_id = self._id_registry.code_group("animal")
         perception = self._perception
-        result: list[int] = []
-        append = result.append
+        indexes = []
+        append = indexes.append
+        get_organism_group = self._id_registry.get_organism_group_from_id
         for i in range(len(perception.xs)):
-            if perception.groups[i] == animal_id:
-                append(i)
-        return result
+            if perception.organisms_id[i] == 0:
+                continue
+            group_name = get_organism_group(perception.organisms[i])
+            if group_name == "animal":
+               append(i)
+
+        return indexes
+
+
 
 
     def get_available_move_positions(self, allowed_terrains: list[Terrain]) -> list[Position]:

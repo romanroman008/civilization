@@ -42,9 +42,11 @@ class WorldInteractionsHandler:
 
         if self.world_interactions_validator.is_kill_allowed(killer_id, victim_id):
             self._notify_organism_death(victim_id)
+            self._world_state_service.register_organism_death(victim_id)
             return True
         else:
             return False
+
 
 
     def _notify_organism_death(self, organism_id: OrganismID):

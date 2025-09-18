@@ -35,6 +35,7 @@ class AnimalsGenerator:
 
             i = 0
             for position in approved_positions:
+               # position = Position(3,5)
                 animal = self._animal_factory.create(prefab, position)
                 world_facade.add_organism(animal)
                 i += 1

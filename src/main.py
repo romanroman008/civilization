@@ -20,7 +20,15 @@ def init_db():
     # Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
 
+def create_game():
+    logger = get_logger("civilization")
 
+    world_generator = create_world_generator(logger)
+    world_facade, world_snapshot_adapter = world_generator.create_world_facade_and_its_adapter(CONFIG["map_width"],
+                                                                                               CONFIG["map_height"],
+                                                                                               CONFIG["scale"])
+
+    run_game(world_facade, world_snapshot_adapter)
 
 def main():
     logger = get_logger("civilization")
@@ -46,13 +54,8 @@ def main():
     #
     # # show_layer(create_terrain_layer(world))
 
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
 
-    import threading
-    threading.Thread(target=loop.run_forever, daemon=True).start()
-
-    asyncio.run(run_game(world_facade, world_snapshot_adapter))
+    run_game(world_facade, world_snapshot_adapter)
 
 
 

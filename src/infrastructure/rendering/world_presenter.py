@@ -34,13 +34,13 @@ TILE_COLORS_RGB = {
 }
 
 sprite_assets = {
-    1: SpriteAsset("Grass", "assets/terrain/grass.png", (1,1), (0,0), 0),
-    2: SpriteAsset("Water", "assets/terrain/water.png", (1,1), (0,0), 0),
-    3: SpriteAsset("Tree", "assets/plants/tree.png", (3, 3), (1, 1), 2),
+    1:SpriteAsset("Grass", "assets/terrain/grass.png", (1,1), (0,0), 0),
+    2:SpriteAsset("Water", "assets/terrain/water.png", (1,1), (0,0), 0),
+    3:SpriteAsset("Tree", "assets/plants/tree.png", (3, 3), (1, 1), 2),
     4:SpriteAsset("Berry", "assets/plants/berry.png", (1, 1), (0, 0), 1),
     5:SpriteAsset("Rabbit", "assets/animals/rabbit.png", (1, 1), (0, 0), 2),
-    "RABBIT_DEAD": SpriteAsset("Dead rabbit", "assets/animals/rabbit_dead.png", (1, 1), (0, 0), 2),
-    6:SpriteAsset("Human", "assets/human/human.png", (1, 1), (0, 0), 2),
+    6:SpriteAsset("Dead rabbit", "assets/animals/rabbit_dead.png", (1, 1), (0, 0), 2),
+    7:SpriteAsset("Human", "assets/human/human.png", (1, 1), (0, 0), 2),
     "RESERVED": SpriteAsset("reserved", "assets/terrain/reserved.png", (1, 1), (0, 0), 0),
     "OCCUPIED": SpriteAsset("occupied", "assets/terrain/occupied.png", (1, 1), (0, 0), 0),
 
@@ -115,7 +115,7 @@ class WorldPresenter:
         xs, ys = organism_soa.xs, organism_soa.ys
         offxs, offys = organism_soa.offset_xs, organism_soa.offset_ys
         rots = organism_soa.rots
-        sprites, alives = organism_soa.sprites, organism_soa.alives
+        sprites, alives = organism_soa.sprites, organism_soa.dead
         blit = self.surface.blit
         tile_size = self.tile_size
         camera_offset_x, camera_offset_y = self.camera.offset_x, self.camera.offset_y
@@ -138,7 +138,7 @@ class WorldPresenter:
         xs, ys = organism_soa.xs, organism_soa.ys
         offxs, offys = organism_soa.offset_xs, organism_soa.offset_ys
         rots = organism_soa.rots
-        sprites, alives = organism_soa.sprites, organism_soa.alives
+        sprites, deads = organism_soa.sprites, organism_soa.dead
         blit = self.surface.blit
         tile_size = self.tile_size
         camera_offset_x, camera_offset_y = self.camera.offset_x, self.camera.offset_y
@@ -146,13 +146,23 @@ class WorldPresenter:
 
         offset_indicator = tile_size / OFFSET_TO_POSITION_RATIO
 
+        for i in range(n):
+            if deads[i] == 1:
+                source = sprite_assets[sprites[i] + deads[i]].image
+                px = xs[i] * tile_size + offxs[i] * offset_indicator - camera_offset_x
+                py = ys[i] * tile_size + offys[i] * offset_indicator - camera_offset_y
+                rotated = pygame.transform.rotate(source, -rots[i])
+                blit(rotated, (int(px), int(py)))
+
 
         for i in range(n):
-            source = sprite_assets[sprites[i]].image
-            px = xs[i] * tile_size + offxs[i] * offset_indicator - camera_offset_x
-            py = ys[i] * tile_size + offys[i] * offset_indicator - camera_offset_y
-            rotated = pygame.transform.rotate(source, -rots[i])
-            blit(rotated, (int(px), int(py)))
+            if deads[i] == 0:
+                source = sprite_assets[sprites[i] + deads[i]].image
+                px = xs[i] * tile_size + offxs[i] * offset_indicator - camera_offset_x
+                py = ys[i] * tile_size + offys[i] * offset_indicator - camera_offset_y
+                rotated = pygame.transform.rotate(source, -rots[i])
+                blit(rotated, (int(px), int(py)))
+
 
 
 

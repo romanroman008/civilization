@@ -31,12 +31,10 @@ class WorldRenderer:
     def __init__(self,
                  surface: pygame.Surface,
                  camera: Camera,
-                 chunk_size: int = 16,
                  tile_size: int = 32):
         self.surface = surface
         self.world_presenter:WorldPresenter = WorldPresenter(surface, tile_size, camera)
         self.camera = camera
-        self.chunk_size = chunk_size
         self.tile_size = tile_size
 
         self._visible_indexes = array("I")
@@ -50,14 +48,6 @@ class WorldRenderer:
         self.world_presenter.blit_map_surface_camera_view()
         self.world_presenter.present_organisms_effectively(world_frame_snapshot.organisms)
 
-        # tiles = world_frame_snapshot.tiles
-        # n_1 = len(tiles.xs)
-        # organisms = world_frame_snapshot.organisms
-        # n_2 = len(organisms.xs)
-        #
-        #
-        # self.world_presenter.present_tiles_effectively(world_frame_snapshot.tiles)
-        # self.world_presenter.present_organisms_effectively(world_frame_snapshot.organisms)
 
 
     def _get_indexes_in_viewport(self, tile_soa: TileSoA) -> array:

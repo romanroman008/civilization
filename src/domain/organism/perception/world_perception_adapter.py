@@ -12,9 +12,11 @@ from shared.id_registry import IdRegistry
 class _PerceptionBuffer:
 
     __slots__ = ("_xs", "_ys", "_terrains","_allowed",
-                 "_organisms", "_organism_ids",
+                 "_organisms", "_organism_ids", "_organisms_alive",
+                 "_offsets_x", "_offsets_y",
                  "append_xs", "append_ys", "append_terrains", "append_allowed",
-                 "append_organisms", "append_organism_ids")
+                 "append_organisms", "append_organism_ids", "append_organisms_alive",
+                 "append_offsets_x", "append_offsets_y",)
 
     def __init__(self):
         self._xs = array("I")
@@ -23,6 +25,9 @@ class _PerceptionBuffer:
         self._allowed = array("B")
         self._organisms = array("H")
         self._organism_ids = array("I")
+        self._organisms_alive = array("B")
+        self._offsets_x = array("b")
+        self._offsets_y = array("b")
         self._bind_appends()
 
 
@@ -32,17 +37,21 @@ class _PerceptionBuffer:
         self.append_terrains = self._terrains.append
         self.append_allowed = self._allowed.append
         self.append_organisms = self._organisms.append
-
         self.append_organism_ids = self._organism_ids.append
+        self.append_organisms_alive = self._organisms_alive.append
+        self.append_offsets_x = self._offsets_x.append
+        self.append_offsets_y = self._offsets_y.append
 
 
     def clear(self):
         del self._xs[:]; del self._ys[:]; del self._terrains[:]; del self._allowed[:]
-        del self._organisms[:]; del self._organism_ids[:]
+        del self._organisms[:]; del self._organism_ids[:]; del self._organisms_alive[:]
+        del self._offsets_x[:]; del self._offsets_y[:]
 
     def soa(self):
         return Perception(xs = self._xs, ys = self._ys, terrains = self._terrains, allowed = self._allowed,
-                          organisms=self._organisms, organisms_id=self._organism_ids)
+                          organisms=self._organisms, organisms_id=self._organism_ids, organisms_alive=self._organisms_alive,
+                          offsets_x = self._offsets_x, offsets_y = self._offsets_y)
 
 
 
@@ -77,6 +86,8 @@ class WorldPerceptionAdapter(WorldPerceptionAdapterProtocol):
 
         append_xs, append_ys, append_terrains, append_allowed = pb.append_xs, pb.append_ys, pb.append_terrains, pb.append_allowed
         append_organisms, append_organism_ids = pb.append_organisms, pb.append_organism_ids
+        append_organism_alive = pb.append_organisms_alive
+        append_offsets_x, append_offsets_y = pb.append_offsets_x, pb.append_offsets_y
 
         get_terrain = self._world_map.get_terrain_at_position
         get_organism = self._world_state_service.get_organism_at_position
@@ -93,10 +104,18 @@ class WorldPerceptionAdapter(WorldPerceptionAdapterProtocol):
             if not organism:
                 append_organisms(0)
                 append_organism_ids(0)
+                append_organism_alive(0)
+                append_offsets_x(0)
+                append_offsets_y(0)
+
             else:
                 organism_id = organism.id
                 append_organisms(code(organism.sprite_key))
                 append_organism_ids(organism_id.id)
+                append_organism_alive(int(organism.is_alive))
+                append_offsets_x(int(organism.offset_x))
+                append_offsets_y(int(organism.offset_y))
+
             append_allowed(is_allowed((x,y)))
 
 

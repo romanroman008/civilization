@@ -9,7 +9,7 @@ SPRITE_IDS_DICTIONARY = {
     "TREE": 3,
     "BERRIES": 4,
     "RABBIT": 5,
-    "HUMAN": 6,
+    "HUMAN": 7,
 }
 
 KIND_DICTIONARY= {
@@ -27,7 +27,7 @@ def get_sprite_id(sprite_name):
     return SPRITE_IDS_DICTIONARY[sprite_name.upper()]
 
 def get_alive_val(is_alive:bool):
-    return 1 if is_alive else 0
+    return 0 if is_alive else 1
 
 
 def render_uid(kind_id: int, organism_id: int) -> int:

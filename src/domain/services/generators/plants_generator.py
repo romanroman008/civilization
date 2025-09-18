@@ -3,7 +3,7 @@ import random
 
 from domain.components.position import Position
 from domain.organism.factory.plant_factory import PlantFactory
-from domain.organism.instances.plant import Plant
+
 from domain.organism.prefabs.plant_prefab import PlantPrefab
 from domain.world_map.world_facade import WorldFacade
 
@@ -22,10 +22,16 @@ class PlantsGenerator:
         self._world_facade = world_facade
         self._plant_factory = PlantFactory(world_facade.event_bus)
 
-        for plant_pref, fraction   in self._species_distribution:
+        count = self._count
+
+        for plant_pref, fraction in self._species_distribution:
+            if count <= 0:
+                break
+
             amount = int(fraction * self._count)
             available_positions = self._get_valid_positions(world_facade.height, world_facade.width, plant_pref)
             approved_positions = self._get_random_positions_with_blocking(available_positions, plant_pref, amount)
+            count -= 1
 
 
             for position in approved_positions:

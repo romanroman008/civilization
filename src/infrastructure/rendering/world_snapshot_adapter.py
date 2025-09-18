@@ -62,7 +62,7 @@ class _OrganismBuffer:
         return OrganismSoA(ids=self._ids, sprites=self._sprites,
                            xs=self._xs, ys=self._ys,
                            offset_xs=self._offset_xs, offset_ys=self._offset_ys, rots=self._rots,
-                           alives=self._alives)
+                           dead=self._alives)
 
 
 class _TileBuffer:
@@ -149,7 +149,7 @@ class WorldSnapshotAdapter:
         aalive = tb.append_alive
 
         for organism in self._world_state_service.get_all_organisms():
-            aid(render_uid(kind_id=get_kind_id(organism.id.kind), organism_id=organism.id.id))
+            aid(render_uid(kind_id=get_sprite_id(organism.id.kind), organism_id=organism.id.id))
             ax(organism.x); ay(organism.y)
             aoffx(organism.offset_x); aoffy(organism.offset_y)
             arot(organism.rotation)

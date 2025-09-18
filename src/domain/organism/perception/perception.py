@@ -12,3 +12,6 @@ class Perception:
     organisms: array
     allowed: array
     organisms_id: array
+    organisms_alive: array
+    offsets_x: array
+    offsets_y: array

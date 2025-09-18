@@ -23,6 +23,7 @@ ACTION_KEYS = {
     pygame.K_DOWN: "down",
     pygame.K_LEFT: "left",
     pygame.K_RIGHT: "right",
+    pygame.K_ESCAPE: "pause",
 }
 
 class Keyboard:
@@ -51,8 +52,10 @@ class Keyboard:
         self._latest_action = None
         return action
 
-    def handle_event(self, event: pygame.event.Event):
+    def handle_event(self, event: pygame.event.Event) -> bool:
         if event.type == pygame.KEYDOWN:
             action = ACTION_KEYS.get(event.key)
             if action:
                 self._latest_action = action
+                return True
+        return False

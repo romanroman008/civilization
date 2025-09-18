@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Dict, Set, Optional, Sequence, Tuple, Iterator
+from typing import Dict, Set, Optional, Sequence, Tuple, Iterator, cast
 
 from domain.components.position import Position
 
@@ -34,6 +34,20 @@ class WorldStateService:
         self._occupied[position] = organism_id
         self._id_to_organism[organism_id] = organism
 
+    def register_organism_death(self, organism_id: OrganismID):
+        actual_position = self._organisms_to_occupied.get(organism_id, None)
+        reserved_position = self._organisms_to_reserved.pop(organism_id, None)
+        self._occupied.pop(actual_position, None)
+        self._reserved.pop(reserved_position, None)
+
+
+    def unregister_organism(self, organism_id: OrganismID):
+        organism = self._id_to_organism.pop(organism_id, None)
+        if organism:
+            position = organism.position
+            self._organisms_to_occupied.pop(organism_id, None)
+            self._occupied.pop(position, None)
+
     def get_organism_by_id(self, organism_id: OrganismID) -> Optional[Organism]:
         return self._id_to_organism[organism_id]
 
@@ -61,7 +75,7 @@ class WorldStateService:
         organism_id = self._occupied.get(position)
         if not organism_id:
             return None
-        return self._id_to_organism[organism_id]
+        return self._id_to_organism.get(organism_id, None)
 
 
     def get_organisms_at_positions(self, positions: list[Position]):
@@ -101,9 +115,9 @@ class WorldStateService:
 
 
     def get_example_agent(self) -> Optional[Human]:
-        for organism in self._organisms_to_occupied:
-            if isinstance(organism, Human):
-                return organism
+        for organism_id in self._organisms_to_occupied:
+            if organism_id.kind == "HUMAN":
+                return cast(Human,self._id_to_organism[organism_id])
         return None
 
 
