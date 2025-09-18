@@ -1,4 +1,4 @@
-# 🌍 Digital Civilization Simulator
+# 🌍 Digital Civilization Simulator (wannabe)
 
 The program generates a two-dimensional elevation grid using Perlin noise. This grid is then converted into individual tiles – currently, only two types are available: water and land.
 
