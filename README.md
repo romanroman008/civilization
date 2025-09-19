@@ -22,3 +22,8 @@ Organism movement consists of a sequence of actions executed step by step across
 
 The project was originally intended to be much more ambitious – I planned to observe interactions between agents, assign them a set of traits and life parameters. However, I underestimated the time required to build a game engine and did not fully account for performance challenges. In practice, it became a constant struggle between code readability and efficiency. For this reason, I decided to conclude the project at its current stage.
 
+
+
+![DEMO_GIF](https://github.com/user-attachments/assets/26879ab6-2c3b-40cb-9331-183423219917)
+
+
