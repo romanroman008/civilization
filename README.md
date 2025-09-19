@@ -24,6 +24,4 @@ The project was originally intended to be much more ambitious – I planned to o
 
 
 
-![DEMO_GIF](https://github.com/user-attachments/assets/26879ab6-2c3b-40cb-9331-183423219917)
-
-
+![DEMO](https://github.com/user-attachments/assets/437c7bbf-7313-46e5-969b-d2213efba55f)
